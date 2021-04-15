@@ -163,7 +163,7 @@
       </layout>
      </item>
      <item>
-      <widget class="Gradient" name="gradient" native="true">
+      <widget class="BackgroundApplier" name="backgroundApplier" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
          <horstretch>0</horstretch>
@@ -184,12 +184,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>Gradient</class>
-   <extends>QWidget</extends>
-   <header>Gradient.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>Grid</class>
    <extends>QWidget</extends>
    <header>Grid.h</header>
@@ -205,6 +199,12 @@
    <class>ItemOptions</class>
    <extends>QWidget</extends>
    <header>ItemOptions.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BackgroundApplier</class>
+   <extends>QWidget</extends>
+   <header location="global">BackgroundApplier.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -53,6 +53,7 @@ INCLUDEPATH +=                                                                  
 
 HEADERS +=                                                                                      \
     OpenRGBVisualMapPlugin.h                                                                    \
+    ui/BackgroundApplier.h \
     ui/OpenRGBVisualMapTab.h \
     VisualMapSettingsManager.h \
     ZoneManager.h \
@@ -61,18 +62,17 @@ HEADERS +=                                                                      
     ui/ItemOptions.h \
     VisualMapJsonDefinitions.h \
     Dependencies/HSV/hsv.h                                                                      \
-    Dependencies/ColorWheel/ColorWheel.h                                                        \
-    ui/Gradient.h
+    Dependencies/ColorWheel/ColorWheel.h
 
 
 SOURCES +=                                                                                      \
     OpenRGBVisualMapPlugin.cpp                                                                  \
     VisualMapSettingsManager.cpp \
     ZoneManager.cpp \
+    ui/BackgroundApplier.cpp \
     ui/ColorPicker.cpp \
     ui/ColorStop.cpp \
     ui/ControllerZoneItem.cpp \
-    ui/Gradient.cpp \
     ui/Grid.cpp                                                                                 \
     ui/GridOptions.cpp \
     ui/ItemOptions.cpp \
@@ -83,9 +83,9 @@ SOURCES +=                                                                      
 
 
 FORMS +=                                                                                        \
+    ui/BackgroundApplier.ui \
     ui/ColorPicker.ui \
     ui/ColorStop.ui \
-    ui/Gradient.ui \
     ui/GridOptions.ui \
     ui/ItemOptions.ui \
     ui/OpenRGBVisualMapTab.ui

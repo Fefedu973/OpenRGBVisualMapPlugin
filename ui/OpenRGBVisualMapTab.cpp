@@ -12,13 +12,12 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     ui->setupUi(this);
     ui->itemOptions->hide();
 
-
     InitZoneList();
 
-    ui->gradient->SetSize(ui->grid->GetWidth(), ui->grid->GetHeight());
+    ui->backgroundApplier->SetSize(ui->grid->GetWidth(), ui->grid->GetHeight());
 
     connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
-    connect(ui->gradient, SIGNAL(GradientApplied(QImage*)), this, SLOT(OnGradientApplied(QImage*)));
+    connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
     connect(ui->zoneList->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(OnZoneSelectionChanged()));
 
     connect(ui->grid, &Grid::ItemSelected, [=](int idx){
@@ -31,7 +30,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     connect(ui->gridOptions, &GridOptions::OptionsChanged, [=](GridSettings settings){
         ui->grid->SetSettings(settings);
-        ui->gradient->SetSize(settings.w,settings.h);
+        ui->backgroundApplier->SetSize(settings.w,settings.h);
     });
 }
 
@@ -205,7 +204,7 @@ void OpenRGBVisualMapTab::UpdateZoneButtons()
 }
 
 
-void OpenRGBVisualMapTab::OnGradientApplied(QImage* image)
+void OpenRGBVisualMapTab::OnBackgroundApplied(QImage* image)
 {
     ui->grid->UpdatePreview(image);
 

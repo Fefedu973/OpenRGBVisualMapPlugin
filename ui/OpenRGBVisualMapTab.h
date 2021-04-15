@@ -12,7 +12,7 @@
 #include "Grid.h"
 #include "GridOptions.h"
 #include "ItemOptions.h"
-#include "Gradient.h"
+#include "BackgroundApplier.h"
 
 namespace Ui {
 class OpenRGBVisualMapTab;
@@ -29,7 +29,7 @@ public:
 private slots:
     void OnZoneSelectionChanged();
     void OnItemOptionsChanged();
-    void OnGradientApplied(QImage*);
+    void OnBackgroundApplied(QImage*);
 
     void on_saveButton_clicked();
     void on_loadButton_clicked();

@@ -1,5 +1,5 @@
-#ifndef GRADIENT_H
-#define GRADIENT_H
+#ifndef BACKGROUNDAPPLIER_H
+#define BACKGROUNDAPPLIER_H
 
 #include "ColorStop.h"
 #include <QWidget>
@@ -9,18 +9,18 @@ class Gradient;
 }
 
 
-class Gradient : public QWidget
+class BackgroundApplier : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Gradient(QWidget *parent = nullptr);
-    ~Gradient();
+    explicit BackgroundApplier(QWidget *parent = nullptr);
+    ~BackgroundApplier();
 
     void SetSize(int,int);
 
 signals:
-    void GradientApplied(QImage*) const;
+    void BackgroundApplied(QImage*) const;
 
 private slots:
     void on_presets_comboBox_currentIndexChanged(int);
@@ -407,4 +407,4 @@ private:
 
 };
 
-#endif // GRADIENT_H
+#endif // BACKGROUNDAPPLIER_H

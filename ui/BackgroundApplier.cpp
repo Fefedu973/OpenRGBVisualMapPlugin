@@ -1,7 +1,7 @@
 #include "ZoneManager.h"
-#include "Gradient.h"
+#include "BackgroundApplier.h"
 #include "ColorStop.h"
-#include "ui_Gradient.h"
+#include "ui_BackgroundApplier.h"
 
 #include "math.h"
 #include <QImage>
@@ -14,7 +14,7 @@
 #include <QGradientStops>
 #include <QFileDialog>
 
-Gradient::Gradient(QWidget *parent) :
+BackgroundApplier::BackgroundApplier(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Gradient)
 {
@@ -40,46 +40,46 @@ Gradient::Gradient(QWidget *parent) :
     }
 }
 
-Gradient::~Gradient()
+BackgroundApplier::~BackgroundApplier()
 {
     delete ui;
 }
 
-void  Gradient::SetSize(int w_value ,int h_value)
+void  BackgroundApplier::SetSize(int w_value ,int h_value)
 {
     w = w_value;
     h = h_value;
 }
 
-void Gradient::on_presets_comboBox_currentIndexChanged(int idx)
+void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int idx)
 {
     preset = presets[idx];
     ApplyPreset();
 }
 
-void Gradient::on_apply_custom_button_clicked()
+void BackgroundApplier::on_apply_custom_button_clicked()
 {
     ApplyCustom();
 }
 
-void Gradient::on_apply_preset_button_clicked()
+void BackgroundApplier::on_apply_preset_button_clicked()
 {
     ApplyPreset();
 }
 
-void Gradient::on_choose_image_button_clicked()
+void BackgroundApplier::on_choose_image_button_clicked()
 {
     OpenFileDialog();
 }
 
-void Gradient::on_add_color_stop_button_clicked()
+void BackgroundApplier::on_add_color_stop_button_clicked()
 {
     ColorStop* item = new ColorStop;
     color_stops.push_back(item);
     ui->color_stops->layout()->addWidget(item);
 }
 
-void Gradient::ApplyPreset()
+void BackgroundApplier::ApplyPreset()
 {
     image = new QImage(w, h, QImage::Format_RGB32);
     preset = presets[ui->presets_comboBox->currentIndex()];
@@ -92,12 +92,12 @@ void Gradient::ApplyPreset()
     QPainter* painter = new QPainter(image);
     painter->fillRect(rect, brush);
 
-    emit GradientApplied(image);
+    emit BackgroundApplied(image);
 }
 
 
 
-void Gradient::ApplyCustom()
+void BackgroundApplier::ApplyCustom()
 {
 
 //    QGradient::PadSpread	0	The area is filled with the closest stop color. This is the default.
@@ -128,10 +128,10 @@ void Gradient::ApplyCustom()
     QPainter* painter = new QPainter(image);
     painter->fillRect(rect, brush);
 
-    emit GradientApplied(image);
+    emit BackgroundApplied(image);
 }
 
-QBrush Gradient::ApplyLinearGradient(QGradientStops stops, QGradient::Spread spread)
+QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::Spread spread)
 {
     int angle = ui->rotate->value();
 
@@ -146,7 +146,7 @@ QBrush Gradient::ApplyLinearGradient(QGradientStops stops, QGradient::Spread spr
     return QBrush(grad);
 }
 
-QBrush Gradient::ApplyRadialGradient(QGradientStops stops, QGradient::Spread spread)
+QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::Spread spread)
 {
     int angle = ui->rotate->value();
     float radius = sqrt(h*h + w*w) / 2;
@@ -159,7 +159,7 @@ QBrush Gradient::ApplyRadialGradient(QGradientStops stops, QGradient::Spread spr
     return QBrush(grad);
 }
 
-QBrush Gradient::ApplyConicalGradient(QGradientStops stops, QGradient::Spread spread)
+QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::Spread spread)
 {
     int angle = ui->rotate->value();
 
@@ -171,7 +171,7 @@ QBrush Gradient::ApplyConicalGradient(QGradientStops stops, QGradient::Spread sp
     return QBrush(grad);
 }
 
-QPointF Gradient::EdgeOfView(int deg) {
+QPointF BackgroundApplier::EdgeOfView(int deg) {
 
   float PI = 3.14159265359;
   float twoPI = PI*2;
@@ -202,8 +202,8 @@ QPointF Gradient::EdgeOfView(int deg) {
 
   QPointF edgePoint(w/2, h/2);
 
-  int xFactor = 1.01;
-  int yFactor = 1.01;
+  float xFactor = 1.01;
+  float yFactor = 1.01;
 
   switch (region) {
     case 1: yFactor = -1.01; break;
@@ -224,7 +224,7 @@ QPointF Gradient::EdgeOfView(int deg) {
 };
 
 
-void Gradient::OpenFileDialog()
+void BackgroundApplier::OpenFileDialog()
 {
 
 //    QWidget *parent = nullptr,
@@ -240,7 +240,7 @@ void Gradient::OpenFileDialog()
     QImage user_image;
     user_image.load(fileName);
     QImage scaled_image = user_image.scaled(w, h, Qt::IgnoreAspectRatio);
-    emit GradientApplied(&scaled_image);
+    emit BackgroundApplied(&scaled_image);
 }
 
 
