@@ -88,6 +88,7 @@ void Grid::ResetItems()
         });
 
         connect(item, &ControllerZoneItem::Moved, [=](){
+            item->Restrict(w,h);
             emit ItemMoved(i);
         });
     }

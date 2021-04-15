@@ -77,9 +77,6 @@ void ControllerZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     emit Moved();
 
-    ctrl_zone->settings.x = x();
-    ctrl_zone->settings.y = y();
-
     update();
 
     QGraphicsItem::mouseReleaseEvent(event);    
@@ -99,3 +96,20 @@ void ControllerZoneItem::ControllerZoneItem::SetSelected(bool value)
 {
     selected = value;
 }
+
+
+void ControllerZoneItem::Restrict(int w, int h)
+{
+    // restrict to 0 - 0
+    int new_x = std::min<int>(std::max<int>(0,x()), w);
+    int new_y = std::min<int>(std::max<int>(0,y()), h);
+
+    setX(new_x);
+    setY(new_y);
+
+    ctrl_zone->settings.x = new_x;
+    ctrl_zone->settings.y = new_y;
+
+    // todo : check if the shape is inside the bounds
+}
+

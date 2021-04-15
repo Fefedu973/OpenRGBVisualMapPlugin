@@ -24,6 +24,8 @@ public:
 
     void SetSelected(bool);
 
+    void Restrict(int,int);
+
 signals:
     void Selected();
     void Moved();
