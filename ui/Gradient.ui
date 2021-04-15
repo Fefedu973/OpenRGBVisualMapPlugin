@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>961</width>
-    <height>511</height>
+    <height>253</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,25 +31,31 @@
      <x>0</x>
      <y>0</y>
      <width>941</width>
-     <height>501</height>
+     <height>4002</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="3,0">
+   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
     <property name="sizeConstraint">
-     <enum>QLayout::SetMaximumSize</enum>
+     <enum>QLayout::SetMinimumSize</enum>
     </property>
-    <item>
+    <item alignment="Qt::AlignTop">
      <widget class="QTabWidget" name="tabs">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>400</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>200</height>
+        <height>16777215</height>
        </size>
       </property>
       <property name="currentIndex">
@@ -57,7 +63,7 @@
       </property>
       <widget class="QWidget" name="custom_tab">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -71,12 +77,12 @@
           <x>0</x>
           <y>10</y>
           <width>931</width>
-          <height>151</height>
+          <height>205</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,5,0">
          <item>
-          <layout class="QVBoxLayout" name="custom_layout" stretch="1,0,1,1,0,1">
+          <layout class="QVBoxLayout" name="custom_layout" stretch="1,1,1,1,1,5">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
@@ -151,7 +157,7 @@
            <item>
             <widget class="QPushButton" name="add_color_stop_button">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -162,7 +168,20 @@
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_3">
+            <widget class="QPushButton" name="apply_custom_button">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Apply</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -173,13 +192,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="apply_custom_button">
-             <property name="text">
-              <string>Apply</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </item>
@@ -200,7 +212,7 @@
               <x>0</x>
               <y>0</y>
               <width>717</width>
-              <height>147</height>
+              <height>201</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -298,19 +310,6 @@
        </widget>
       </widget>
      </widget>
-    </item>
-    <item>
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>
