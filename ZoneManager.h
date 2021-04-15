@@ -23,6 +23,12 @@ struct ControllerZoneSettings
     unsigned int y;
     unsigned int led_spacing;
     bool reverse;
+
+    static ControllerZoneSettings defaults() {
+        return {
+            ControllerZoneSettings::HORIZONTAL_LINE, 0, 0, 1, false
+        };
+    }
 };
 
 struct ControllerZone

@@ -6,7 +6,6 @@
 
 Grid::Grid(QWidget *parent) : QGraphicsView(parent)
 {
-
     setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     resize(w, h);

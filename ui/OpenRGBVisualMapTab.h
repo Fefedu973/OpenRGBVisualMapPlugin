@@ -33,6 +33,7 @@ private slots:
 
     void on_saveButton_clicked();
     void on_loadButton_clicked();
+    void on_resetButton_clicked();
 
 private:
     Ui::OpenRGBVisualMapTab*   ui;
@@ -41,6 +42,7 @@ private:
     QIcon remove_icon = QIcon(":/remove.png");
 
     void DecorateButton(QPushButton*, QIcon);
+    void UpdateZoneButtons();
     void InitZoneList();
     void resizeEvent(QResizeEvent*);
     void UpdateControllerZone(ControllerZone*,QImage*);

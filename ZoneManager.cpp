@@ -31,9 +31,7 @@ ZoneManager::ZoneManager()
 
                     ctrl_zone->controller = controllers[i];
                     ctrl_zone->zone_idx = zone_idx;
-                    ctrl_zone->settings = {
-                        ControllerZoneSettings::HORIZONTAL_LINE, 0, 0, 1, false
-                    };
+                    ctrl_zone->settings = ControllerZoneSettings::defaults();
 
                     available_zones.push_back(ctrl_zone);
                 }

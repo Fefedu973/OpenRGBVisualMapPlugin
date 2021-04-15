@@ -1,6 +1,7 @@
 #include "ControllerZoneItem.h"
 #include "math.h"
 #include <QString>
+#include <QCursor>
 
 ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone) :
    ctrl_zone(ctrl_zone)
@@ -14,6 +15,8 @@ ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone) :
         + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
+
+    setCursor(Qt::OpenHandCursor);
 }
 
 QRectF ControllerZoneItem::boundingRect() const
@@ -63,6 +66,8 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 void ControllerZoneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     pressed = true;
+    setCursor(Qt::ClosedHandCursor);
+
 
     emit Selected();
 
@@ -74,6 +79,7 @@ void ControllerZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     pressed = false;
     moving = false;
+    setCursor(Qt::OpenHandCursor);
 
     emit Moved();
 

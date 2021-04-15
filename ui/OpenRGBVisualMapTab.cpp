@@ -122,6 +122,21 @@ void OpenRGBVisualMapTab::OnItemOptionsChanged()
     ui->grid->UpdateItems();
 }
 
+void OpenRGBVisualMapTab::on_resetButton_clicked()
+{
+    ZoneManager::Get()->ClearZones();
+    ui->grid->ResetItems();
+    UpdateZoneButtons();
+
+    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
+
+    for(ControllerZone* ctrl_zone:ctrl_zones)
+    {
+        ctrl_zone->settings = ControllerZoneSettings::defaults();
+    }
+
+    ui->itemOptions->Update();
+}
 
 void OpenRGBVisualMapTab::on_saveButton_clicked()
 {
@@ -164,21 +179,29 @@ void OpenRGBVisualMapTab::on_loadButton_clicked()
             }
         }
 
-        for(unsigned int i = 0; i < available_zones.size(); i++)
-        {
-            QList<QPushButton *> buttons = ui->zoneList->cellWidget(i, 1)->findChildren<QPushButton *>();
-
-            if(buttons.size() == 1)
-            {
-                DecorateButton(buttons[0], ZoneManager::Get()->HasZone(i) ? remove_icon : add_icon);
-            }
-
-        }
     }
+
+    UpdateZoneButtons();
 
     ui->gridOptions->SetSettings(settings["grid_settings"]);
 
     ui->grid->ResetItems();
+}
+
+void OpenRGBVisualMapTab::UpdateZoneButtons()
+{
+    std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
+
+    for(unsigned int i = 0; i < available_zones.size(); i++)
+    {
+        QList<QPushButton *> buttons = ui->zoneList->cellWidget(i, 1)->findChildren<QPushButton *>();
+
+        if(buttons.size() == 1)
+        {
+            DecorateButton(buttons[0], ZoneManager::Get()->HasZone(i) ? remove_icon : add_icon);
+        }
+
+    }
 }
 
 
@@ -193,7 +216,6 @@ void OpenRGBVisualMapTab::OnGradientApplied(QImage* image)
         UpdateControllerZone(ctrl_zones[i], image);
     }
 }
-
 
 void OpenRGBVisualMapTab::UpdateControllerZone(ControllerZone* ctrl_zone, QImage* image)
 {
