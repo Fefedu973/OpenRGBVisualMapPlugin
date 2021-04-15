@@ -80,3 +80,45 @@ void ZoneManager::ClearZones()
 {
     added_zones.clear();
 }
+
+void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
+{
+
+    for(ControllerZone* ctrl_zone: available_zones)
+    {
+        SetControllerZoneColor(ctrl_zone, ctrl_zone == ctrl_zone_to_identify ? Qt::green : Qt::black);
+    }
+
+}
+
+void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color)
+{
+    RGBController* controller = ctrl_zone->controller;
+    zone z = controller->zones[ctrl_zone->zone_idx];
+    ControllerZoneSettings settings = ctrl_zone->settings;
+    int leds_count = z.leds_count;
+    int start_idx = z.start_idx;
+
+    for(int i = 0; i < leds_count; i++)
+    {
+        controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+    }
+
+    controller->UpdateLEDs();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

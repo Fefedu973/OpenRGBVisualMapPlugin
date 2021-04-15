@@ -77,3 +77,11 @@ void ItemOptions::on_reverse_checkBox_stateChanged(int state)
         emit ItemOptionsChanged();
     }
 }
+
+void ItemOptions::on_identifyButton_clicked()
+{
+    if(zone)
+    {
+        ZoneManager::Get()->IdentifyZone(zone);
+    }
+}

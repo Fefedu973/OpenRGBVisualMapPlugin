@@ -22,7 +22,7 @@
      <height>281</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,1,1,1,1">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1,1,1,0,1,1">
     <property name="spacing">
      <number>6</number>
     </property>
@@ -103,6 +103,13 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QPushButton" name="identifyButton">
+      <property name="text">
+       <string>Identify</string>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">

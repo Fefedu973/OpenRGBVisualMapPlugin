@@ -2,6 +2,7 @@
 #define ZONEMANAGER_H
 
 #include <QStringList>
+#include <QColor>
 #include "RGBController.h"
 
 struct ControllerZoneSettings
@@ -65,6 +66,9 @@ public:
     void AddZone(int);
     void RemoveZone(int);
     void ClearZones();
+
+    void IdentifyZone(ControllerZone*);
+    void SetControllerZoneColor(ControllerZone*, QColor);
 
 private:
     ZoneManager();

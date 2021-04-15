@@ -32,6 +32,8 @@ private slots:
     void on_led_spacing_spinBox_valueChanged(int);
     void on_shape_comboBox_currentIndexChanged(int);
     void on_reverse_checkBox_stateChanged(int);
+    void on_identifyButton_clicked();
+
 };
 
 #endif // ITEMOPTIONS_H
