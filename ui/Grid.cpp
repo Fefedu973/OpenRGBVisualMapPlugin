@@ -104,10 +104,7 @@ void Grid::SetSelected(int idx)
 
 void Grid::UpdateItems()
 {
-    for(unsigned int i = 0; i < ctrl_zone_items.size(); i++)
-    {
-        ctrl_zone_items[i]->update();
-    }
+    scene->update();
 }
 
 void Grid::UpdatePreview(QImage* image)
