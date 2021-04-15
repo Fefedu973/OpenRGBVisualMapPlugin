@@ -29,7 +29,7 @@ before_script:
     - add-apt-repository ppa:beineri/opt-qt-5.12.2-bionic
     - add-apt-repository ppa:ubuntu-toolchain-r/test
     - apt update
-    - apt install -y build-essential qt512-meta-full libusb-1.0-0-dev libhidapi-dev pkgconf wget git
+    - apt install -y build-essential qt5-qmake qt512-meta-full libusb-1.0-0-dev libhidapi-dev pkgconf wget git
     - apt install -y gcc-9 g++-9
     - rm /usr/bin/gcc
     - rm /usr/bin/g++
