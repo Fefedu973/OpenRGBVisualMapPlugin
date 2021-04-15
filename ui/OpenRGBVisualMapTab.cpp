@@ -10,10 +10,10 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     ui(new Ui::OpenRGBVisualMapTab)
 {
     ui->setupUi(this);
-    ui->itemOptions->hide();
 
     InitZoneList();
 
+    ui->itemOptions->hide();
     ui->backgroundApplier->SetSize(ui->grid->GetWidth(), ui->grid->GetHeight());
 
     connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
@@ -25,6 +25,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     });
 
     connect(ui->grid, &Grid::ItemMoved, [=](int){
+        OnBackgroundApplied(ui->backgroundApplier->GetImage());
         ui->itemOptions->Update();
     });
 
@@ -206,6 +207,11 @@ void OpenRGBVisualMapTab::UpdateZoneButtons()
 
 void OpenRGBVisualMapTab::OnBackgroundApplied(QImage* image)
 {
+    if(!image)
+    {
+        return;
+    }
+
     ui->grid->UpdatePreview(image);
 
     std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAddedZones();

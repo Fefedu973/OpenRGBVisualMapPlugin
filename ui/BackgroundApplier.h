@@ -19,6 +19,8 @@ public:
 
     void SetSize(int,int);
 
+    QImage* GetImage();
+
 signals:
     void BackgroundApplied(QImage*) const;
 

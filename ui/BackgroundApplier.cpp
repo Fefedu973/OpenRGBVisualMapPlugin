@@ -45,6 +45,11 @@ BackgroundApplier::~BackgroundApplier()
     delete ui;
 }
 
+QImage* BackgroundApplier::GetImage()
+{
+    return image;
+}
+
 void  BackgroundApplier::SetSize(int w_value ,int h_value)
 {
     w = w_value;
