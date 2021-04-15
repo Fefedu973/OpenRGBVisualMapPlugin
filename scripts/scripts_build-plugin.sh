@@ -4,8 +4,8 @@
 # OpenRGB E1.31 Receiver Plugin Build Script                            #
 #-----------------------------------------------------------------------#
 
-set -x
-set -e
+#set -x
+#set -e
 
 source /opt/qt512/bin/qt512-env.sh
 
