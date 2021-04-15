@@ -27,6 +27,7 @@ private slots:
     void on_apply_preset_button_clicked();    
     void on_add_color_stop_button_clicked();
     void on_apply_custom_button_clicked();
+    void on_choose_image_button_clicked();
 
 private:
     Ui::Gradient *ui;
@@ -39,8 +40,8 @@ private:
     std::vector<ColorStop*> color_stops;
 
     void ApplyPreset();
-
     void ApplyCustom();
+    void OpenFileDialog();
 
     QBrush ApplyLinearGradient(QGradientStops, QGradient::Spread);
     QBrush ApplyRadialGradient(QGradientStops, QGradient::Spread);

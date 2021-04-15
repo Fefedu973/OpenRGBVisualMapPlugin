@@ -12,6 +12,7 @@
 #include <QRadialGradient>
 #include <QConicalGradient>
 #include <QGradientStops>
+#include <QFileDialog>
 
 Gradient::Gradient(QWidget *parent) :
     QWidget(parent),
@@ -60,9 +61,15 @@ void Gradient::on_apply_custom_button_clicked()
 {
     ApplyCustom();
 }
+
 void Gradient::on_apply_preset_button_clicked()
 {
     ApplyPreset();
+}
+
+void Gradient::on_choose_image_button_clicked()
+{
+    OpenFileDialog();
 }
 
 void Gradient::on_add_color_stop_button_clicked()
@@ -217,7 +224,24 @@ QPointF Gradient::EdgeOfView(int deg) {
 };
 
 
+void Gradient::OpenFileDialog()
+{
 
+//    QWidget *parent = nullptr,
+//   const QString &caption = QString(),
+//   const QString &dir = QString(),
+//   const QString &filter = QString(),
+//   QString *selectedFilter = nullptr,
+//   Options options = Options());
+
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+
+    QImage user_image;
+    user_image.load(fileName);
+    QImage scaled_image = user_image.scaled(w, h, Qt::IgnoreAspectRatio);
+    emit GradientApplied(&scaled_image);
+}
 
 
 

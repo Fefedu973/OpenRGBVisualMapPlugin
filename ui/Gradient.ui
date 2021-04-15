@@ -309,6 +309,40 @@
         </layout>
        </widget>
       </widget>
+      <widget class="QWidget" name="file_tab">
+       <attribute name="title">
+        <string>File</string>
+       </attribute>
+       <widget class="QWidget" name="horizontalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>941</width>
+          <height>201</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QPushButton" name="choose_image_button">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Choose image file</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
