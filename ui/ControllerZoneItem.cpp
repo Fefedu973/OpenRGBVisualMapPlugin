@@ -27,8 +27,6 @@ QRectF ControllerZoneItem::boundingRect() const
         return QRectF(0, 0, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 2);
     case ControllerZoneSettings::VERTICAL_LINE :
         return QRectF(0, 0, 2, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
-    case ControllerZoneSettings::CIRCLE :
-        return QRectF(0, 0, ctrl_zone->led_count() / 4 , ctrl_zone->led_count() / 4);
     }
 
     return QRectF(0, 0, 1, 1);
@@ -58,8 +56,6 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         painter->fillRect(rect,brush);
     case ControllerZoneSettings::VERTICAL_LINE :
         painter->fillRect(rect, brush);
-    case ControllerZoneSettings::CIRCLE :
-        painter->drawEllipse(rect);
     }
 }
 

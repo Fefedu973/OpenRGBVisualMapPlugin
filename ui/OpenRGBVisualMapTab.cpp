@@ -244,13 +244,6 @@ void OpenRGBVisualMapTab::UpdateControllerZone(ControllerZone* ctrl_zone, QImage
             }
             break;
 
-        case ControllerZoneSettings::CIRCLE:
-            for(int i = 0; i < leds_count; i++)
-            {
-
-            }
-            break;
-
         default:break;
     }
 

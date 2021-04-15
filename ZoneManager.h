@@ -9,14 +9,12 @@ struct ControllerZoneSettings
 {
     inline static const QStringList ZONE_SHAPES = {
         "Horizontal line",
-        "Vertical line",
-        "Circle"
+        "Vertical line"
     };
 
     enum ZoneShape {
         HORIZONTAL_LINE = 0,
-        VERTICAL_LINE = 1,
-        CIRCLE = 2
+        VERTICAL_LINE = 1
     };
 
     ZoneShape shape;
