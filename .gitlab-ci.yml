@@ -29,8 +29,7 @@ before_script:
     - add-apt-repository ppa:beineri/opt-qt-5.12.2-bionic
     - add-apt-repository ppa:ubuntu-toolchain-r/test
     - apt update
-    - apt install -y build-essential qtcreator  qt512tools qt512base qt512declarative qt512webengine libusb-1.0-0-dev libhidapi-dev pkgconf wget git
-    - apt install -y gcc-9 g++-9
+    - apt install -y build-essential qtcreator  qt512tools qt512base qt512declarative qt512webengine libusb-1.0-0-dev libhidapi-dev pkgconf wget git gcc-9 g++-9 libgl1-mesa-dev
     - rm /usr/bin/gcc
     - rm /usr/bin/g++
     - ln -s /usr/bin/gcc-9 /usr/bin/gcc
