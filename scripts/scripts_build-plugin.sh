@@ -7,6 +7,8 @@
 set -x
 set -e
 
+source /opt/qt512/bin/qt512-env.sh
+
 #-----------------------------------------------------------------------#
 # Configure build files with qmake                                      #
 # we need to explicitly set the install prefix, as qmake's default is   #
