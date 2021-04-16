@@ -3,17 +3,22 @@
 
 #include "RGBController.h"
 #include "ControllerZoneItem.h"
+#include "ZoneManager.h"
 
-Grid::Grid(QWidget *parent) : QGraphicsView(parent)
+void Grid::Init(GridSettings* s)
 {
+    settings = s;
+
+    GridSettings::defaults();
+
     setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    resize(w, h);
+    resize(settings->w, settings->h );
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    scene = new Scene(0,0,w,h);
-    scene->setSceneRect(0,0,w,h);
+    scene = new Scene(settings);
+    scene->setSceneRect(0,0, settings->w, settings->h);
 
     preview = scene->addPixmap(preview_pixmap);
 
@@ -25,39 +30,9 @@ Grid::Grid(QWidget *parent) : QGraphicsView(parent)
     scale(scaleFactor, scaleFactor);
 }
 
-int Grid::GetWidth()
+void Grid::OnSettingsChanged()
 {
-    return w;
-}
-
-int Grid::GetHeight()
-{
-    return h;
-}
-
-void Grid::SetWidth(int value)
-{
-    w = value;
-}
-void Grid::SetHeight(int value)
-{
-    h = value;
-}
-
-void Grid::SetSettings(GridSettings settings)
-{
-    SetHeight(settings.h);
-    SetWidth(settings.w);
-
-    scene->SetHeight(settings.h);
-    scene->SetWidth(settings.w);
-    scene->SetGrid(settings.show_grid);
-    scene->SetBounds(settings.show_bounds);
-
-    scene->invalidate(scene->sceneRect());
-
-    scene->setSceneRect(0,0,w,h);
-    scene->update();
+    scene->OnSettingsChanged();
 }
 
 void Grid::ResetItems()
@@ -87,7 +62,7 @@ void Grid::ResetItems()
         });
 
         connect(item, &ControllerZoneItem::Moved, [=](){
-            item->Restrict(w,h);
+            item->Restrict(settings->w,settings->h);
             emit ItemMoved(i);
         });
     }

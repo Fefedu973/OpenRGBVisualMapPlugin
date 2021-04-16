@@ -3,26 +3,19 @@
 
 #include <QGraphicsScene>
 #include <QPainter>
+#include "GridSettings.h"
 
 class Scene: public QGraphicsScene
 {
 public:
-    Scene(qreal x, qreal y, qreal w, qreal h) : QGraphicsScene(x, y, w, h), w(w), h(h), grid(false), bounds(false) {};
-
-    void SetWidth(int);
-    void SetHeight(int);
-    void SetGrid(bool);
-    void SetBounds(bool);
+    Scene(GridSettings* settings) : QGraphicsScene(0, 0, settings->w, settings->h), settings(settings) {};
+    void OnSettingsChanged();
 
     protected:
         void drawBackground(QPainter *painter, const QRectF &rect);
 
     private:
-        int w;
-        int h;
-        bool grid;
-        bool bounds;
-        inline static const int grid_size = 8;
+        GridSettings* settings;
 };
 
 #endif // SCENE_H

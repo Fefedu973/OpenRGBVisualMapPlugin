@@ -29,7 +29,7 @@ OpenRGBPluginInfo OpenRGBVisualMapPlugin::Initialize(bool Dt, ResourceManager *R
 QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
 {
     OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();        
-    OpenRGBVisualMapTab* pluginGUI = new OpenRGBVisualMapTab(nullptr);
+    OpenRGBVisualMapTab* pluginGUI = new OpenRGBVisualMapTab(parent);
     pluginGUI->setStyle(new TooltipProxy(pluginGUI->style()));
     pluginGUI->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     return pluginGUI;

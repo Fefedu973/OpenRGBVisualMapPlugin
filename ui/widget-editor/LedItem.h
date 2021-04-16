@@ -1,20 +1,18 @@
-#ifndef CONTROLLERZONEITEM_H
-#define CONTROLLERZONEITEM_H
+#ifndef LEDITEM_H
+#define LEDITEM_H
 
 #include <QPainter>
 #include <QPen>
 #include <QGraphicsItem>
 
-#include "ControllerZone.h"
-
-class ControllerZoneItem : public QObject, public QGraphicsItem
+class LedItem: public QObject, public QGraphicsItem
 {
     Q_OBJECT;
     Q_INTERFACES(QGraphicsItem);
 
 public:
 
-    ControllerZoneItem(ControllerZone*);
+    LedItem(int, QPoint*);
 
     QRectF boundingRect() const;
 
@@ -28,10 +26,13 @@ public:
 
 signals:
     void Selected();
-    void Moved();
+    void Moving();
+    void Released();
 
 private:
-    ControllerZone* ctrl_zone;
+    int  led_num;
+    QPoint*  led_position;
+
     bool selected = false;
     bool pressed = false;
     bool moving = false;
@@ -46,5 +47,4 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
 };
-
-#endif // CONTROLLERZONEITEM_H
+#endif // LEDITEM_H

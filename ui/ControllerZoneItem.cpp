@@ -23,16 +23,18 @@ QRectF ControllerZoneItem::boundingRect() const
 {
     switch(ctrl_zone->settings.shape)
     {
-    case ControllerZoneSettings::HORIZONTAL_LINE :
+    case HORIZONTAL_LINE :
         return QRectF(0, 0, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 2);
-    case ControllerZoneSettings::VERTICAL_LINE :
+    case VERTICAL_LINE :
         return QRectF(0, 0, 2, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
+    case CUSTOM:
+        return QRectF(0, 0, ctrl_zone->settings.custom_shape->w, ctrl_zone->settings.custom_shape->h);
     }
 
     return QRectF(0, 0, 1, 1);
 }
 
-void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
 
     if(!moving)
@@ -50,13 +52,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     QBrush brush = pressed ? moving_brush: selected ? selected_brush : default_brush;
     painter->setBrush(brush);
 
-    switch(ctrl_zone->settings.shape)
-    {
-    case ControllerZoneSettings::HORIZONTAL_LINE :
-        painter->fillRect(rect,brush);
-    case ControllerZoneSettings::VERTICAL_LINE :
-        painter->fillRect(rect, brush);
-    }
+    painter->fillRect(rect,brush);
 }
 
 void ControllerZoneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)

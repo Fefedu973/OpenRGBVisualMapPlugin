@@ -2,7 +2,7 @@
 #define ITEMOPTIONS_H
 
 #include <QWidget>
-#include "ZoneManager.h"
+#include "ControllerZone.h"
 
 namespace Ui {
 class ItemOptions;
@@ -24,7 +24,7 @@ signals:
 
 private:
     Ui::ItemOptions *ui;
-    ControllerZone* zone = nullptr;
+    ControllerZone* ctrl_zone = nullptr;
 
 private slots:
     void on_x_spinBox_valueChanged(int);
@@ -33,6 +33,7 @@ private slots:
     void on_shape_comboBox_currentIndexChanged(int);
     void on_reverse_checkBox_stateChanged(int);
     void on_identifyButton_clicked();
+    void on_edit_shape_button_clicked();
 
 };
 

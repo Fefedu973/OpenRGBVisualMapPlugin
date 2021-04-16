@@ -90,12 +90,29 @@ void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
     }
 
 }
+void ZoneManager::IdentifyLed(ControllerZone* ctrl_zone,  int led_num)
+{
+    RGBController* controller = ctrl_zone->controller;
+    zone z = controller->zones[ctrl_zone->zone_idx];
+    int leds_count = z.leds_count;
+    int start_idx = z.start_idx;
+
+    printf("Identify [%d] \n", led_num);
+
+    for(int i = 0; i < leds_count; i++)
+    {
+        QColor color = i == led_num ? Qt::green : Qt::black;
+        controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+    }
+
+    controller->UpdateLEDs();
+
+}
 
 void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color)
 {
     RGBController* controller = ctrl_zone->controller;
     zone z = controller->zones[ctrl_zone->zone_idx];
-    ControllerZoneSettings settings = ctrl_zone->settings;
     int leds_count = z.leds_count;
     int start_idx = z.start_idx;
 

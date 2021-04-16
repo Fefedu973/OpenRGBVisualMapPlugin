@@ -2,6 +2,7 @@
 #include "OpenRGBVisualMapPlugin.h"
 #include "VisualMapSettingsManager.h"
 #include "ZoneManager.h"
+#include "WidgetEditor.h"
 #include "VisualMapJsonDefinitions.h"
 #include "hsv.h"
 
@@ -11,10 +12,21 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 {
     ui->setupUi(this);
 
+    // default settings for main grid
+    settings = new GridSettings();
+    settings->w = 128;
+    settings->h = 128;
+    settings->show_bounds = true;
+    settings->show_grid = true;
+    settings->grid_size = 8;
+
+    ui->grid->Init(settings);
+    ui->gridOptions->Init(settings);
+
     InitZoneList();
 
     ui->itemOptions->hide();
-    ui->backgroundApplier->SetSize(ui->grid->GetWidth(), ui->grid->GetHeight());
+    ui->backgroundApplier->SetSize(settings->w, settings->h);
 
     connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
     connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
@@ -29,9 +41,9 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
         ui->itemOptions->Update();
     });
 
-    connect(ui->gridOptions, &GridOptions::OptionsChanged, [=](GridSettings settings){
-        ui->grid->SetSettings(settings);
-        ui->backgroundApplier->SetSize(settings.w,settings.h);
+    connect(ui->gridOptions, &GridOptions::SettingsChanged, [=](){
+        ui->grid->OnSettingsChanged();
+        ui->backgroundApplier->SetSize(settings->w,settings->h);
     });
 }
 
@@ -141,21 +153,21 @@ void OpenRGBVisualMapTab::on_resetButton_clicked()
 void OpenRGBVisualMapTab::on_saveButton_clicked()
 {
     std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAddedZones();
-    json settings;
-    settings["ctrl_zones"] = ctrl_zones;
-    settings["grid_settings"] = ui->gridOptions->GetSettings();
-    VisualMapSettingsManager::SaveSettings(settings);
+    json j;
+    j["ctrl_zones"] = ctrl_zones;
+    j["grid_settings"] = settings;
+    VisualMapSettingsManager::SaveSettings(j);
 }
 
 void OpenRGBVisualMapTab::on_loadButton_clicked()
 {
-    json settings = VisualMapSettingsManager::LoadSettings();
+    json j = VisualMapSettingsManager::LoadSettings();
 
     std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
 
     ZoneManager::Get()->ClearZones();
 
-    auto ctrl_zones = settings["ctrl_zones"];
+    auto ctrl_zones = j["ctrl_zones"];
 
     for (auto it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
     {
@@ -183,7 +195,9 @@ void OpenRGBVisualMapTab::on_loadButton_clicked()
 
     UpdateZoneButtons();
 
-    ui->gridOptions->SetSettings(settings["grid_settings"]);
+    j.at("grid_settings").get_to(settings);
+
+    ui->gridOptions->SetSettings(settings);
 
     ui->grid->ResetItems();
 }
@@ -231,7 +245,7 @@ void OpenRGBVisualMapTab::UpdateControllerZone(ControllerZone* ctrl_zone, QImage
     int start_idx = z.start_idx;
 
     switch (ctrl_zone->settings.shape) {
-        case ControllerZoneSettings::HORIZONTAL_LINE:
+        case HORIZONTAL_LINE:
             for(int i = 0; i < leds_count; i++)
             {
                 int idx = settings.reverse ? leds_count - 1 - i : i;
@@ -240,7 +254,7 @@ void OpenRGBVisualMapTab::UpdateControllerZone(ControllerZone* ctrl_zone, QImage
             }
             break;
 
-        case ControllerZoneSettings::VERTICAL_LINE:
+        case VERTICAL_LINE:
             for(int i = 0; i < leds_count; i++)
             {
                 int idx = settings.reverse ? leds_count - 1 - i : i;

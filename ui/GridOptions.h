@@ -2,18 +2,11 @@
 #define GRIDOPTIONS_H
 
 #include <QWidget>
+#include "GridSettings.h"
 
 namespace Ui {
 class GridOptions;
 }
-
-struct GridSettings
-{
-    int w;
-    int h;
-    bool show_grid;
-    bool show_bounds;
-};
 
 class GridOptions : public QWidget
 {
@@ -23,11 +16,12 @@ public:
     explicit GridOptions(QWidget *parent = nullptr);
     ~GridOptions();
 
-    GridSettings GetSettings();
-    void SetSettings(GridSettings);
+    void Init(GridSettings* settings);
+
+    void SetSettings(GridSettings*);
 
 signals:
-    void OptionsChanged(GridSettings);
+    void SettingsChanged();
 
 private slots:
     void on_w_spinBox_valueChanged(int);
@@ -37,7 +31,7 @@ private slots:
 
 private:
     Ui::GridOptions *ui;
-    GridSettings settings = {128,128,false,false};
+    GridSettings* settings;
 
     void Update();
 };

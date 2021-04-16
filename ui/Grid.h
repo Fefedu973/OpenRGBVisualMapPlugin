@@ -8,29 +8,24 @@
 #include <QPixmap>
 #include <QWheelEvent>
 
-#include "ZoneManager.h"
 #include "ControllerZoneItem.h"
 #include "Scene.h"
-#include "GridOptions.h"
+#include "GridSettings.h"
 
 class Grid : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit Grid(QWidget *parent = nullptr);
+    explicit Grid(QWidget *parent) : QGraphicsView(parent){}
 
-    int GetWidth();
-    int GetHeight();
-
-    void SetWidth(int);
-    void SetHeight(int);
+    void Init(GridSettings*);
 
     void ResetItems();
     void UpdateItems();
     void SetSelected(int);
 
-    void SetSettings(GridSettings);
+    void OnSettingsChanged();
     void UpdatePreview(QImage* image);
 
 signals:
@@ -46,8 +41,7 @@ private:
 
     float scaleFactor = 1.0f;
 
-    int w = 128;
-    int h = 128;
+    GridSettings* settings;
 
     std::vector<ControllerZoneItem*> ctrl_zone_items;
     int selected_idx = -1;

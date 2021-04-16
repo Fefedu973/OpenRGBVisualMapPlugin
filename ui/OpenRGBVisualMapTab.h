@@ -37,6 +37,7 @@ private slots:
 
 private:
     Ui::OpenRGBVisualMapTab*   ui;
+    GridSettings* settings;
 
     QIcon add_icon = QIcon(":/add.png");
     QIcon remove_icon = QIcon(":/remove.png");

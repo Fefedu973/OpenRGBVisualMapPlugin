@@ -25,6 +25,7 @@ INCLUDEPATH +=                                                                  
     OpenRGB/dependencies/json                                                                   \
 
 HEADERS +=                                                                                      \
+    MathUtils.h \
     OpenRGB/NetworkClient.h                                                                     \
     OpenRGB/NetworkProtocol.h                                                                   \
     OpenRGB/NetworkServer.h                                                                     \
@@ -38,15 +39,20 @@ HEADERS +=                                                                      
     OpenRGB/RGBController/RGBController.h                                                       \
     ui/ColorPicker.h \
     ui/ColorStop.h \
+    ControllerZone.h \
     ui/ControllerZoneItem.h \
+    ui/GridSettings.h \
     ui/Scene.h \
-    ui/TooltipProxy.h
+    ui/TooltipProxy.h \
+    ui/widget-editor/EditorGrid.h \
+    ui/widget-editor/LedItem.h
 
 #-----------------------------------------------------------------------------------------------#
 # GUI and misc                                                                                  #
 #-----------------------------------------------------------------------------------------------#
 INCLUDEPATH +=                                                                                  \
     ui/                                                                                         \       
+    ui/widget-editor/                                                                           \
     Dependencies/                                                                               \
     Dependencies/HSV                                                                            \
     Dependencies/ColorWheel                                                                     \
@@ -62,7 +68,8 @@ HEADERS +=                                                                      
     ui/ItemOptions.h \
     VisualMapJsonDefinitions.h \
     Dependencies/HSV/hsv.h                                                                      \
-    Dependencies/ColorWheel/ColorWheel.h
+    Dependencies/ColorWheel/ColorWheel.h \
+    ui/widget-editor/WidgetEditor.h
 
 
 SOURCES +=                                                                                      \
@@ -79,7 +86,10 @@ SOURCES +=                                                                      
     ui/OpenRGBVisualMapTab.cpp \
     Dependencies/HSV/hsv.cpp \
     Dependencies/ColorWheel/ColorWheel.cpp                                                      \
-    ui/Scene.cpp
+    ui/Scene.cpp \
+    ui/widget-editor/EditorGrid.cpp \
+    ui/widget-editor/LedItem.cpp \
+    ui/widget-editor/WidgetEditor.cpp
 
 
 FORMS +=                                                                                        \
@@ -88,7 +98,8 @@ FORMS +=                                                                        
     ui/ColorStop.ui \
     ui/GridOptions.ui \
     ui/ItemOptions.ui \
-    ui/OpenRGBVisualMapTab.ui
+    ui/OpenRGBVisualMapTab.ui \
+    ui/widget-editor/WidgetEditor.ui
 
 #-------------------------------------------------------------------#
 # Windows GitLab CI Configuration                                   #

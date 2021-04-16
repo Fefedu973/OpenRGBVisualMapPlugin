@@ -153,7 +153,6 @@ QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::S
 
 QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::Spread spread)
 {
-    int angle = ui->rotate->value();
     float radius = sqrt(h*h + w*w) / 2;
 
     QRadialGradient grad = QRadialGradient(w/2, h/2, radius);
