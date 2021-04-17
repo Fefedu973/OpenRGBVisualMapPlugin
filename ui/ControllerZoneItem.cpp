@@ -48,7 +48,6 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     QBrush brush = pressed ? moving_brush: selected ? selected_brush : hover ? hover_brush : default_brush;
 
-    printf("redraw\n");
     painter->setBrush(brush);
     QPen pen(QColor(0, 0, 0, 0x00));
     painter->setPen(pen);

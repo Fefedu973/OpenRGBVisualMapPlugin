@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1177</width>
-    <height>715</height>
+    <width>1231</width>
+    <height>848</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -87,24 +87,24 @@
         <widget class="Grid" name="grid" native="true"/>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="optionsLayout" stretch="1,1,1,0">
-         <item>
-          <layout class="QHBoxLayout" name="actionsLayout">
-           <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
             <widget class="QPushButton" name="saveButton">
              <property name="text">
               <string>Save</string>
              </property>
             </widget>
            </item>
-           <item>
+           <item row="0" column="1">
             <widget class="QPushButton" name="loadButton">
              <property name="text">
               <string>Load</string>
              </property>
             </widget>
            </item>
-           <item>
+           <item row="0" column="2">
             <widget class="QPushButton" name="resetButton">
              <property name="text">
               <string>Reset</string>
@@ -113,10 +113,10 @@
            </item>
           </layout>
          </item>
-         <item>
+         <item row="1" column="0">
           <widget class="GridOptions" name="gridOptions" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -124,15 +124,15 @@
            <property name="minimumSize">
             <size>
              <width>10</width>
-             <height>200</height>
+             <height>150</height>
             </size>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="2" column="0">
           <widget class="ItemOptions" name="itemOptions" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -140,12 +140,12 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>200</height>
+             <height>250</height>
             </size>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="3" column="0">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>

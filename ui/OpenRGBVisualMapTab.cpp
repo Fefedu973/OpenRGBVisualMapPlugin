@@ -74,6 +74,7 @@ void OpenRGBVisualMapTab::InitZoneList()
     // Set size
     ui->zoneList->setRowCount(retained_zones.size());
     ui->zoneList->setColumnCount(2);
+    ui->zoneList->setColumnWidth(1, 20);
 
     // Set selection options
     ui->zoneList->setEditTriggers(QAbstractItemView::NoEditTriggers);
