@@ -31,7 +31,8 @@ void ItemOptions::Update()
         ui->led_spacing_spinBox->setValue(ctrl_zone->settings.led_spacing);
         ui->shape_comboBox->setCurrentIndex(ctrl_zone->settings.shape);
         ui->reverse_checkBox->setChecked(ctrl_zone->settings.reverse);
-        ui->edit_shape_button->setVisible(ctrl_zone->isCustomShape());
+
+        UpdateWidgetsVisibility();
     }
 }
 
@@ -67,7 +68,8 @@ void ItemOptions::on_shape_comboBox_currentIndexChanged(int i)
     if(ctrl_zone)
     {
         ctrl_zone->settings.shape = static_cast<ZoneShape>(i);
-        ui->edit_shape_button->setVisible(ctrl_zone->isCustomShape());
+
+        UpdateWidgetsVisibility();
 
         // needs custon shape init
         if(ctrl_zone->isCustomShape() && !ctrl_zone->settings.custom_shape)
@@ -116,3 +118,10 @@ void ItemOptions::on_edit_shape_button_clicked()
     }
 }
 
+void ItemOptions::UpdateWidgetsVisibility()
+{
+    ui->edit_shape_button->setVisible(ctrl_zone->isCustomShape());
+    ui->reverse_checkBox->setVisible(!ctrl_zone->isCustomShape());
+    ui->led_spacing_spinBox->setVisible(!ctrl_zone->isCustomShape());
+    ui->led_spacing_label->setVisible(!ctrl_zone->isCustomShape());
+}

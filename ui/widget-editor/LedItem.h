@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QGraphicsItem>
+#include "GridSettings.h"
 
 class LedItem: public QObject, public QGraphicsItem
 {
@@ -12,13 +13,11 @@ class LedItem: public QObject, public QGraphicsItem
 
 public:
 
-    LedItem(int, QPoint*);
+    LedItem(int, QPoint*, GridSettings*);
 
     QRectF boundingRect() const;
 
-    void paint(QPainter * painter,
-               const QStyleOptionGraphicsItem * option,
-               QWidget * widget);
+    void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
 
     void SetSelected(bool);
 
@@ -32,6 +31,7 @@ signals:
 private:
     int  led_num;
     QPoint*  led_position;
+    GridSettings* settings;
 
     bool selected = false;
     bool pressed = false;

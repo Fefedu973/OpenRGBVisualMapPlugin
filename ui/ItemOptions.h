@@ -26,6 +26,8 @@ private:
     Ui::ItemOptions *ui;
     ControllerZone* ctrl_zone = nullptr;
 
+    void UpdateWidgetsVisibility();
+
 private slots:
     void on_x_spinBox_valueChanged(int);
     void on_y_spinBox_valueChanged(int);

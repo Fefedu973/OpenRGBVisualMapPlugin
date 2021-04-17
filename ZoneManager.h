@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QColor>
 #include <QPoint>
+#include <QImage>
 #include <vector>
 
 #include "ControllerZone.h"
@@ -25,6 +26,9 @@ public:
     void IdentifyZone(ControllerZone*);
     void IdentifyLed(ControllerZone*, int);
     void SetControllerZoneColor(ControllerZone*, QColor);
+
+    void ApplyImage(QImage*);
+    void ApplyImage(ControllerZone*, QImage*);
 
 private:
     ZoneManager();

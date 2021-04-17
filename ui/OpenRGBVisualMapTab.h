@@ -46,7 +46,6 @@ private:
     void UpdateZoneButtons();
     void InitZoneList();
     void resizeEvent(QResizeEvent*);
-    void UpdateControllerZone(ControllerZone*,QImage*);
 };
 
 #endif // OPENRGBVISUALMAPTAB_H

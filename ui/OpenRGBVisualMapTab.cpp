@@ -19,6 +19,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     settings->show_bounds = true;
     settings->show_grid = true;
     settings->grid_size = 8;
+    settings->grid_scale_factor = 1;
 
     ui->grid->Init(settings);
     ui->gridOptions->Init(settings);
@@ -137,7 +138,9 @@ void OpenRGBVisualMapTab::OnItemOptionsChanged()
 void OpenRGBVisualMapTab::on_resetButton_clicked()
 {
     ZoneManager::Get()->ClearZones();
+
     ui->grid->ResetItems();
+
     UpdateZoneButtons();
 
     std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
@@ -218,54 +221,14 @@ void OpenRGBVisualMapTab::UpdateZoneButtons()
     }
 }
 
-
 void OpenRGBVisualMapTab::OnBackgroundApplied(QImage* image)
-{
+{    
     if(!image)
     {
         return;
     }
 
     ui->grid->UpdatePreview(image);
-
-    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAddedZones();
-
-    for(unsigned int i = 0; i < ctrl_zones.size(); i++)
-    {
-        UpdateControllerZone(ctrl_zones[i], image);
-    }
+    ZoneManager::Get()->ApplyImage(image);
 }
 
-void OpenRGBVisualMapTab::UpdateControllerZone(ControllerZone* ctrl_zone, QImage* image)
-{
-    RGBController* controller = ctrl_zone->controller;
-    zone z = controller->zones[ctrl_zone->zone_idx];
-    ControllerZoneSettings settings = ctrl_zone->settings;
-    int leds_count = z.leds_count;
-    int start_idx = z.start_idx;
-
-    switch (ctrl_zone->settings.shape) {
-        case HORIZONTAL_LINE:
-            for(int i = 0; i < leds_count; i++)
-            {
-                int idx = settings.reverse ? leds_count - 1 - i : i;
-                QColor color = image->pixelColor(idx * settings.led_spacing + settings.x, settings.y);
-                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-            break;
-
-        case VERTICAL_LINE:
-            for(int i = 0; i < leds_count; i++)
-            {
-                int idx = settings.reverse ? leds_count - 1 - i : i;
-
-                QColor color = image->pixelColor(settings.x, idx * settings.led_spacing + settings.y);
-                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-            break;
-
-        default:break;
-    }
-
-    controller->UpdateLEDs();
-}

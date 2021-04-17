@@ -8,10 +8,7 @@ struct GridSettings
     bool show_grid;
     bool show_bounds;
     int grid_size;
-
-    static inline GridSettings defaults() {
-        return {128, 128, false, false, 8};
-    }
+    int grid_scale_factor;
 };
 
 #endif // GRIDSETTINGS_H

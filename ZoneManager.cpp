@@ -125,8 +125,56 @@ void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color
 }
 
 
+void ZoneManager::ApplyImage(QImage* image)
+{
+    for(ControllerZone* ctrl_zone: added_zones)
+    {
+        ApplyImage(ctrl_zone, image);
+    }
+}
 
+void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage* image)
+{
+    RGBController* controller = ctrl_zone->controller;
+    zone z = controller->zones[ctrl_zone->zone_idx];
+    ControllerZoneSettings settings = ctrl_zone->settings;
+    int leds_count = z.leds_count;
+    int start_idx = z.start_idx;
 
+    switch (ctrl_zone->settings.shape) {
+        case HORIZONTAL_LINE:
+            for(int i = 0; i < leds_count; i++)
+            {
+                int idx = settings.reverse ? leds_count - 1 - i : i;
+                QColor color = image->pixelColor(idx * settings.led_spacing + settings.x, settings.y);
+                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+            break;
+
+        case VERTICAL_LINE:
+            for(int i = 0; i < leds_count; i++)
+            {
+                int idx = settings.reverse ? leds_count - 1 - i : i;
+
+                QColor color = image->pixelColor(settings.x, idx * settings.led_spacing + settings.y);
+                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+            break;
+
+        case CUSTOM:
+            std::vector<QPoint*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
+
+            for(unsigned int i = 0; i < led_positions.size(); i++)
+            {
+              QColor color = image->pixelColor(settings.x + led_positions[i]->x(), settings.y + led_positions[i]->y());
+              controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+
+            break;
+    }
+
+    controller->UpdateLEDs();
+}
 
 
 

@@ -40,7 +40,8 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     settings->h = ctrl_zone->settings.custom_shape->h;
     settings->show_grid = true;
     settings->show_bounds = true;
-    settings->grid_size = 8;
+    settings->grid_size = 1;
+    settings->grid_scale_factor = 10;
 
     ui->grid->Init(settings);
 
@@ -83,13 +84,16 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone)
     }
 
     dialog->setWindowTitle("Widget editor");
-    dialog->setMinimumSize(800,600);
+    dialog->setMinimumSize(814,489);
     dialog->setModal(true);
+
 
     QVBoxLayout* dialog_layout = new QVBoxLayout(dialog);
 
     dialog_layout->addWidget(editor);    
     dialog->setLayout(dialog_layout);
+
+    editor->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     connect(editor, &WidgetEditor::Save, [=](){
         dialog->accept();

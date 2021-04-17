@@ -7,6 +7,8 @@ ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone) :
    ctrl_zone(ctrl_zone)
 {
     setFlag(ItemIsMovable);
+    setAcceptHoverEvents(true);
+
     setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
 
     std::string tooltip =
@@ -24,9 +26,9 @@ QRectF ControllerZoneItem::boundingRect() const
     switch(ctrl_zone->settings.shape)
     {
     case HORIZONTAL_LINE :
-        return QRectF(0, 0, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 2);
+        return QRectF(0, 0, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 1);
     case VERTICAL_LINE :
-        return QRectF(0, 0, 2, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
+        return QRectF(0, 0, 1, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
     case CUSTOM:
         return QRectF(0, 0, ctrl_zone->settings.custom_shape->w, ctrl_zone->settings.custom_shape->h);
     }
@@ -36,23 +38,39 @@ QRectF ControllerZoneItem::boundingRect() const
 
 void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
+    setZValue(ctrl_zone->isCustomShape() ? -ctrl_zone->settings.custom_shape->h * ctrl_zone->settings.custom_shape->w :
+                                           -ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
 
     if(!moving)
     {
         setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
     }
 
-    QRectF rect = boundingRect();
-    QPen pen(QColor(0, 0, 0, 0x00));
+    QBrush brush = pressed ? moving_brush: selected ? selected_brush : hover ? hover_brush : default_brush;
 
+    printf("redraw\n");
+    painter->setBrush(brush);
+    QPen pen(QColor(0, 0, 0, 0x00));
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
+    painter->setCompositionMode(QPainter::CompositionMode_Source);
 
+    if(ctrl_zone->isCustomShape())
+    {
+        std::vector<QPoint*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
 
-    QBrush brush = pressed ? moving_brush: selected ? selected_brush : default_brush;
-    painter->setBrush(brush);
+        for(QPoint* point : led_positions)
+        {
+            QRectF rect = QRectF(point->x(), point->y(), 1, 1);
+            //painter->fillRect(rect,brush);
+            painter->fillRect(rect, brush);
+        }
+    }
+    else
+    {
+        painter->fillRect(boundingRect(), brush);
+    }
 
-    painter->fillRect(rect,brush);
 }
 
 void ControllerZoneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -83,11 +101,25 @@ void ControllerZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void ControllerZoneItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     moving = true;
+
     ctrl_zone->settings.x = x();
     ctrl_zone->settings.y = y();
+
     emit Moved();
 
     QGraphicsItem::mouseMoveEvent(event);
+}
+
+void ControllerZoneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    hover = true;
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void ControllerZoneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    hover = false;
+    QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void ControllerZoneItem::ControllerZoneItem::SetSelected(bool value)

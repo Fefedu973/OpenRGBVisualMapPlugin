@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1973</width>
-    <height>756</height>
+    <width>1177</width>
+    <height>715</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,9 +45,9 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="mainLayout" stretch="3,1">
-     <item>
-      <layout class="QHBoxLayout" name="mapLayout" stretch="1,2,1">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <layout class="QHBoxLayout" name="mapLayout" stretch="1,5,1">
        <item>
         <layout class="QVBoxLayout" name="zonesLayout" stretch="1,100">
          <property name="sizeConstraint">
@@ -162,10 +162,10 @@
        </item>
       </layout>
      </item>
-     <item>
+     <item row="1" column="0">
       <widget class="BackgroundApplier" name="backgroundApplier" native="true">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>

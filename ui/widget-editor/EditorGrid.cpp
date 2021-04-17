@@ -8,12 +8,20 @@ void EditorGrid::Init(GridSettings* s)
 
     setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    resize(settings->w, settings->h);
+    resize(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     scene = new Scene(settings);
-    scene->setSceneRect(0, 0, settings->w, settings->h);
+    scene->setSceneRect(0,
+                        0,
+                        settings->w * settings->grid_scale_factor,
+                        settings->h * settings->grid_scale_factor);
+
+    setSceneRect(- (settings->w * settings->grid_scale_factor) / 2,
+                 - (settings->h * settings->grid_scale_factor) / 2,
+                 settings->w * settings->grid_scale_factor * 2,
+                 settings->h * settings->grid_scale_factor * 2);
 
     setScene(scene);
 
@@ -51,7 +59,7 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
 {
     for(int unsigned led_num = 0; led_num < shape->led_positions.size(); led_num++)
     {
-        LedItem* item = new LedItem(led_num, shape->led_positions[led_num]);
+        LedItem* item = new LedItem(led_num, shape->led_positions[led_num], settings);
 
         led_items.push_back(item);
 
@@ -69,7 +77,7 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
         });
 
         connect(item, &LedItem::Released, [=](){
-            item->Restrict(settings->w, settings->h);
+            item->Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
             emit ItemMoved(led_num);
         });
 

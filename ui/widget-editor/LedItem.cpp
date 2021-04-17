@@ -6,9 +6,10 @@
 #include <QString>
 #include <QCursor>
 
-LedItem::LedItem(int led_num, QPoint* led_position) :
+LedItem::LedItem(int led_num, QPoint* led_position, GridSettings* settings) :
    led_num(led_num),
-   led_position(led_position)
+   led_position(led_position),
+   settings(settings)
 {
     setFlag(ItemIsMovable);
 
@@ -24,14 +25,14 @@ LedItem::LedItem(int led_num, QPoint* led_position) :
 
 QRectF LedItem::boundingRect() const
 {
-    return QRectF(0, 0, 1, 1);
+    return QRectF(0, 0, 1 * settings->grid_scale_factor , 1 * settings->grid_scale_factor);
 }
 
 void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     // scale to display
-    setX(led_position->x());
-    setY(led_position->y());
+    setX(led_position->x() * settings->grid_scale_factor);
+    setY(led_position->y() * settings->grid_scale_factor);
 
     QRectF rect = boundingRect();
     QPen pen(QColor(0, 0, 0, 0x00));
@@ -44,10 +45,15 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
 
     painter->fillRect(rect, brush);
 
-    //QPen text_pen(QColor("#534e52"));
-    //painter->setPen(text_pen);
-    //painter->setBrush(QColor("#534e52"));
-    //painter->drawText(rect, Qt::AlignCenter, QString("%1").arg(led_num+1));
+    QPen text_pen(QColor("#534e52"));
+
+    QFont font;
+    font.setPixelSize(6);
+    painter->setFont(font);
+
+    painter->setPen(text_pen);
+    painter->setBrush(QColor("#534e52"));
+    painter->drawText(rect, Qt::AlignCenter, QString("%1").arg(led_num+1));
 
 }
 
@@ -79,8 +85,6 @@ void LedItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     moving = true;
 
-    led_position->setX(x());
-    led_position->setY(y());
 
     emit Moving();
 
@@ -97,8 +101,8 @@ void LedItem::Restrict(int w, int h)
     int new_x = std::min<int>(std::max<int>(0,x()), w-1);
     int new_y = std::min<int>(std::max<int>(0,y()), h-1);
 
-    //new_x = MathUtils::FloorToNearestTen(new_x);
-    //new_y = MathUtils::FloorToNearestTen(new_y);
+    new_x = (new_x/settings->grid_scale_factor);
+    new_y = (new_y/settings->grid_scale_factor);
 
     led_position->setX(new_x);
     led_position->setY(new_y);
