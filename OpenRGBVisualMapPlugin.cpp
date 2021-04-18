@@ -1,6 +1,7 @@
 #include "OpenRGBVisualMapPlugin.h"
 #include "OpenRGBVisualMapTab.h"
 #include "TooltipProxy.h"
+#include "VirtualControllerProvider.h"
 
 bool OpenRGBVisualMapPlugin::DarkTheme = false;
 ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
@@ -22,6 +23,8 @@ OpenRGBPluginInfo OpenRGBVisualMapPlugin::Initialize(bool Dt, ResourceManager *R
     OpenRGBVisualMapPlugin::DarkTheme = Dt;
     OpenRGBVisualMapPlugin::PInfo.PluginLabel = TabLabel();
     OpenRGBVisualMapPlugin::RMPointer = RM;
+
+    VirtualControllerProvider::Get()->RegisterController();
 
     return OpenRGBVisualMapPlugin::PInfo;
 }

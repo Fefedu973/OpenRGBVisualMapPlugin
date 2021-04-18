@@ -25,6 +25,7 @@ INCLUDEPATH +=                                                                  
     OpenRGB/dependencies/json                                                                   \
 
 HEADERS +=                                                                                      \
+    EventEmmiter.h \
     MathUtils.h \
     OpenRGB/NetworkClient.h                                                                     \
     OpenRGB/NetworkProtocol.h                                                                   \
@@ -37,6 +38,8 @@ HEADERS +=                                                                      
     OpenRGB/i2c_smbus/i2c_smbus.h                                                               \
     OpenRGB/net_port/net_port.h                                                                 \
     OpenRGB/RGBController/RGBController.h                                                       \
+    VirtualController.h \
+    VirtualControllerProvider.h \
     ui/ColorPicker.h \
     ui/ColorStop.h \
     ControllerZone.h \
@@ -73,7 +76,11 @@ HEADERS +=                                                                      
 
 
 SOURCES +=                                                                                      \
+    EventEmmiter.cpp \
+    OpenRGB/RGBController/RGBController.cpp                                                     \
     OpenRGBVisualMapPlugin.cpp                                                                  \
+    VirtualController.cpp \
+    VirtualControllerProvider.cpp \
     VisualMapSettingsManager.cpp \
     ZoneManager.cpp \
     ui/BackgroundApplier.cpp \

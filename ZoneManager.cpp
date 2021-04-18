@@ -1,5 +1,8 @@
 #include "ZoneManager.h"
 #include "OpenRGBVisualMapPlugin.h"
+#include "VirtualController.h"
+
+#include <set>
 
 ZoneManager* ZoneManager::instance;
 
@@ -23,6 +26,11 @@ ZoneManager::ZoneManager()
     {
         for (unsigned int mode_idx = 0; mode_idx < controllers[i]->modes.size(); mode_idx++)
         {
+            if(controllers[i]->serial == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
+            {
+                continue;
+            }
+
             if (controllers[i]->modes[mode_idx].name == "Direct")
             {
                 for(unsigned int zone_idx = 0; zone_idx < controllers[i]->zones.size(); zone_idx++)
@@ -127,9 +135,18 @@ void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color
 
 void ZoneManager::ApplyImage(QImage* image)
 {
+    // make sure we update the controller only once by using a set
+    std::set<RGBController*> controllers;
+
     for(ControllerZone* ctrl_zone: added_zones)
     {
-        ApplyImage(ctrl_zone, image);
+        ApplyImage(ctrl_zone, image);        
+        controllers.insert(ctrl_zone->controller);
+    }
+
+    for(RGBController* controller : controllers)
+    {
+        controller->UpdateLEDs();
     }
 }
 
@@ -173,7 +190,7 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage* image)
             break;
     }
 
-    controller->UpdateLEDs();
+
 }
 
 

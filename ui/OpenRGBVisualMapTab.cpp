@@ -5,6 +5,8 @@
 #include "WidgetEditor.h"
 #include "VisualMapJsonDefinitions.h"
 #include "hsv.h"
+#include "VirtualControllerProvider.h"
+#include "EventEmmiter.h"
 
 OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QWidget(parent),
@@ -14,8 +16,8 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     // default settings for main grid
     settings = new GridSettings();
-    settings->w = 128;
-    settings->h = 128;
+    settings->w = 64;
+    settings->h = 64;
     settings->show_bounds = true;
     settings->show_grid = true;
     settings->grid_size = 8;
@@ -23,6 +25,8 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     ui->grid->Init(settings);
     ui->gridOptions->Init(settings);
+
+    VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
 
     InitZoneList();
 
@@ -45,7 +49,12 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     connect(ui->gridOptions, &GridOptions::SettingsChanged, [=](){
         ui->grid->OnSettingsChanged();
         ui->backgroundApplier->SetSize(settings->w,settings->h);
+        VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
     });
+
+    connect(EventEmmiter::Get(), SIGNAL(ImageApplied(QImage*)),
+            this, SLOT(OnBackgroundApplied(QImage*)),Qt::QueuedConnection);
+
 }
 
 void OpenRGBVisualMapTab::DecorateButton(QPushButton* button, QIcon icon)
@@ -204,6 +213,8 @@ void OpenRGBVisualMapTab::on_loadButton_clicked()
     ui->gridOptions->SetSettings(settings);
 
     ui->grid->ResetItems();
+
+    VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
 }
 
 void OpenRGBVisualMapTab::UpdateZoneButtons()
