@@ -14,23 +14,7 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     ui(new Ui::WidgetEditor),
     ctrl_zone(ctrl_zone)
 {
-    int led_count = ctrl_zone->led_count();
 
-    if(ctrl_zone->settings.custom_shape == nullptr)
-    {
-        ctrl_zone->settings.custom_shape = new CustomShape();
-        ctrl_zone->settings.custom_shape->w = ctrl_zone->led_count();
-        ctrl_zone->settings.custom_shape->h = ctrl_zone->led_count();
-
-        // really needed ?
-        ctrl_zone->settings.custom_shape->led_positions = std::vector<QPoint*>();
-        // ---------------
-
-        for(int i = 0; i < led_count; i++)
-        {
-            ctrl_zone->settings.custom_shape->led_positions.push_back(new QPoint(i, 0));
-        }
-    }
 
     ui->setupUi(this);
 
@@ -56,7 +40,14 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
         }
     });
 
-    ui->grid->CreateLEDItems(ctrl_zone->settings.custom_shape);
+    if(ctrl_zone->settings.custom_shape == nullptr)
+    {
+        ResetShape();
+    }
+    else
+    {
+        ui->grid->CreateLEDItems(ctrl_zone->settings.custom_shape);
+    }
 
     Update();
 }
@@ -124,6 +115,33 @@ void WidgetEditor::Update()
 void WidgetEditor::on_identify_button_clicked()
 {
     IdentifySelected();
+}
+
+void WidgetEditor::on_reset_button_clicked()
+{
+    ResetShape();
+}
+
+void WidgetEditor::ResetShape()
+{
+    int led_count = ctrl_zone->led_count();
+
+    ctrl_zone->settings.custom_shape = new CustomShape();
+    ctrl_zone->settings.custom_shape->w = ctrl_zone->led_count();
+    ctrl_zone->settings.custom_shape->h = ctrl_zone->led_count();
+
+    // really needed ?
+    ctrl_zone->settings.custom_shape->led_positions = std::vector<QPoint*>();
+    // ---------------
+
+    for(int i = 0; i < led_count; i++)
+    {
+        ctrl_zone->settings.custom_shape->led_positions.push_back(new QPoint(i, 0));
+    }
+
+    ui->grid->CreateLEDItems(ctrl_zone->settings.custom_shape);
+
+    Update();
 }
 
 void WidgetEditor::on_cancel_button_clicked()

@@ -39,6 +39,8 @@ private:
     int selected = -1;
 
     std::vector<LedItem*> led_items;
+
+    void Clear();
 };
 
 #endif // EDITORGRID_H

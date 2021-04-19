@@ -57,6 +57,8 @@ void EditorGrid::wheelEvent(QWheelEvent *event)
 
 void EditorGrid::CreateLEDItems(CustomShape* shape)
 {
+    Clear();
+
     for(int unsigned led_num = 0; led_num < shape->led_positions.size(); led_num++)
     {
         LedItem* item = new LedItem(led_num, shape->led_positions[led_num], settings);
@@ -81,6 +83,12 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
             emit ItemMoved(led_num);
         });
     }
+}
+
+void EditorGrid::Clear()
+{
+    scene->clear();
+    led_items.clear();
 }
 
 void EditorGrid::SetSelected(int idx)
