@@ -42,7 +42,6 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     });
 
     connect(ui->grid, &Grid::ItemMoved, [=](int){
-        OnBackgroundApplied(ui->backgroundApplier->GetImage());
         ui->itemOptions->Update();
     });
 
