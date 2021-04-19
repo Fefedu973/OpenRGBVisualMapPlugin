@@ -4,10 +4,12 @@
 #include "OpenRGBVisualMapPlugin.h"
 #include "ZoneManager.h"
 
+#include <QMessageBox>
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QFile>
 #include <QPoint>
+#include <QInputDialog>
 
 WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     QWidget(parent),
@@ -74,7 +76,9 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone)
         dark_theme.close();
     }
 
-    dialog->setWindowTitle("Widget editor");
+    std::string title = "Widget editor: " + ctrl_zone->display_name();
+
+    dialog->setWindowTitle(QString::fromUtf8(title.c_str()));
     dialog->setMinimumSize(814,489);
     dialog->setModal(true);
 
@@ -142,6 +146,85 @@ void WidgetEditor::ResetShape()
     ui->grid->CreateLEDItems(ctrl_zone->settings.custom_shape);
 
     Update();
+}
+
+void WidgetEditor::on_copy_shape_button_clicked()
+{
+    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
+
+    QStringList items;
+
+    std::map<QString, ControllerZone*> ctrl_zones_choices;
+
+    int i = 0;
+    for(ControllerZone* ctrl_zone_it : ctrl_zones)
+    {
+        // ignore current ctrl_zone
+        if(ctrl_zone == ctrl_zone_it)
+        {
+            continue;
+        }
+
+        if(ctrl_zone->led_count() != ctrl_zone_it->led_count())
+        {
+            continue;
+        }
+
+        if(!ctrl_zone_it->isCustomShape())
+        {
+            continue;
+        }
+
+        std::string item_text = std::to_string(i+1) + ". " +ctrl_zone_it->display_name() + "(" + std::to_string(ctrl_zone_it->led_count()) +")";
+        QString choice = QString::fromUtf8(item_text.c_str());
+
+        items << choice;
+
+        ctrl_zones_choices[choice] = ctrl_zone_it;
+        i++;
+    }
+
+    QPoint button_pos = ui->copy_shape_button->cursor().pos();
+
+    if(items.isEmpty())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("No other eligible shape found.\nMake sure you have a similar device zone (number of leds has to be the same).");
+        msgBox.setWindowTitle("Oooops");
+        msgBox.move(button_pos.x(), button_pos.y());
+        msgBox.exec();
+        return;
+    }
+
+    QInputDialog *inp = new QInputDialog(this);
+
+    inp->setOptions(QInputDialog::UseListViewForComboBoxItems);
+    inp->setComboBoxItems(items);
+    inp->setWindowTitle("Choose shape");
+    inp->move(button_pos.x(), button_pos.y());
+
+    if(inp->exec()){
+
+        printf("Exec \n");
+        QString selected = inp->textValue();
+        ControllerZone* selected_ctrl_zone = ctrl_zones_choices[selected];
+
+        ctrl_zone->settings.custom_shape = new CustomShape();
+        ctrl_zone->settings.custom_shape->w = selected_ctrl_zone->settings.custom_shape->w;
+        ctrl_zone->settings.custom_shape->h = selected_ctrl_zone->settings.custom_shape->h;
+
+        ctrl_zone->settings.custom_shape->led_positions = std::vector<QPoint*>();
+
+        for(QPoint* point :selected_ctrl_zone->settings.custom_shape->led_positions)
+        {
+            ctrl_zone->settings.custom_shape->led_positions.push_back(new QPoint(point->x(), point->y()));
+        }
+
+        ui->grid->CreateLEDItems(ctrl_zone->settings.custom_shape);
+
+        Update();
+    }
+
 }
 
 void WidgetEditor::on_cancel_button_clicked()

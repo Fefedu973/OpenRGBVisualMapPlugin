@@ -22,7 +22,9 @@ ColorPicker::~ColorPicker()
 }
 
 void ColorPicker::on_button_clicked()
-{
+{    
+    QPoint button_pos = ui->button->cursor().pos();
+
     QDialog* dialog = new QDialog();
 
     if (OpenRGBVisualMapPlugin::DarkTheme)
@@ -58,6 +60,8 @@ void ColorPicker::on_button_clicked()
     buttons_layout->addWidget(cancel_button);
 
     dialog_layout->addLayout(buttons_layout);
+
+    dialog->move(button_pos.x(), button_pos.y());
 
     if (dialog->exec())
     {
