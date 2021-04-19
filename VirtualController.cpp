@@ -68,13 +68,14 @@ void VirtualController::SetupVirtualZone()
 }
 
 void VirtualController::DeviceUpdateLEDs() {
-    QImage* image = new QImage(width, height, QImage::Format_RGB32);
+    QImage* image = new QImage(width, height, QImage::Format_ARGB32);
 
     for(int h = 0; h<height; h++)
     {
         for(int w = 0; w < width; w++)
         {
-            QColor color = QColor(colors[(h*width) + w]);
+            int rgb = colors[(h*width) + w];
+            QColor color = QColor(RGBGetRValue(rgb), RGBGetGValue(rgb), RGBGetBValue(rgb));
             image->setPixelColor(w, h, color);
         }
     }
