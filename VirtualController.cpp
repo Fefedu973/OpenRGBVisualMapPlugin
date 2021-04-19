@@ -1,6 +1,6 @@
 #include "VirtualController.h"
 #include "ZoneManager.h"
-#include "EventEmmiter.h"
+#include "EventEmitter.h"
 
 VirtualController::VirtualController()
 {
@@ -79,15 +79,8 @@ void VirtualController::DeviceUpdateLEDs() {
         }
     }
 
-    EventEmmiter::Get()->ApplyImage(image);
+    EventEmitter::Get()->ApplyImage(image);
 };
-
-void VirtualController::SetType(VirtualControllerType t)
-{
-    type = t;
-
-    SetupVirtualZone();
-}
 
 void VirtualController::UpdateSize(int w, int h)
 {

@@ -6,35 +6,30 @@
 bool OpenRGBVisualMapPlugin::DarkTheme = false;
 ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
 
-QLabel* TabLabel()
-{
-    QLabel* Label = new QLabel();
-    Label->setText("VisualMap");
-    return Label;
-}
-
 OpenRGBPluginInfo OpenRGBVisualMapPlugin::Initialize(bool Dt, ResourceManager *RM)
 {
-    OpenRGBVisualMapPlugin::PInfo.PluginName         = "VisualMap";
-    OpenRGBVisualMapPlugin::PInfo.PluginDescription  = "Spatial configurator";
-    OpenRGBVisualMapPlugin::PInfo.PluginLocation     = "TopTabBar";
+    PInfo.PluginName         = "VisualMap";
+    PInfo.PluginDescription  = "Spatial configurator";
+    PInfo.PluginLocation     = "TopTabBar";
+    PInfo.HasCustom          = true;
+    PInfo.PluginLabel        = new QLabel("VisualMap");
 
-    OpenRGBVisualMapPlugin::PInfo.HasCustom   = true;
-    OpenRGBVisualMapPlugin::DarkTheme = Dt;
-    OpenRGBVisualMapPlugin::PInfo.PluginLabel = TabLabel();
-    OpenRGBVisualMapPlugin::RMPointer = RM;
+    RMPointer                = RM;
+    DarkTheme                = Dt;
 
-    VirtualControllerProvider::Get()->RegisterController();
-
-    return OpenRGBVisualMapPlugin::PInfo;
+    return PInfo;
 }
 
 QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
 {
-    OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();        
+    VirtualControllerProvider::Get()->RegisterController();
+
+    OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();
+
     OpenRGBVisualMapTab* pluginGUI = new OpenRGBVisualMapTab(parent);
+
     pluginGUI->setStyle(new TooltipProxy(pluginGUI->style()));
     pluginGUI->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
     return pluginGUI;
 }
-

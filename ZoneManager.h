@@ -1,12 +1,8 @@
 #ifndef ZONEMANAGER_H
 #define ZONEMANAGER_H
 
-#include <QStringList>
-#include <QColor>
-#include <QPoint>
 #include <QImage>
 #include <vector>
-
 #include "ControllerZone.h"
 
 class ZoneManager

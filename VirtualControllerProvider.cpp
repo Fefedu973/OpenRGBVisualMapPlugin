@@ -26,11 +26,6 @@ void VirtualControllerProvider::RegisterController()
     OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(virtual_controller);
 }
 
-void VirtualControllerProvider::UnregisterController()
-{
-    OpenRGBVisualMapPlugin::RMPointer->DetectDevices();
-}
-
 void VirtualControllerProvider::UpdateSize(int w, int h)
 {
     virtual_controller->UpdateSize(w, h);

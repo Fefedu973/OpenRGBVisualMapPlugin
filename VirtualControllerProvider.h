@@ -9,19 +9,14 @@ public:
     static VirtualControllerProvider* Get();
 
     void RegisterController();
-    void UnregisterController();
-
     void UpdateSize(int,int);
-
     VirtualController* GetController();
-
 
 private:
     VirtualControllerProvider();
     ~VirtualControllerProvider();
 
     static VirtualControllerProvider* instance;
-
     VirtualController* virtual_controller;
 };
 

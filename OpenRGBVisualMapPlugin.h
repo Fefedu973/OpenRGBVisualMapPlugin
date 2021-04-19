@@ -24,7 +24,7 @@ public:
 
     OpenRGBPluginInfo       PInfo;
     OpenRGBPluginInfo       Initialize(bool, ResourceManager*)   override;
-    QWidget*                CreateGUI(QWidget *Parent)                                                 override;
+    QWidget*                CreateGUI(QWidget *Parent)           override;
     static bool             DarkTheme;
     static ResourceManager* RMPointer;
 

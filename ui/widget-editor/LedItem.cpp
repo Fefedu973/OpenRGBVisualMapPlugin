@@ -1,6 +1,5 @@
 #include "LedItem.h"
 
-#include "MathUtils.h"
 #include "math.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QString>

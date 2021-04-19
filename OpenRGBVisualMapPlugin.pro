@@ -14,19 +14,22 @@ unix:!macx {
   QMAKE_CXXFLAGS += -std=c++17
 }
 
-#-----------------------------------------------------------------------------------------------#
-# OpenRGB Plugin SDK                                                                            #
-#-----------------------------------------------------------------------------------------------#
+#-------------------------------------------------------------------#
+# Includes                                                          #
+#-------------------------------------------------------------------#
 INCLUDEPATH +=                                                                                  \
     OpenRGB/                                                                                    \
     OpenRGB/i2c_smbus                                                                           \
     OpenRGB/net_port                                                                            \
     OpenRGB/RGBController                                                                       \
     OpenRGB/dependencies/json                                                                   \
+    ui/                                                                                         \
+    ui/widget-editor/                                                                           \
+    Dependencies/                                                                               \
+    Dependencies/HSV                                                                            \
+    Dependencies/ColorWheel                                                                     \
 
 HEADERS +=                                                                                      \
-    EventEmmiter.h \
-    MathUtils.h \
     OpenRGB/NetworkClient.h                                                                     \
     OpenRGB/NetworkProtocol.h                                                                   \
     OpenRGB/NetworkServer.h                                                                     \
@@ -38,75 +41,62 @@ HEADERS +=                                                                      
     OpenRGB/i2c_smbus/i2c_smbus.h                                                               \
     OpenRGB/net_port/net_port.h                                                                 \
     OpenRGB/RGBController/RGBController.h                                                       \
-    VirtualController.h \
-    VirtualControllerProvider.h \
-    ui/ColorPicker.h \
-    ui/ColorStop.h \
-    ControllerZone.h \
-    ui/ControllerZoneItem.h \
-    ui/GridSettings.h \
-    ui/Scene.h \
-    ui/TooltipProxy.h \
-    ui/widget-editor/EditorGrid.h \
-    ui/widget-editor/LedItem.h
-
-#-----------------------------------------------------------------------------------------------#
-# GUI and misc                                                                                  #
-#-----------------------------------------------------------------------------------------------#
-INCLUDEPATH +=                                                                                  \
-    ui/                                                                                         \       
-    ui/widget-editor/                                                                           \
-    Dependencies/                                                                               \
-    Dependencies/HSV                                                                            \
-    Dependencies/ColorWheel                                                                     \
-
-HEADERS +=                                                                                      \
     OpenRGBVisualMapPlugin.h                                                                    \
-    ui/BackgroundApplier.h \
-    ui/OpenRGBVisualMapTab.h \
-    VisualMapSettingsManager.h \
-    ZoneManager.h \
-    ui/Grid.h \
-    ui/GridOptions.h \
-    ui/ItemOptions.h \
-    VisualMapJsonDefinitions.h \
+    ZoneManager.h                                                                               \
+    VirtualController.h                                                                         \
+    VirtualControllerProvider.h                                                                 \
+    VisualMapSettingsManager.h                                                                  \
+    VisualMapJsonDefinitions.h                                                                  \
+    ControllerZone.h                                                                            \
+    EventEmitter.h                                                                              \
+    ui/ColorPicker.h                                                                            \
+    ui/ColorStop.h                                                                              \
+    ui/ControllerZoneItem.h                                                                     \
+    ui/GridSettings.h                                                                           \
+    ui/Scene.h                                                                                  \
+    ui/TooltipProxy.h                                                                           \
+    ui/widget-editor/EditorGrid.h                                                               \
+    ui/widget-editor/LedItem.h                                                                  \
+    ui/BackgroundApplier.h                                                                      \
+    ui/OpenRGBVisualMapTab.h                                                                    \
+    ui/widget-editor/WidgetEditor.h                                                             \
+    ui/Grid.h                                                                                   \
+    ui/GridOptions.h                                                                            \
+    ui/ItemOptions.h                                                                            \
     Dependencies/HSV/hsv.h                                                                      \
-    Dependencies/ColorWheel/ColorWheel.h \
-    ui/widget-editor/WidgetEditor.h
-
+    Dependencies/ColorWheel/ColorWheel.h                                                        \
 
 SOURCES +=                                                                                      \
-    EventEmmiter.cpp \
     OpenRGB/RGBController/RGBController.cpp                                                     \
     OpenRGBVisualMapPlugin.cpp                                                                  \
-    VirtualController.cpp \
-    VirtualControllerProvider.cpp \
-    VisualMapSettingsManager.cpp \
-    ZoneManager.cpp \
-    ui/BackgroundApplier.cpp \
-    ui/ColorPicker.cpp \
-    ui/ColorStop.cpp \
-    ui/ControllerZoneItem.cpp \
+    VirtualController.cpp                                                                       \
+    VirtualControllerProvider.cpp                                                               \
+    VisualMapSettingsManager.cpp                                                                \
+    ZoneManager.cpp                                                                             \
+    EventEmitter.cpp                                                                            \
+    ui/BackgroundApplier.cpp                                                                    \
+    ui/ColorPicker.cpp                                                                          \
+    ui/ColorStop.cpp                                                                            \
+    ui/ControllerZoneItem.cpp                                                                   \
     ui/Grid.cpp                                                                                 \
-    ui/GridOptions.cpp \
-    ui/ItemOptions.cpp \
-    ui/OpenRGBVisualMapTab.cpp \
-    Dependencies/HSV/hsv.cpp \
+    ui/GridOptions.cpp                                                                          \
+    ui/ItemOptions.cpp                                                                          \
+    ui/OpenRGBVisualMapTab.cpp                                                                  \
+    ui/Scene.cpp                                                                                \
+    ui/widget-editor/EditorGrid.cpp                                                             \
+    ui/widget-editor/LedItem.cpp                                                                \
+    ui/widget-editor/WidgetEditor.cpp                                                           \
+    Dependencies/HSV/hsv.cpp                                                                    \
     Dependencies/ColorWheel/ColorWheel.cpp                                                      \
-    ui/Scene.cpp \
-    ui/widget-editor/EditorGrid.cpp \
-    ui/widget-editor/LedItem.cpp \
-    ui/widget-editor/WidgetEditor.cpp
-
 
 FORMS +=                                                                                        \
-    ui/BackgroundApplier.ui \
-    ui/ColorPicker.ui \
-    ui/ColorStop.ui \
-    ui/GridOptions.ui \
-    ui/ItemOptions.ui \
-    ui/OpenRGBVisualMapTab.ui \
-    ui/widget-editor/WidgetEditor.ui
+    ui/BackgroundApplier.ui                                                                     \
+    ui/ColorPicker.ui                                                                           \
+    ui/ColorStop.ui                                                                             \
+    ui/GridOptions.ui                                                                           \
+    ui/ItemOptions.ui                                                                           \
+    ui/OpenRGBVisualMapTab.ui                                                                   \
+    ui/widget-editor/WidgetEditor.ui                                                            \
 
 #-------------------------------------------------------------------#
 # Windows GitLab CI Configuration                                   #

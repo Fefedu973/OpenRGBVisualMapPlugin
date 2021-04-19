@@ -6,7 +6,7 @@
 #include "VisualMapJsonDefinitions.h"
 #include "hsv.h"
 #include "VirtualControllerProvider.h"
-#include "EventEmmiter.h"
+#include "EventEmitter.h"
 
 OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QWidget(parent),
@@ -52,7 +52,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
         VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
     });
 
-    connect(EventEmmiter::Get(), SIGNAL(ImageApplied(QImage*)),
+    connect(EventEmitter::Get(), SIGNAL(ImageApplied(QImage*)),
             this, SLOT(OnBackgroundApplied(QImage*)),Qt::QueuedConnection);
 
 }

@@ -1,11 +1,6 @@
 #ifndef VISUALMAPSETTINGSMANAGER_H
 #define VISUALMAPSETTINGSMANAGER_H
 
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <filesystem>
-
 #include "RGBController.h"
 #include "json.hpp"
 

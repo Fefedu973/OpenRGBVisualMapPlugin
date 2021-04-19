@@ -1,6 +1,9 @@
 #include "VisualMapSettingsManager.h"
 #include "OpenRGBVisualMapPlugin.h"
 
+#include <fstream>
+#include <filesystem>
+
 void VisualMapSettingsManager::SaveSettings(json settings)
 {
     if(!CreateSettingsDirectory())
