@@ -61,15 +61,35 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         for(QPoint* point : led_positions)
         {
             QRectF rect = QRectF(point->x(), point->y(), 1, 1);
-            //painter->fillRect(rect,brush);
+            painter->fillRect(rect, brush);
+        }
+    }
+    else if(ctrl_zone->settings.shape == HORIZONTAL_LINE)
+    {
+        int led_count = ctrl_zone->led_count();
+        int interval = ctrl_zone->settings.led_spacing;
+
+        for (int i = 0; i < led_count; i++)
+        {
+            QRectF rect = QRectF(i * interval, 0, 1, 1);
+            painter->fillRect(rect, brush);
+        }
+    }
+    else if(ctrl_zone->settings.shape == VERTICAL_LINE)
+    {
+        int led_count = ctrl_zone->led_count();
+        int interval = ctrl_zone->settings.led_spacing;
+
+        for (int i = 0; i < led_count; i++)
+        {
+            QRectF rect = QRectF(0, i * interval, 1, 1);
             painter->fillRect(rect, brush);
         }
     }
     else
     {
-        painter->fillRect(boundingRect(), brush);
+        printf("Unsupported shape\n");
     }
-
 }
 
 void ControllerZoneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
