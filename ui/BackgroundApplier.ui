@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Gradient</class>
- <widget class="QWidget" name="Gradient">
+ <class>BackgroundApplier</class>
+ <widget class="QWidget" name="BackgroundApplier">
   <property name="geometry">
    <rect>
     <x>0</x>

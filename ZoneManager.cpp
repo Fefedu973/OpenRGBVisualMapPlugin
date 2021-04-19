@@ -91,30 +91,19 @@ void ZoneManager::ClearZones()
 
 void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 {
+    // make sure we update the controller only once by using a set
+    std::set<RGBController*> controllers;
 
     for(ControllerZone* ctrl_zone: available_zones)
     {
         SetControllerZoneColor(ctrl_zone, ctrl_zone == ctrl_zone_to_identify ? Qt::green : Qt::black);
+        controllers.insert(ctrl_zone->controller);
     }
 
-}
-void ZoneManager::IdentifyLed(ControllerZone* ctrl_zone,  int led_num)
-{
-    RGBController* controller = ctrl_zone->controller;
-    zone z = controller->zones[ctrl_zone->zone_idx];
-    int leds_count = z.leds_count;
-    int start_idx = z.start_idx;
-
-    printf("Identify [%d] \n", led_num);
-
-    for(int i = 0; i < leds_count; i++)
+    for(RGBController* controller : controllers)
     {
-        QColor color = i == led_num ? Qt::green : Qt::black;
-        controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+        controller->UpdateLEDs();
     }
-
-    controller->UpdateLEDs();
-
 }
 
 void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color)
@@ -128,10 +117,24 @@ void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color
     {
         controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
     }
-
-    controller->UpdateLEDs();
 }
 
+void ZoneManager::IdentifyLed(ControllerZone* ctrl_zone,  int led_num)
+{
+    RGBController* controller = ctrl_zone->controller;
+    zone z = controller->zones[ctrl_zone->zone_idx];
+    int leds_count = z.leds_count;
+    int start_idx = z.start_idx;
+
+    for(int i = 0; i < leds_count; i++)
+    {
+        QColor color = i == led_num ? Qt::green : Qt::black;
+        controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+    }
+
+    controller->UpdateLEDs();
+
+}
 
 void ZoneManager::ApplyImage(QImage* image)
 {
@@ -189,18 +192,4 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage* image)
 
             break;
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-

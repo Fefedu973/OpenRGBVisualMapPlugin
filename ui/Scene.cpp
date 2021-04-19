@@ -40,5 +40,4 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
         painter->setPen(QPen(QColor(0xC7, 0x95, 0x6D, 0x80), 1));
         painter->drawLines(bound_lines.data(), bound_lines.size());
     }
-
 }

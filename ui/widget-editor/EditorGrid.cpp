@@ -80,8 +80,6 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
             item->Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
             emit ItemMoved(led_num);
         });
-
-        printf("LED Item #%d added at [%d,%d]\n", led_num, shape->led_positions[led_num]->x(), shape->led_positions[led_num]->y());
     }
 }
 

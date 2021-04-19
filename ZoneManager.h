@@ -25,14 +25,15 @@ public:
 
     void IdentifyZone(ControllerZone*);
     void IdentifyLed(ControllerZone*, int);
-    void SetControllerZoneColor(ControllerZone*, QColor);
 
     void ApplyImage(QImage*);
-    void ApplyImage(ControllerZone*, QImage*);
 
 private:
     ZoneManager();
     static ZoneManager* instance;
+
+    void SetControllerZoneColor(ControllerZone*, QColor);
+    void ApplyImage(ControllerZone*, QImage*);
 
     std::vector<ControllerZone*> available_zones;
     std::vector<ControllerZone*> added_zones;

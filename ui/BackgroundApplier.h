@@ -5,7 +5,7 @@
 #include <QWidget>
 
 namespace Ui {
-class Gradient;
+class BackgroundApplier;
 }
 
 
@@ -32,7 +32,7 @@ private slots:
     void on_choose_image_button_clicked();
 
 private:
-    Ui::Gradient *ui;
+    Ui::BackgroundApplier *ui;
     int w;
     int h;
 

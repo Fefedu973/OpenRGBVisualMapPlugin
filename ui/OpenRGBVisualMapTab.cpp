@@ -234,7 +234,7 @@ void OpenRGBVisualMapTab::UpdateZoneButtons()
 }
 
 void OpenRGBVisualMapTab::OnBackgroundApplied(QImage* image)
-{    
+{
     if(!image)
     {
         return;

@@ -114,7 +114,7 @@ void ItemOptions::on_edit_shape_button_clicked()
     if(ctrl_zone)
     {
         int result = WidgetEditor::Show(ctrl_zone);
-        printf("Result = %d\n", result);
+        // todo : do something with result ?
     }
 }
 

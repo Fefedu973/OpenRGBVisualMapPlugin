@@ -16,7 +16,7 @@
 
 BackgroundApplier::BackgroundApplier(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Gradient)
+    ui(new Ui::BackgroundApplier)
 {
     ui->setupUi(this);
 
@@ -25,7 +25,7 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
 
     // custom
     ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->color_stops->setLayout(new QHBoxLayout(this));
+    ui->color_stops->setLayout(new QHBoxLayout());
     ui->scrollArea->setWidgetResizable(true);
 
     ui->gradient_type->addItems(custom_names);
@@ -100,16 +100,10 @@ void BackgroundApplier::ApplyPreset()
     emit BackgroundApplied(image);
 }
 
-
-
 void BackgroundApplier::ApplyCustom()
 {
-
-//    QGradient::PadSpread	0	The area is filled with the closest stop color. This is the default.
-//    QGradient::RepeatSpread	2	The gradient is repeated outside the gradient area.
-//    QGradient::ReflectSpread	1	The gradient is reflected outside the gradient area.
-
     image = new QImage(w, h, QImage::Format_RGB32);
+
     QBrush brush;
 
     QGradientStops stops;
@@ -230,20 +224,14 @@ QPointF BackgroundApplier::EdgeOfView(int deg) {
 
 void BackgroundApplier::OpenFileDialog()
 {
-
-//    QWidget *parent = nullptr,
-//   const QString &caption = QString(),
-//   const QString &dir = QString(),
-//   const QString &filter = QString(),
-//   QString *selectedFilter = nullptr,
-//   Options options = Options());
-
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
 
     QImage user_image;
     user_image.load(fileName);
+
     QImage scaled_image = user_image.scaled(w, h, Qt::IgnoreAspectRatio);
+
     emit BackgroundApplied(&scaled_image);
 }
 

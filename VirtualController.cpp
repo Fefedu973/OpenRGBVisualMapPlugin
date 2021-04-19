@@ -56,18 +56,15 @@ void VirtualController::SetupVirtualZone()
 
     zones[0].start_idx = 0;
     zones[0].type = ZONE_TYPE_MATRIX;
-
-    printf("SIZE = %d\n", size);
-
     zones[0].colors = &colors[0];
     zones[0].leds = &leds[0];
 
     modes[0].name = "Direct";
     modes[0].colors.resize(size);
     modes[0].colors = colors;
-    modes[0].value                 = 0;
-    modes[0].flags                  = MODE_FLAG_HAS_PER_LED_COLOR;
-    modes[0].color_mode       = MODE_COLORS_PER_LED;
+    modes[0].value = 0;
+    modes[0].flags = MODE_FLAG_HAS_PER_LED_COLOR;
+    modes[0].color_mode = MODE_COLORS_PER_LED;
 }
 
 void VirtualController::DeviceUpdateLEDs() {
