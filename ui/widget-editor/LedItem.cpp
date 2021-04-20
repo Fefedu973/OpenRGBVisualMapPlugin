@@ -97,9 +97,10 @@ void LedItem::SetSelected(bool value)
 
 void LedItem::Restrict(int w, int h)
 {
-    int new_x = std::min<int>(std::max<int>(0,x()), w-1);
-    int new_y = std::min<int>(std::max<int>(0,y()), h-1);
+    int new_x = x();
+    int new_y = y();
 
+    // ease moves
     if(new_x % settings->grid_scale_factor >= settings->grid_scale_factor/2)
     {
         new_x += settings->grid_scale_factor/2;
@@ -110,9 +111,15 @@ void LedItem::Restrict(int w, int h)
         new_y += settings->grid_scale_factor/2;
     }
 
+    // restrict to bounds
+    new_x = std::min<int>(std::max<int>(0,new_x), w-1);
+    new_y = std::min<int>(std::max<int>(0,new_y), h-1);
+
+    // normalize
     new_x = (new_x/settings->grid_scale_factor);
     new_y = (new_y/settings->grid_scale_factor);
 
+    // update led real position
     led_position->setX(new_x);
     led_position->setY(new_y);
 

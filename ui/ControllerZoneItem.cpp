@@ -149,9 +149,23 @@ void ControllerZoneItem::ControllerZoneItem::SetSelected(bool value)
 
 void ControllerZoneItem::Restrict(int w, int h)
 {
-    // restrict to 0 - 0
-    int new_x = std::min<int>(std::max<int>(0,x()), w);
-    int new_y = std::min<int>(std::max<int>(0,y()), h);
+    int new_x = 10 * x();
+    int new_y = 10 * y();
+
+    // ease moves
+    if(new_x % 10 >= 5)
+    {
+        new_x += 5;
+    }
+
+    if(new_y % 10 >= 5)
+    {
+        new_y += 5;
+    }
+
+    // restrict to bounds
+    new_x = std::min<int>(std::max<int>(0,new_x/10), w-1);
+    new_y = std::min<int>(std::max<int>(0,new_y/10), h-1);
 
     setX(new_x);
     setY(new_y);
