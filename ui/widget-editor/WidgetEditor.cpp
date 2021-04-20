@@ -16,8 +16,6 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     ui(new Ui::WidgetEditor),
     ctrl_zone(ctrl_zone)
 {
-
-
     ui->setupUi(this);
 
     settings = new GridSettings();
@@ -26,6 +24,7 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     settings->h = ctrl_zone->settings.custom_shape->h;
     settings->show_grid = true;
     settings->show_bounds = true;
+    settings->live_preview = false;
     settings->grid_size = 1;
     settings->grid_scale_factor = 10;
 

@@ -20,6 +20,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     settings->h = 64;
     settings->show_bounds = true;
     settings->show_grid = true;
+    settings->live_preview = true;
     settings->grid_size = 8;
     settings->grid_scale_factor = 1;
 
@@ -239,8 +240,11 @@ void OpenRGBVisualMapTab::OnBackgroundApplied(QImage* image)
         return;
     }
 
-    ui->grid->UpdatePreview(image);
-    ZoneManager::Get()->ApplyImage(image);
+    if(settings->live_preview)
+    {
+        ui->grid->UpdatePreview(image);
+        ZoneManager::Get()->ApplyImage(image);
+    }
 
     delete image;
 }

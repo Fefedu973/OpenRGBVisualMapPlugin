@@ -42,10 +42,17 @@ void GridOptions::on_bounds_checkBox_stateChanged(int value)
     emit SettingsChanged();
 }
 
+void GridOptions::on_live_preview_checkBox_stateChanged(int value)
+{
+    settings->live_preview = value;
+    emit SettingsChanged();
+}
+
 void GridOptions::Update()
 {
     ui->bounds_checkBox->setChecked(settings->show_bounds);
     ui->grid_checkBox->setChecked(settings->show_grid);
+    ui->live_preview_checkBox->setChecked(settings->live_preview);
     ui->w_spinBox->setValue(settings->w);
     ui->h_spinBox->setValue(settings->h);
 }

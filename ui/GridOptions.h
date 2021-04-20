@@ -28,6 +28,7 @@ private slots:
     void on_h_spinBox_valueChanged(int);
     void on_grid_checkBox_stateChanged(int);
     void on_bounds_checkBox_stateChanged(int);
+    void on_live_preview_checkBox_stateChanged(int);
 
 private:
     Ui::GridOptions *ui;

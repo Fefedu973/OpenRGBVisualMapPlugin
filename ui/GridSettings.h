@@ -7,6 +7,7 @@ struct GridSettings
     int h;
     bool show_grid;
     bool show_bounds;
+    bool live_preview;
     int grid_size;
     int grid_scale_factor;
 };

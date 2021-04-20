@@ -93,6 +93,7 @@ void to_json(json& j, const GridSettings* settings) {
     {"w", settings->w},
     {"show_grid", settings->show_grid},
     {"show_bounds", settings->show_bounds},
+    {"live_preview", settings->live_preview},
     {"grid_size", settings->grid_size}
 };
 }
@@ -102,6 +103,7 @@ void from_json(const json& j, GridSettings* s) {
     j.at("w").get_to(s->w);
     j.at("show_grid").get_to(s->show_grid);
     j.at("show_bounds").get_to(s->show_bounds);
+    j.at("live_preview").get_to(s->live_preview);
     j.at("grid_size").get_to(s->grid_size);
 }
 
