@@ -3,7 +3,6 @@
 
 #include "RGBController.h"
 #include "ControllerZoneItem.h"
-#include "ZoneManager.h"
 
 void Grid::Init(GridSettings* s)
 {
@@ -37,7 +36,7 @@ void Grid::OnSettingsChanged()
     scene->OnSettingsChanged();
 }
 
-void Grid::ResetItems()
+void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
 {
     scene->clear();
 
@@ -46,14 +45,10 @@ void Grid::ResetItems()
 
     ctrl_zone_items.clear();
 
-    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
-
     for(unsigned int i = 0; i < ctrl_zones.size(); i++)
     {        
         ControllerZoneItem* item = new ControllerZoneItem(ctrl_zones[i]);
         ctrl_zone_items.push_back(item);
-
-        item->setVisible(ZoneManager::Get()->HasZone(i));
 
         item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 

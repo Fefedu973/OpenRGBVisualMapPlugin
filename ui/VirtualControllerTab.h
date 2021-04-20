@@ -9,23 +9,27 @@
 #include <QSignalMapper>
 
 #include "ui_VirtualControllerTab.h"
+#include "VirtualController.h"
 #include "RGBController.h"
 #include "Grid.h"
 #include "GridOptions.h"
 #include "ItemOptions.h"
 #include "BackgroundApplier.h"
 
+
 namespace Ui {
 class VirtualControllerTab;
 }
 
-class VirtualControllerTab : public QTabBar
+class VirtualControllerTab : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit VirtualControllerTab(QWidget *parent = nullptr);
     ~VirtualControllerTab();
+
+    void RenameController(std::string);
 
 private slots:
     void OnZoneSelectionChanged();
@@ -35,12 +39,14 @@ private slots:
     void on_saveButton_clicked();
     void on_loadButton_clicked();
     void on_resetButton_clicked();
+    void on_register_controller_stateChanged(int);
 
-protected:
-    //bool eventFilter(QObject * o, QEvent * e);
+signals:
+    void ApplyBackground(QImage*);
 
 private:
     Ui::VirtualControllerTab*   ui;
+    VirtualController* virtual_controller;
     GridSettings* settings;
 
     QIcon add_icon = QIcon(":/add.png");
@@ -50,6 +56,8 @@ private:
     void UpdateZoneButtons();
     void InitZoneList();
     void resizeEvent(QResizeEvent*);
+
+    std::vector<ControllerZone*> added_zones;
 };
 
 #endif // VIRTUALCONTROLLERTAB_H

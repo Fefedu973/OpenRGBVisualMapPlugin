@@ -16,7 +16,7 @@ public:
     explicit ItemOptions(QWidget *parent = nullptr);
     ~ItemOptions();
 
-    void SetControllerZone(int);
+    void SetControllerZone(ControllerZone*);
     void Update();
 
 signals:

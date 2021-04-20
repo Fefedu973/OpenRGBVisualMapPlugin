@@ -1,4 +1,3 @@
-#include "ZoneManager.h"
 #include "BackgroundApplier.h"
 #include "ColorStop.h"
 #include "ui_BackgroundApplier.h"

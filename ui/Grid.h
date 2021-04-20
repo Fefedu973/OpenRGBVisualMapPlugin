@@ -21,7 +21,7 @@ public:
 
     void Init(GridSettings*);
 
-    void ResetItems();
+    void ResetItems(std::vector<ControllerZone*>);
     void UpdateItems();
     void SetSelected(int);
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>940</width>
-    <height>715</height>
+    <height>727</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -52,10 +52,17 @@
      <item row="0" column="0">
       <layout class="QHBoxLayout" name="mapLayout" stretch="1,5,1">
        <item>
-        <layout class="QVBoxLayout" name="zonesLayout" stretch="100">
+        <layout class="QVBoxLayout" name="zonesLayout" stretch="0,100">
          <property name="sizeConstraint">
           <enum>QLayout::SetMinimumSize</enum>
          </property>
+         <item>
+          <widget class="QCheckBox" name="register_controller">
+           <property name="text">
+            <string>Register controller</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QTableWidget" name="zoneList">
            <property name="sizePolicy">

@@ -3,6 +3,7 @@
 
 #include "RGBController.h"
 #include "ControllerZone.h"
+#include <QImage>
 
 class VirtualController: public RGBController
 {
@@ -26,11 +27,15 @@ public:
     // Internals
     void UpdateSize(int,int);
 
+    void SetCallBack(std::function<void(QImage*)>);
+
 private:
     int width;
     int height;
 
-    void SetupVirtualZone();
+    void SetupVirtualZone();    
+
+    std::function<void(QImage*)> callback;
 };
 
 #endif // VIRTUALCONTROLLER_H

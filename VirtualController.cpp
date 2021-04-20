@@ -1,6 +1,4 @@
 #include "VirtualController.h"
-#include "ZoneManager.h"
-#include "EventEmitter.h"
 
 VirtualController::VirtualController()
 {
@@ -80,7 +78,7 @@ void VirtualController::DeviceUpdateLEDs() {
         }
     }
 
-    EventEmitter::Get()->ApplyImage(image);
+    callback(image);
 };
 
 void VirtualController::UpdateSize(int w, int h)
@@ -90,3 +88,9 @@ void VirtualController::UpdateSize(int w, int h)
 
     SetupVirtualZone();
 }
+
+void VirtualController::SetCallBack(std::function<void(QImage*)> callback)
+{
+    this->callback = callback;
+}
+

@@ -16,9 +16,9 @@ ItemOptions::~ItemOptions()
     delete ui;
 }
 
-void ItemOptions::SetControllerZone(int zone_idx)
+void ItemOptions::SetControllerZone(ControllerZone* ctrl_zone)
 {
-    ctrl_zone = ZoneManager::Get()->GetZone(zone_idx);
+    this->ctrl_zone = ctrl_zone;
     Update();
 }
 

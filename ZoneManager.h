@@ -11,28 +11,21 @@ public:
     static ZoneManager* Get();
 
     std::vector<ControllerZone*> GetAvailableZones();
-    std::vector<ControllerZone*> GetAddedZones();
     ControllerZone* GetZone(int);
-
-    bool HasZone(int);
-    void AddZone(int);
-    void RemoveZone(int);
-    void ClearZones();
 
     void IdentifyZone(ControllerZone*);
     void IdentifyLed(ControllerZone*, int);
-
-    void ApplyImage(QImage*);
+    void ApplyImage(std::vector<ControllerZone*>, QImage*);
 
 private:
     ZoneManager();
     static ZoneManager* instance;
 
     void SetControllerZoneColor(ControllerZone*, QColor);
-    void ApplyImage(ControllerZone*, QImage*);
 
     std::vector<ControllerZone*> available_zones;
-    std::vector<ControllerZone*> added_zones;
+
+    void ApplyImage(ControllerZone*, QImage*);
 };
 
 #endif // ZONEMANAGER_H

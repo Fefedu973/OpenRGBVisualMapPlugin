@@ -4,13 +4,19 @@
 #include "ZoneManager.h"
 #include "WidgetEditor.h"
 #include "hsv.h"
-#include "VirtualControllerProvider.h"
-#include "EventEmitter.h"
 #include "VisualMapJsonDefinitions.h"
 
+static void VirtualControllerChangeCallback(void * this_ptr)
+{
+    VirtualControllerTab * _this = (VirtualControllerTab *)this_ptr;
+
+    QMetaObject::invokeMethod(_this, "OnBackgroundApplied", Qt::QueuedConnection);
+}
+
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
-    QTabBar(parent),
-    ui(new Ui::VirtualControllerTab)
+    QWidget(parent),
+    ui(new Ui::VirtualControllerTab),
+    virtual_controller(new VirtualController())
 {
     ui->setupUi(this);
 
@@ -27,13 +33,14 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     ui->grid->Init(settings);
     ui->gridOptions->Init(settings);
 
-    VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
+    virtual_controller->UpdateSize(settings->w, settings->h);
 
     InitZoneList();
 
     ui->itemOptions->hide();
     ui->backgroundApplier->SetSize(settings->w, settings->h);
 
+    connect(this, SIGNAL(ApplyBackground(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
     connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
     connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
     connect(ui->zoneList->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(OnZoneSelectionChanged()));
@@ -49,14 +56,18 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     connect(ui->gridOptions, &GridOptions::SettingsChanged, [=](){
         ui->grid->OnSettingsChanged();
         ui->backgroundApplier->SetSize(settings->w,settings->h);
-        VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
+        virtual_controller->UpdateSize(settings->w, settings->h);
     });
 
-    connect(EventEmitter::Get(), SIGNAL(ImageApplied(QImage*)),
-            this, SLOT(OnBackgroundApplied(QImage*)),Qt::QueuedConnection);
-
+    virtual_controller->SetCallBack([=](QImage* image){
+        emit ApplyBackground(image);
+    });
 }
 
+void VirtualControllerTab::RenameController(std::string value)
+{
+    virtual_controller->name = value;
+}
 
 void VirtualControllerTab::DecorateButton(QPushButton* button, QIcon icon)
 {
@@ -116,18 +127,18 @@ void VirtualControllerTab::InitZoneList()
         ui->zoneList->setCellWidget(i, 1, widget);
 
         connect(button, &QPushButton::clicked, [=]() {
-            if(!ZoneManager::Get()->HasZone(i))
+            if(std::find(added_zones.begin(), added_zones.end(),retained_zones[i]) == added_zones.end())
             {
-                ZoneManager::Get()->AddZone(i);
+                added_zones.push_back(retained_zones[i]);
                 DecorateButton(button, remove_icon);
             }
             else
             {
-                ZoneManager::Get()->RemoveZone(i);
+                added_zones.erase(std::find(added_zones.begin(), added_zones.end(),retained_zones[i]));
                 DecorateButton(button, add_icon);
             }
 
-            ui->grid->ResetItems();
+            ui->grid->ResetItems(added_zones);
         });
     }
 
@@ -136,39 +147,49 @@ void VirtualControllerTab::InitZoneList()
 void VirtualControllerTab::OnZoneSelectionChanged()
 {    
     int selected_idx = ui->zoneList->selectionModel()->currentIndex().row();
-    ui->itemOptions->SetControllerZone(selected_idx);
+    ui->itemOptions->SetControllerZone(ZoneManager::Get()->GetZone(selected_idx));
     ui->itemOptions->show();
     ui->grid->SetSelected(selected_idx);
 }
+
 
 void VirtualControllerTab::OnItemOptionsChanged()
 {
     ui->grid->UpdateItems();
 }
 
-void VirtualControllerTab::on_resetButton_clicked()
+void VirtualControllerTab::on_register_controller_stateChanged(int value)
 {
-    ZoneManager::Get()->ClearZones();
+    if(value)
+    {
+        OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(virtual_controller);
+    }
+    else
+    {
+        OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(virtual_controller);
+    }
+}
 
-    ui->grid->ResetItems();
-
-    UpdateZoneButtons();
-
-    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
-
-    for(ControllerZone* ctrl_zone:ctrl_zones)
+void VirtualControllerTab::on_resetButton_clicked()
+{   
+    for(ControllerZone* ctrl_zone: added_zones)
     {
         ctrl_zone->settings = ControllerZoneSettings::defaults();
     }
+
+    added_zones.clear();
+
+    ui->grid->ResetItems(added_zones);
+
+    UpdateZoneButtons();
 
     ui->itemOptions->Update();
 }
 
 void VirtualControllerTab::on_saveButton_clicked()
 {
-    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAddedZones();
     json j;
-    j["ctrl_zones"] = ctrl_zones;
+    j["ctrl_zones"] = added_zones;
     j["grid_settings"] = settings;
     VisualMapSettingsManager::SaveSettings(j);
 }
@@ -179,7 +200,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
 
-    ZoneManager::Get()->ClearZones();
+    added_zones.clear();
 
     auto ctrl_zones = j["ctrl_zones"];
 
@@ -201,7 +222,7 @@ void VirtualControllerTab::on_loadButton_clicked()
                     )
             {
                 ctrl_zone->settings = settings;
-                ZoneManager::Get()->AddZone(i);
+                added_zones.push_back(available_zones[i]);
             }
         }
 
@@ -213,9 +234,9 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     ui->gridOptions->SetSettings(settings);
 
-    ui->grid->ResetItems();
+    ui->grid->ResetItems(added_zones);
 
-    VirtualControllerProvider::Get()->UpdateSize(settings->w, settings->h);
+    virtual_controller->UpdateSize(settings->w, settings->h);
 }
 
 void VirtualControllerTab::UpdateZoneButtons()
@@ -228,7 +249,8 @@ void VirtualControllerTab::UpdateZoneButtons()
 
         if(buttons.size() == 1)
         {
-            DecorateButton(buttons[0], ZoneManager::Get()->HasZone(i) ? remove_icon : add_icon);
+            bool zone_added = std::find(added_zones.begin(), added_zones.end(), available_zones[i]) != added_zones.end();
+            DecorateButton(buttons[0], zone_added ? remove_icon : add_icon);
         }
 
     }
@@ -246,7 +268,7 @@ void VirtualControllerTab::OnBackgroundApplied(QImage* image)
         ui->grid->UpdatePreview(image);        
     }
 
-    ZoneManager::Get()->ApplyImage(image);
+    ZoneManager::Get()->ApplyImage(added_zones, image);
 
     delete image;
 }

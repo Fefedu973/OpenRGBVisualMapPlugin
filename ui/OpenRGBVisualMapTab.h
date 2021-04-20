@@ -16,8 +16,12 @@ public:
     explicit OpenRGBVisualMapTab(QWidget *parent = nullptr);
     ~OpenRGBVisualMapTab();
 
+private slots:
+    void AddTab();
+
 private:
     Ui::OpenRGBVisualMapTab*   ui;   
+
 };
 
 #endif // OPENRGBVISUALMAPTAB_H

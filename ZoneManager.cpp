@@ -55,38 +55,10 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
     return available_zones;
 }
 
-std::vector<ControllerZone*> ZoneManager::GetAddedZones()
-{
-    return added_zones;
-}
-
-void ZoneManager::AddZone(int idx) {
-    if(!HasZone(idx)) {
-        added_zones.push_back(available_zones[idx]);
-    }
-}
-
-void ZoneManager::RemoveZone(int idx) {
-    std::vector<ControllerZone*>::iterator position = std::find(added_zones.begin(), added_zones.end(), available_zones[idx]);
-
-    if (position != added_zones.end())
-    {
-        added_zones.erase(position);
-    }
-}
-
-bool ZoneManager::HasZone(int idx) {
-    return std::find(added_zones.begin(), added_zones.end(), available_zones[idx]) != added_zones.end();
-}
 
 ControllerZone* ZoneManager::GetZone(int idx)
 {
     return available_zones[idx];
-}
-
-void ZoneManager::ClearZones()
-{
-    added_zones.clear();
 }
 
 void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
@@ -136,14 +108,14 @@ void ZoneManager::IdentifyLed(ControllerZone* ctrl_zone,  int led_num)
 
 }
 
-void ZoneManager::ApplyImage(QImage* image)
+void ZoneManager::ApplyImage(std::vector<ControllerZone*> ctrl_zones, QImage* image)
 {
     // make sure we update the controller only once by using a set
     std::set<RGBController*> controllers;
 
-    for(ControllerZone* ctrl_zone: added_zones)
+    for(ControllerZone* ctrl_zone: ctrl_zones)
     {
-        ApplyImage(ctrl_zone, image);        
+        ApplyImage(ctrl_zone, image);
         controllers.insert(ctrl_zone->controller);
     }
 

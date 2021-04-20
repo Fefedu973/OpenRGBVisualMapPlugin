@@ -44,11 +44,9 @@ HEADERS +=                                                                      
     OpenRGBVisualMapPlugin.h                                                                    \
     ZoneManager.h                                                                               \
     VirtualController.h                                                                         \
-    VirtualControllerProvider.h                                                                 \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
     ControllerZone.h                                                                            \
-    EventEmitter.h                                                                              \
     ui/ColorPicker.h                                                                            \
     ui/ColorStop.h                                                                              \
     ui/ControllerZoneItem.h                                                                     \
@@ -71,10 +69,8 @@ SOURCES +=                                                                      
     OpenRGB/RGBController/RGBController.cpp                                                     \
     OpenRGBVisualMapPlugin.cpp                                                                  \
     VirtualController.cpp                                                                       \
-    VirtualControllerProvider.cpp                                                               \
     VisualMapSettingsManager.cpp                                                                \
     ZoneManager.cpp                                                                             \
-    EventEmitter.cpp                                                                            \
     ui/BackgroundApplier.cpp                                                                    \
     ui/ColorPicker.cpp                                                                          \
     ui/ColorStop.cpp                                                                            \
