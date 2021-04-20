@@ -5,13 +5,7 @@
 #include "WidgetEditor.h"
 #include "hsv.h"
 #include "VisualMapJsonDefinitions.h"
-
-static void VirtualControllerChangeCallback(void * this_ptr)
-{
-    VirtualControllerTab * _this = (VirtualControllerTab *)this_ptr;
-
-    QMetaObject::invokeMethod(_this, "OnBackgroundApplied", Qt::QueuedConnection);
-}
+#include <QInputDialog>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -188,15 +182,44 @@ void VirtualControllerTab::on_resetButton_clicked()
 
 void VirtualControllerTab::on_saveButton_clicked()
 {
-    json j;
-    j["ctrl_zones"] = added_zones;
-    j["grid_settings"] = settings;
-    VisualMapSettingsManager::SaveSettings(j);
+    QString filename = QInputDialog::getText(nullptr, "Title", "Hello World !!\nWhat goes in here").trimmed();
+
+    if(!filename.isEmpty())
+    {
+        json j;
+        j["ctrl_zones"] = added_zones;
+        j["grid_settings"] = settings;
+        VisualMapSettingsManager::SaveSettings(filename.toStdString(), j);
+    }
 }
 
 void VirtualControllerTab::on_loadButton_clicked()
-{
-    json j = VisualMapSettingsManager::LoadSettings();
+{    
+    QPoint button_pos = ui->loadButton->cursor().pos();
+
+    QStringList file_list;
+
+    std::vector<std::string> filenames = VisualMapSettingsManager::GetFileNames();
+
+    for(std::string filename : filenames)
+    {
+        file_list << QString::fromUtf8(filename.c_str());
+    }
+
+    QInputDialog *inp = new QInputDialog(this);
+
+    inp->setOptions(QInputDialog::UseListViewForComboBoxItems);
+    inp->setComboBoxItems(file_list);
+    inp->setWindowTitle("Choose file");
+    inp->move(button_pos.x(), button_pos.y());
+
+    if(!inp->exec()){
+        return;
+    }
+
+    QString filename = inp->textValue();
+
+    json j = VisualMapSettingsManager::LoadSettings(filename.toStdString());
 
     std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
 

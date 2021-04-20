@@ -4,7 +4,20 @@
 #include <fstream>
 #include <filesystem>
 
-void VisualMapSettingsManager::SaveSettings(json settings)
+std::vector<std::string> VisualMapSettingsManager::GetFileNames()
+{
+    std::string path = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
+    std::vector<std::string> filenames;
+
+    for (const auto & entry : std::filesystem::directory_iterator(path))
+    {
+        filenames.push_back(entry.path().filename());
+    }
+
+    return filenames;
+}
+
+void VisualMapSettingsManager::SaveSettings(std::string filename, json settings)
 {
     if(!CreateSettingsDirectory())
     {
@@ -12,7 +25,7 @@ void VisualMapSettingsManager::SaveSettings(json settings)
         return;
     }
 
-    std::ofstream SFile((OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + SettingsFolder + SettingsFileName), std::ios::out | std::ios::binary);
+    std::ofstream SFile((OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder + filename), std::ios::out | std::ios::binary);
 
     if(SFile)
     {
@@ -27,11 +40,11 @@ void VisualMapSettingsManager::SaveSettings(json settings)
     }
 }
 
-json VisualMapSettingsManager::LoadSettings()
+json VisualMapSettingsManager::LoadSettings(std::string filename)
 {
     json Settings;
 
-    std::ifstream SFile(OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + SettingsFolder + SettingsFileName, std::ios::in | std::ios::binary);
+    std::ifstream SFile(OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder + filename, std::ios::in | std::ios::binary);
 
     if(SFile)
     {
@@ -51,7 +64,7 @@ json VisualMapSettingsManager::LoadSettings()
 
 bool VisualMapSettingsManager::CreateSettingsDirectory()
 {
-    std::string directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + SettingsFolder;
+    std::string directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
 
     if(std::filesystem::exists(directory))
     {
