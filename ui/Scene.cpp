@@ -23,7 +23,7 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
         for (qreal y = top; y < rect.bottom(); y += (settings->grid_size * settings->grid_scale_factor))
             grid_lines.append(QLineF(rect.left(), y, rect.right(), y));
 
-        painter->setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x18), 1));
+        painter->setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x18), 0.1));
         painter->drawLines(grid_lines.data(), grid_lines.size());
     }
 
@@ -37,7 +37,7 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
         bound_lines.append(QLineF(0, settings->h * settings->grid_scale_factor, settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor));
         bound_lines.append(QLineF(settings->w * settings->grid_scale_factor, 0, settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor));
 
-        painter->setPen(QPen(QColor(0xC7, 0x95, 0x6D, 0x80), 1));
+        painter->setPen(QPen(QColor(0xC7, 0x95, 0x6D, 0xA0), 0.1));
         painter->drawLines(bound_lines.data(), bound_lines.size());
     }
 }

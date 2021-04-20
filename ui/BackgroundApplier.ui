@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>894</width>
-    <height>324</height>
+    <width>953</width>
+    <height>306</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,13 +25,28 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame{border:0}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
+    <layout class="QGridLayout" name="gridLayout_4">
      <property name="sizeConstraint">
       <enum>QLayout::SetMinimumSize</enum>
      </property>
-     <item alignment="Qt::AlignTop">
+     <item row="0" column="0">
       <widget class="QTabWidget" name="tabs">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -69,6 +84,9 @@
           <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,10,0">
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="custom_layout" stretch="1,1,1,1,1,5">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMinimumSize</enum>
+             </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
@@ -197,8 +215,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>638</width>
-                <height>243</height>
+                <width>717</width>
+                <height>245</height>
                </rect>
               </property>
               <property name="sizePolicy">

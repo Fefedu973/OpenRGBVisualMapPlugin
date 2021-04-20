@@ -55,6 +55,7 @@ HEADERS +=                                                                      
     ui/GridSettings.h                                                                           \
     ui/Scene.h                                                                                  \
     ui/TooltipProxy.h                                                                           \
+    ui/VirtualControllerTab.h                                                                   \
     ui/widget-editor/EditorGrid.h                                                               \
     ui/widget-editor/LedItem.h                                                                  \
     ui/BackgroundApplier.h                                                                      \
@@ -83,6 +84,7 @@ SOURCES +=                                                                      
     ui/ItemOptions.cpp                                                                          \
     ui/OpenRGBVisualMapTab.cpp                                                                  \
     ui/Scene.cpp                                                                                \
+    ui/VirtualControllerTab.cpp                                                                 \
     ui/widget-editor/EditorGrid.cpp                                                             \
     ui/widget-editor/LedItem.cpp                                                                \
     ui/widget-editor/WidgetEditor.cpp                                                           \
@@ -96,6 +98,7 @@ FORMS +=                                                                        
     ui/GridOptions.ui                                                                           \
     ui/ItemOptions.ui                                                                           \
     ui/OpenRGBVisualMapTab.ui                                                                   \
+    ui/VirtualControllerTab.ui                                                                  \
     ui/widget-editor/WidgetEditor.ui                                                            \
 
 #-------------------------------------------------------------------#
