@@ -4,7 +4,7 @@
 
 ## What is this?
 
-This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that allows you to orgnaize your real devices on a map and create a virtual devices. You can then apply gradients (presets or custom), and expose it to an other plugin (eg. Effect Engine plugin).
+This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that allows you to orgnaize your real devices on a map and create a virtual devices (or many). You can then apply gradients (presets or custom), and expose it to an other plugin (eg. Effect Engine plugin).
 
 ## How do I install it?
 
