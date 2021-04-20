@@ -6,24 +6,26 @@ void EditorGrid::Init(GridSettings* s)
 {
     settings = s;
 
-    setStyleSheet("background-color: #534e52;");
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    resize(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     scene = new Scene(settings);
     scene->setSceneRect(0,
                         0,
                         settings->w * settings->grid_scale_factor,
                         settings->h * settings->grid_scale_factor);
 
+    setStyleSheet("background-color: #534e52;");
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    resize(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
+
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setInteractive(true);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+
+    setScene(scene);
     setSceneRect(- (settings->w * settings->grid_scale_factor) / 2,
                  - (settings->h * settings->grid_scale_factor) / 2,
                  settings->w * settings->grid_scale_factor * 2,
                  settings->h * settings->grid_scale_factor * 2);
-
-    setScene(scene);
 
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);

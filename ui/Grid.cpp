@@ -16,8 +16,12 @@ void Grid::Init(GridSettings* s)
     setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     resize(settings->w, settings->h );
+
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setInteractive(true);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+
     setScene(scene);
     setSceneRect(QRect(-settings->w / 2,-settings->h / 2, settings->w *2, settings->h*2));
 
