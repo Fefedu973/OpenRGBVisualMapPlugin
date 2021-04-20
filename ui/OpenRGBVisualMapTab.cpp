@@ -243,8 +243,9 @@ void OpenRGBVisualMapTab::OnBackgroundApplied(QImage* image)
     if(settings->live_preview)
     {
         ui->grid->UpdatePreview(image);
-        ZoneManager::Get()->ApplyImage(image);
     }
+
+    ZoneManager::Get()->ApplyImage(image);
 
     delete image;
 }
