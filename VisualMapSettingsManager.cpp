@@ -9,9 +9,9 @@ std::vector<std::string> VisualMapSettingsManager::GetFileNames()
     std::string path = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
     std::vector<std::string> filenames;
 
-    for (const auto & entry : std::filesystem::directory_iterator(path))
+    for (std::filesystem::directory_entry entry : std::filesystem::directory_iterator(path))
     {
-        filenames.push_back(entry.path().filename());
+        filenames.push_back(entry.path().filename().u8string());
     }
 
     return filenames;
