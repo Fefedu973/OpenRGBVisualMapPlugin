@@ -208,9 +208,7 @@ void WidgetEditor::on_copy_shape_button_clicked()
     inp->setWindowTitle("Choose shape");
     inp->move(button_pos.x(), button_pos.y());
 
-    if(inp->exec()){
-
-        printf("Exec \n");
+    if(inp->exec()){        
         QString selected = inp->textValue();
         ControllerZone* selected_ctrl_zone = ctrl_zones_choices[selected];
 
