@@ -220,7 +220,7 @@ void WidgetEditor::on_copy_shape_button_clicked()
 
         temp_shape->led_positions = std::vector<QPoint*>();
 
-        for(QPoint* point : temp_shape->led_positions)
+        for(QPoint* point : selected_ctrl_zone->settings.custom_shape->led_positions)
         {
             temp_shape->led_positions.push_back(new QPoint(point->x(), point->y()));
         }
