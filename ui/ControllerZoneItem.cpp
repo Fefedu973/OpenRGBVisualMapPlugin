@@ -176,3 +176,7 @@ void ControllerZoneItem::Restrict(int w, int h)
     // todo : check if the shape is inside the bounds
 }
 
+ControllerZone* ControllerZoneItem::GetControllerZone()
+{
+    return ctrl_zone;
+}

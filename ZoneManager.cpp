@@ -41,6 +41,11 @@ ZoneManager::ZoneManager()
                     ctrl_zone->zone_idx = zone_idx;
                     ctrl_zone->settings = ControllerZoneSettings::defaults();
 
+                    if(ctrl_zone->controller->zones[ctrl_zone->zone_idx].type == ZONE_TYPE_MATRIX)
+                    {
+                        InitMatrixCustomShape(ctrl_zone);
+                    }
+
                     available_zones.push_back(ctrl_zone);
                 }
 
@@ -165,3 +170,31 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage* image)
             break;
     }
 }
+
+void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
+{
+    unsigned int NA = 0xFFFFFFFF;
+
+    matrix_map_type* matrix_map = ctrl_zone->controller->zones[ctrl_zone->zone_idx].matrix_map;
+
+    ctrl_zone->settings.shape = CUSTOM;
+    ctrl_zone->settings.custom_shape = new CustomShape();
+    ctrl_zone->settings.custom_shape->w = matrix_map->width;
+    ctrl_zone->settings.custom_shape->h = matrix_map->height;
+
+    // really needed ?
+    ctrl_zone->settings.custom_shape->led_positions = std::vector<QPoint*>();
+    // ---------------
+
+    for(unsigned int h = 0; h < matrix_map->height; h++)
+    {
+        for(unsigned int w = 0; w < matrix_map->width; w++)
+        {
+            if(matrix_map->map[h * matrix_map->width + w] != NA)
+            {
+                ctrl_zone->settings.custom_shape->led_positions.push_back(new QPoint(w, h));
+            }
+        }
+    }
+
+ }

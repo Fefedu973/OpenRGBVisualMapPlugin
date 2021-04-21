@@ -26,6 +26,8 @@ private:
     std::vector<ControllerZone*> available_zones;
 
     void ApplyImage(ControllerZone*, QImage*);
+
+    void InitMatrixCustomShape(ControllerZone*);
 };
 
 #endif // ZONEMANAGER_H

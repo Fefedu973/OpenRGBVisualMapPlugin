@@ -49,6 +49,8 @@ private:
     VirtualController* virtual_controller;
     GridSettings* settings;
 
+    ControllerZone* selected_ctrl_zone = nullptr;
+
     QIcon add_icon = QIcon(":/add.png");
     QIcon remove_icon = QIcon(":/remove.png");
 

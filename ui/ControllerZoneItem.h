@@ -28,6 +28,8 @@ public:
 
     void Restrict(int,int);
 
+    ControllerZone* GetControllerZone();
+
 signals:
     void Selected();
     void Moved();

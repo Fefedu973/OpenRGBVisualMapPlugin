@@ -39,11 +39,19 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
     connect(ui->zoneList->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(OnZoneSelectionChanged()));
 
-    connect(ui->grid, &Grid::ItemSelected, [=](int idx){
-        ui->zoneList->selectRow(idx);
+    connect(ui->grid, &Grid::ItemSelected, [=](ControllerZone* ctrl_zone){
+        std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
+        for(unsigned int i = 0; i < ctrl_zones.size(); i++)
+        {
+            if(ctrl_zones[i] == ctrl_zone)
+            {
+                ui->zoneList->selectRow(i);
+                break;
+            }
+        }
     });
 
-    connect(ui->grid, &Grid::ItemMoved, [=](int){
+    connect(ui->grid, &Grid::ItemMoved, [=](ControllerZone* ctrl_zone){
         ui->itemOptions->Update();
     });
 
@@ -124,11 +132,20 @@ void VirtualControllerTab::InitZoneList()
             if(std::find(added_zones.begin(), added_zones.end(),retained_zones[i]) == added_zones.end())
             {
                 added_zones.push_back(retained_zones[i]);
+                ui->zoneList->selectRow(i);
                 DecorateButton(button, remove_icon);
             }
             else
             {
                 added_zones.erase(std::find(added_zones.begin(), added_zones.end(),retained_zones[i]));
+
+                if(selected_ctrl_zone == retained_zones[i])
+                {
+                     ui->grid->ClearSelection();
+                     ui->zoneList->clearSelection();
+                     ui->itemOptions->hide();
+                }
+
                 DecorateButton(button, add_icon);
             }
 
@@ -141,11 +158,11 @@ void VirtualControllerTab::InitZoneList()
 void VirtualControllerTab::OnZoneSelectionChanged()
 {    
     int selected_idx = ui->zoneList->selectionModel()->currentIndex().row();
-    ui->itemOptions->SetControllerZone(ZoneManager::Get()->GetZone(selected_idx));
+    selected_ctrl_zone = ZoneManager::Get()->GetZone(selected_idx);
+    ui->itemOptions->SetControllerZone(selected_ctrl_zone);
     ui->itemOptions->show();
-    ui->grid->SetSelected(selected_idx);
+    ui->grid->SetSelected(selected_ctrl_zone);
 }
-
 
 void VirtualControllerTab::OnItemOptionsChanged()
 {

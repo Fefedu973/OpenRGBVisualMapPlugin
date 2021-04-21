@@ -54,35 +54,47 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
 
         scene->addItem(item);
 
+        item->SetSelected(item->GetControllerZone() == selected_ctrl_zone);
+
         connect(item, &ControllerZoneItem::Selected, [=](){
-            SetSelected(i);
-            emit ItemSelected(i);
+            SetSelected(item->GetControllerZone());
+            emit ItemSelected(item->GetControllerZone());
         });
 
         connect(item, &ControllerZoneItem::Moved, [=](){
             item->Restrict(settings->w,settings->h);
-            emit ItemMoved(i);
+            emit ItemMoved(item->GetControllerZone());
         });
     }
 }
 
-void Grid::SetSelected(int idx)
+void Grid::SetSelected(ControllerZone* ctrl_zone)
 {
-    for(unsigned int i = 0; i < ctrl_zone_items.size(); i++)
+    selected_ctrl_zone = ctrl_zone;
+
+    for(ControllerZoneItem* item: ctrl_zone_items)
     {
-        ctrl_zone_items[i]->SetSelected((int)i == idx);
-        ctrl_zone_items[i]->update();
-    }
+        item->SetSelected(item->GetControllerZone() == selected_ctrl_zone);
+        item->update();
+    }    
+}
+
+void Grid::ClearSelection()
+{
+    SetSelected(nullptr);
 }
 
 void Grid::UpdateItems()
 {
+    for(ControllerZoneItem* item: ctrl_zone_items)
+    {
+        item->update();
+    }
     scene->update();
 }
 
 void Grid::UpdatePreview(QImage* image)
 {
-    //QPixmap new_pixmap;
     preview_pixmap.convertFromImage(*image);
     preview->setPixmap(preview_pixmap);
     preview->update();

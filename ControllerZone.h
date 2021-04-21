@@ -8,8 +8,8 @@
 
 struct CustomShape
 {
-    int w;
-    int h;
+    unsigned int w;
+    unsigned int h;
     std::vector<QPoint*> led_positions;
 };
 

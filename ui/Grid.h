@@ -23,14 +23,15 @@ public:
 
     void ResetItems(std::vector<ControllerZone*>);
     void UpdateItems();
-    void SetSelected(int);
+    void SetSelected(ControllerZone*);
+    void ClearSelection();
 
     void OnSettingsChanged();
     void UpdatePreview(QImage* image);
 
 signals:
-    void ItemSelected(int);
-    void ItemMoved(int);
+    void ItemSelected(ControllerZone*);
+    void ItemMoved(ControllerZone*);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -44,7 +45,8 @@ private:
     GridSettings* settings;
 
     std::vector<ControllerZoneItem*> ctrl_zone_items;
-    int selected_idx = -1;
+
+    ControllerZone* selected_ctrl_zone = nullptr;
 
     Scene* scene;
 };
