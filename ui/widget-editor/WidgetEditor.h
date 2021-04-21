@@ -41,6 +41,8 @@ private:
     void IdentifySelected();
     void ResetShape();
 
+    CustomShape* temp_shape;
+
     Ui::WidgetEditor *ui;
     ControllerZone* ctrl_zone;
     GridSettings* settings;
