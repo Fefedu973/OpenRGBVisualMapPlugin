@@ -48,7 +48,7 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
     QPen text_pen(QColor("#534e52"));
 
     QFont font;
-    font.setPixelSize(6);
+    font.setPixelSize(4);
     painter->setFont(font);
 
     painter->setPen(text_pen);
