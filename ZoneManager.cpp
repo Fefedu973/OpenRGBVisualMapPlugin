@@ -176,7 +176,7 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
     unsigned int NA = 0xFFFFFFFF;
     unsigned int NO_LED = 255;
 
-
+    unsigned int led_count = ctrl_zone->led_count();
     matrix_map_type* matrix_map = ctrl_zone->controller->zones[ctrl_zone->zone_idx].matrix_map;
 
     ctrl_zone->settings.shape = CUSTOM;
@@ -188,11 +188,11 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
 
     printf("##########################\n");
     printf("InitMatrixCustomShape for %s\n", ctrl_zone->display_name().c_str());
-    printf("  led_count [%d]\n", ctrl_zone->led_count());
+    printf("  led_count [%d]\n", led_count);
     printf("  matrix width [%d]\n", matrix_map->width);
     printf("  matrix height [%d]\n", matrix_map->height);
 
-    int total = 0;
+    int total_leds = 0;
 
     for(unsigned int h = 0; h < matrix_map->height; h++)
     {
@@ -200,15 +200,31 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
         {
             unsigned int led_num = matrix_map->map[h * matrix_map->width + w];
 
-            if(led_num != NA && led_num != NO_LED)
+            if(led_num == NA)
             {
-                printf("      found led_num [%d]\n", led_num);
-                ctrl_zone->settings.custom_shape->led_positions[led_num] = new QPoint(w, h);
-                total++;
+                printf(      "NA, skipping\n");
+                continue;
             }
+
+            if(led_num == NO_LED)
+            {
+                printf("      NO_LED, skipping\n");
+                continue;
+            }
+
+            if(led_num >= led_count)
+            {
+                printf("      led_num [%d] is outside the range, skipping", led_num);
+                continue;
+            }
+
+            printf("      adding led_num [%d]\n", led_num);
+            ctrl_zone->settings.custom_shape->led_positions[led_num] = new QPoint(w, h);
+
+            ++total_leds;
         }
     }
 
-    printf("  total led discovered [%d]\n", total);
-
+    printf("  total led discovered [%d]\n", total_leds);
+    printf("##########################\n\n");
  }

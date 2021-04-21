@@ -54,7 +54,7 @@ struct ControllerZone
         return this->controller == rhs.controller && this->zone_idx == rhs.zone_idx;
     }
 
-    int led_count() const {
+    unsigned int led_count() const {
         return controller->zones[zone_idx].leds_count;
     }
 
