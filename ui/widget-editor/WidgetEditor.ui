@@ -32,7 +32,7 @@
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,1">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="10000,1">
        <item>
         <widget class="EditorGrid" name="grid">
          <property name="minimumSize">
@@ -45,6 +45,9 @@
        </item>
        <item>
         <layout class="QVBoxLayout" name="menuLayout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
