@@ -199,7 +199,7 @@ void VirtualControllerTab::on_resetButton_clicked()
 
 void VirtualControllerTab::on_saveButton_clicked()
 {
-    QString filename = QInputDialog::getText(nullptr, "Title", "Hello World !!\nWhat goes in here").trimmed();
+    QString filename = QInputDialog::getText(nullptr, "Save current view", "Choose a filename").trimmed();
 
     if(!filename.isEmpty())
     {
