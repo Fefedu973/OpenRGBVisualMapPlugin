@@ -2,11 +2,15 @@
 #include "ControllerZone.h"
 #include "LedItem.h"
 
-void EditorGrid::Init(GridSettings* s)
+void EditorGrid::ApplySettings(GridSettings* s)
 {
     settings = s;
 
-    scene = new Scene(settings);
+    if(!scene)
+    {
+        scene = new Scene(settings);
+    }
+
     scene->setSceneRect(0,
                         0,
                         settings->w * settings->grid_scale_factor,
@@ -29,11 +33,8 @@ void EditorGrid::Init(GridSettings* s)
 
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);
-}
 
-void EditorGrid::OnSettingsChanged()
-{
-    scene->OnSettingsChanged();
+
 }
 
 void EditorGrid::UpdateItems()

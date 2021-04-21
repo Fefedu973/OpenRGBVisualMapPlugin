@@ -17,8 +17,7 @@ class EditorGrid : public QGraphicsView
 public:
     explicit EditorGrid(QWidget *parent) : QGraphicsView(parent){}
 
-    void Init(GridSettings*);
-    void OnSettingsChanged();
+    void ApplySettings(GridSettings*);
     void SetSelected(int);
     int GetSelected();
     void CreateLEDItems(CustomShape*);
@@ -33,8 +32,8 @@ signals:
     void ItemMoved(int);
 
 private:
-    GridSettings* settings;
-    Scene* scene;
+    GridSettings* settings = nullptr;
+    Scene* scene = nullptr;
 
     int selected = -1;
 

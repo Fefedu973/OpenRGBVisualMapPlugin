@@ -37,7 +37,7 @@ private:
     explicit WidgetEditor(QWidget *parent = nullptr, ControllerZone* ctrl_zone = nullptr);
     ~WidgetEditor();
 
-    void Update();
+    void UpdateWidgetsValues();
     void IdentifySelected();
     void ResetShape();
 
