@@ -15,8 +15,6 @@ EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
 
 void EditorGrid::ApplySettings(GridSettings* s)
 {
-    printf("EditorGrid::ApplySettings \n");
-
     settings = s;
 
     if(!scene)
