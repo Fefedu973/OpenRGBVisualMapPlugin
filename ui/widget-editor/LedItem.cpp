@@ -11,6 +11,7 @@ LedItem::LedItem(int led_num, QPoint* led_position, GridSettings* settings) :
    settings(settings)
 {
     setFlag(ItemIsMovable);
+    setFlag(ItemIsSelectable);
     setAcceptHoverEvents(true);
 
     std::string tooltip =
@@ -40,7 +41,7 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    QBrush brush = pressed ? moving_brush: hover ? hover_brush : selected ? selected_brush :  default_brush;
+    QBrush brush = pressed ? moving_brush: hover ? hover_brush : selected || isSelected() ? selected_brush :  default_brush;
     painter->setBrush(brush);
 
     painter->drawRect(rect);
@@ -85,7 +86,6 @@ void LedItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     moving = true;
 
-
     emit Moving();
 
     QGraphicsItem::mouseMoveEvent(event);
@@ -108,9 +108,26 @@ void LedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsItem::hoverLeaveEvent(event);
 }
 
+void LedItem::MoveBy(int x, int y)
+{
+    int new_x = led_position->x() + x;
+    int new_y = led_position->y() + y;
+
+    new_x = std::min<int>(std::max<int>(0,new_x), settings->w-1);
+    new_y = std::min<int>(std::max<int>(0,new_y), settings->h-1);
+
+    led_position->setX(new_x);
+    led_position->setY(new_y);
+
+    update();
+}
+
 void LedItem::Restrict(int w, int h)
 {
-    int new_x = x();
+    int original_x = led_position->x();
+    int original_y = led_position->y();
+
+    int new_x = x();    
     int new_y = y();
 
     // ease moves
@@ -137,5 +154,11 @@ void LedItem::Restrict(int w, int h)
     led_position->setY(new_y);
 
     update();
+
+    int delta_x = new_x - original_x;
+    int delta_y = new_y - original_y;
+
+    emit Restricted(delta_x, delta_y);
+
 }
 

@@ -8,9 +8,9 @@ EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setInteractive(true);
-    setDragMode(QGraphicsView::ScrollHandDrag);
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);
+    setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 void EditorGrid::ApplySettings(GridSettings* s)
@@ -60,32 +60,59 @@ void EditorGrid::wheelEvent(QWheelEvent *event)
     event->accept();
 }
 
+void EditorGrid::keyPressEvent(QKeyEvent *event)
+{
+    if(event->modifiers() == Qt::ShiftModifier)
+    {
+        setDragMode(QGraphicsView::RubberBandDrag);
+    }
+    else
+    {
+        setDragMode(QGraphicsView::ScrollHandDrag);
+    }
+}
+
+void EditorGrid::keyReleaseEvent(QKeyEvent *event)
+{
+    setDragMode(QGraphicsView::ScrollHandDrag);
+}
+
 void EditorGrid::CreateLEDItems(CustomShape* shape)
 {
     Clear();
 
     for(int unsigned led_num = 0; led_num < shape->led_positions.size(); led_num++)
     {
-        LedItem* item = new LedItem(led_num, shape->led_positions[led_num], settings);
+        LedItem* led_item = new LedItem(led_num, shape->led_positions[led_num], settings);
 
-        led_items.push_back(item);
+        led_items.push_back(led_item);
 
-        item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+        led_item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
-        scene->addItem(item);
+        scene->addItem(led_item);
 
-        connect(item, &LedItem::Selected, [=](){
+        connect(led_item, &LedItem::Selected, [=](){
             SetSelected(led_num);
             emit ItemSelected(led_num);
         });
 
-        connect(item, &LedItem::Moving, [=](){
+        connect(led_item, &LedItem::Moving, [=](){
             emit ItemMoved(led_num);
         });
 
-        connect(item, &LedItem::Released, [=](){
-            item->Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
+        connect(led_item, &LedItem::Released, [=](){
+            led_item->Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
             emit ItemMoved(led_num);
+        });
+
+        connect(led_item, &LedItem::Restricted, [=](int delta_x, int delta_y){
+            for(LedItem* item : led_items)
+            {
+                if(item->isSelected() && item != led_item)
+                {
+                    item->MoveBy(delta_x, delta_y);
+                }
+            }
         });
     }
 }

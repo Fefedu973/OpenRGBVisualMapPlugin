@@ -3,6 +3,7 @@
 
 #include <QGraphicsView>
 #include <QWheelEvent>
+#include <QKeyEvent>
 #include <QPoint>
 
 #include "Scene.h"
@@ -26,6 +27,8 @@ public:
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
 signals:
     void ItemSelected(int);
