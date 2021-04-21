@@ -26,7 +26,7 @@ public:
     void SetSelected(ControllerZone*);
     void ClearSelection();
 
-    void OnSettingsChanged();
+    void ApplySettings(GridSettings* settings);
     void UpdatePreview(QImage* image);
 
 signals:

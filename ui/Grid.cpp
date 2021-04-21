@@ -30,10 +30,11 @@ void Grid::Init(GridSettings* s)
     scale(scaleFactor, scaleFactor);
 }
 
-void Grid::OnSettingsChanged()
+void Grid::ApplySettings(GridSettings* settings)
 {
+    this->settings = settings;
     setSceneRect(QRect(-settings->w / 2,-settings->h / 2, settings->w *2, settings->h*2));
-    scene->OnSettingsChanged();
+    scene->ApplySettings(settings);
 }
 
 void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)

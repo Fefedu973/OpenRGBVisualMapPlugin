@@ -1,7 +1,8 @@
 #include "Scene.h"
 
-void Scene::OnSettingsChanged()
+void Scene::ApplySettings(GridSettings* settings)
 {    
+    this->settings = settings;
     invalidate(sceneRect());
     setSceneRect(0,0,settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
     update();

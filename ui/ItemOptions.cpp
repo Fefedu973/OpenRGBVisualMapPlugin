@@ -82,7 +82,7 @@ void ItemOptions::on_shape_comboBox_currentIndexChanged(int i)
             ctrl_zone->settings.custom_shape->led_positions = std::vector<QPoint*>();
             // ---------------
 
-            for(int i = 0; i < ctrl_zone->led_count(); i++)
+            for(unsigned int i = 0; i < ctrl_zone->led_count(); i++)
             {
                 ctrl_zone->settings.custom_shape->led_positions.push_back(new QPoint(i, 0));
             }
@@ -114,7 +114,11 @@ void ItemOptions::on_edit_shape_button_clicked()
     if(ctrl_zone)
     {
         int result = WidgetEditor::Show(ctrl_zone);
-        // todo : do something with result ?
+
+        if(result)
+        {
+            emit ItemOptionsChanged();
+        }
     }
 }
 

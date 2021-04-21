@@ -9,7 +9,7 @@ class Scene: public QGraphicsScene
 {
 public:
     Scene(GridSettings* settings) : QGraphicsScene(0, 0, settings->w, settings->h), settings(settings) {};
-    void OnSettingsChanged();
+    void ApplySettings(GridSettings*);
 
     protected:
         void drawBackground(QPainter *painter, const QRectF &rect);

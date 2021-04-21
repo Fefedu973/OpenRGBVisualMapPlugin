@@ -2,39 +2,36 @@
 #include "ControllerZone.h"
 #include "LedItem.h"
 
+EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
+    setStyleSheet("background-color: #534e52;");
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setInteractive(true);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    setFrameShadow(QFrame::Raised);
+    setFrameStyle(QFrame::NoFrame);
+}
+
 void EditorGrid::ApplySettings(GridSettings* s)
 {
+    printf("EditorGrid::ApplySettings \n");
+
     settings = s;
 
     if(!scene)
     {
         scene = new Scene(settings);
+        setScene(scene);
+        resize(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
     }
 
-    scene->setSceneRect(0,
-                        0,
-                        settings->w * settings->grid_scale_factor,
-                        settings->h * settings->grid_scale_factor);
-
-    setStyleSheet("background-color: #534e52;");
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    resize(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
-
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setInteractive(true);
-    setDragMode(QGraphicsView::ScrollHandDrag);
-
-    setScene(scene);
     setSceneRect(- (settings->w * settings->grid_scale_factor) / 2,
                  - (settings->h * settings->grid_scale_factor) / 2,
                  settings->w * settings->grid_scale_factor * 2,
                  settings->h * settings->grid_scale_factor * 2);
 
-    setFrameShadow(QFrame::Raised);
-    setFrameStyle(QFrame::NoFrame);
-
-
+    scene->ApplySettings(settings);
 }
 
 void EditorGrid::UpdateItems()
@@ -43,6 +40,7 @@ void EditorGrid::UpdateItems()
     {
         led_item->update();
     }
+    scene->update();
 }
 
 void EditorGrid::wheelEvent(QWheelEvent *event)

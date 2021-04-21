@@ -261,41 +261,45 @@ void WidgetEditor::IdentifySelected()
 {
     int led_num = ui->grid->GetSelected();
 
-    if(led_num >= 0){
+    if(led_num >= 0)
+    {
         ZoneManager::Get()->IdentifyLed(ctrl_zone, led_num);
     }
 }
 
 void WidgetEditor::on_rotate_button_clicked()
 {
-        int new_width  = ctrl_zone->settings.custom_shape->h;
-        int new_height = ctrl_zone->settings.custom_shape->w;
+    // Resize first (swap w and h)
+    int new_width  = ctrl_zone->settings.custom_shape->h;
+    int new_height = ctrl_zone->settings.custom_shape->w;
 
-        QTransform t = QTransform().rotate(90);
+    ctrl_zone->settings.custom_shape->w = new_width;
+    ctrl_zone->settings.custom_shape->h = new_height;
 
-        ctrl_zone->settings.custom_shape->w = new_width;
-        ctrl_zone->settings.custom_shape->h = new_height;
+    UpdateWidgetsValues();
 
-        for(unsigned int i = 0; i < ctrl_zone->settings.custom_shape->led_positions.size(); i++)
-        {
-            QPoint* point = ctrl_zone->settings.custom_shape->led_positions[i];
-            QPoint new_pos = t.map(*point);
-            point->setX(new_pos.x() + new_width - 1);
-            point->setY(new_pos.y());
-        }
+    // Apply clockwise rotation then
+    QTransform t = QTransform().rotate(90);
 
-        UpdateWidgetsValues();
-        ui->grid->UpdateItems();
+    for(QPoint* point : ctrl_zone->settings.custom_shape->led_positions)
+    {
+        QPoint new_pos = t.map(*point);
+        point->setX(new_pos.x() + new_width - 1);
+        point->setY(new_pos.y());
+    }
 
+    // Fix the glitch with UpdateItems (some leds disappear, need to zoom out/in after update)
+    // Lets recreate the items instead
+    //ui->grid->UpdateItems();
+    ui->grid->CreateLEDItems(ctrl_zone->settings.custom_shape);
 }
 
 void WidgetEditor::on_v_flip_button_clicked()
 {
     QTransform t = QTransform().scale(1,-1);
 
-    for(unsigned int i = 0; i < ctrl_zone->settings.custom_shape->led_positions.size(); i++)
+    for(QPoint* point : ctrl_zone->settings.custom_shape->led_positions)
     {
-        QPoint* point = ctrl_zone->settings.custom_shape->led_positions[i];
         QPoint new_pos = t.map(*point);
         point->setX(new_pos.x());
         point->setY(new_pos.y() +  ctrl_zone->settings.custom_shape->h - 1);
@@ -308,11 +312,10 @@ void WidgetEditor::on_h_flip_button_clicked()
 {
     QTransform t = QTransform().scale(-1, 1);
 
-    for(unsigned int i = 0; i < ctrl_zone->settings.custom_shape->led_positions.size(); i++)
+    for(QPoint* point : ctrl_zone->settings.custom_shape->led_positions)
     {
-        QPoint* point = ctrl_zone->settings.custom_shape->led_positions[i];
         QPoint new_pos = t.map(*point);
-        point->setX(new_pos.x()  +  ctrl_zone->settings.custom_shape->w - 1 );
+        point->setX(new_pos.x() + ctrl_zone->settings.custom_shape->w - 1 );
         point->setY(new_pos.y());
     }
 

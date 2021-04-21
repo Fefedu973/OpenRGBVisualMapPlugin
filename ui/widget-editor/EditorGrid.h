@@ -15,7 +15,7 @@ class EditorGrid : public QGraphicsView
      Q_OBJECT
 
 public:
-    explicit EditorGrid(QWidget *parent) : QGraphicsView(parent){}
+    explicit EditorGrid(QWidget *parent);
 
     void ApplySettings(GridSettings*);
     void SetSelected(int);

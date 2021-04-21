@@ -51,13 +51,13 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
         }
     });
 
-    connect(ui->grid, &Grid::ItemMoved, [=](ControllerZone* ctrl_zone){
+    connect(ui->grid, &Grid::ItemMoved, [=](ControllerZone*){
         ui->itemOptions->Update();
     });
 
     connect(ui->gridOptions, &GridOptions::SettingsChanged, [=](){
-        ui->grid->OnSettingsChanged();
-        ui->backgroundApplier->SetSize(settings->w,settings->h);
+        ui->grid->ApplySettings(settings);
+        ui->backgroundApplier->SetSize(settings->w, settings->h);
         virtual_controller->UpdateSize(settings->w, settings->h);
     });
 
