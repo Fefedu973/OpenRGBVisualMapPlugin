@@ -174,6 +174,8 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage* image)
 void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
 {
     unsigned int NA = 0xFFFFFFFF;
+    unsigned int NO_LED = 255;
+
 
     matrix_map_type* matrix_map = ctrl_zone->controller->zones[ctrl_zone->zone_idx].matrix_map;
 
@@ -182,7 +184,15 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
     ctrl_zone->settings.custom_shape->w = matrix_map->width;
     ctrl_zone->settings.custom_shape->h = matrix_map->height;
 
-    ctrl_zone->settings.custom_shape->led_positions.resize(ctrl_zone->led_count());
+    ctrl_zone->settings.custom_shape->led_positions.resize(ctrl_zone->led_count());    
+
+    printf("##########################\n");
+    printf("InitMatrixCustomShape for %s\n", ctrl_zone->display_name().c_str());
+    printf("  led_count [%d]\n", ctrl_zone->led_count());
+    printf("  matrix width [%d]\n", matrix_map->width);
+    printf("  matrix height [%d]\n", matrix_map->height);
+
+    int total = 0;
 
     for(unsigned int h = 0; h < matrix_map->height; h++)
     {
@@ -190,11 +200,15 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
         {
             unsigned int led_num = matrix_map->map[h * matrix_map->width + w];
 
-            if(led_num != NA)
+            if(led_num != NA && led_num != NO_LED)
             {
+                printf("      found led_num [%d]\n", led_num);
                 ctrl_zone->settings.custom_shape->led_positions[led_num] = new QPoint(w, h);
+                total++;
             }
         }
     }
+
+    printf("  total led discovered [%d]\n", total);
 
  }
