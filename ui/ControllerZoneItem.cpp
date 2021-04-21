@@ -46,10 +46,10 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
     }
 
-    QBrush brush = pressed ? moving_brush: selected ? selected_brush : hover ? hover_brush : default_brush;
+    QBrush brush = pressed ? moving_brush: hover ? hover_brush : selected ? selected_brush :  default_brush;
 
     painter->setBrush(brush);
-    QPen pen(QColor(0, 0, 0, 0x00));
+    QPen pen(QColor(0, 0, 0, 0x80), 0.05);
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -61,7 +61,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         for(QPoint* point : led_positions)
         {
             QRectF rect = QRectF(point->x(), point->y(), 1, 1);
-            painter->fillRect(rect, brush);
+            painter->drawRect(rect);
         }
     }
     else if(ctrl_zone->settings.shape == HORIZONTAL_LINE)
@@ -72,7 +72,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         for (int i = 0; i < led_count; i++)
         {
             QRectF rect = QRectF(i * interval, 0, 1, 1);
-            painter->fillRect(rect, brush);
+            painter->drawRect(rect);
         }
     }
     else if(ctrl_zone->settings.shape == VERTICAL_LINE)
@@ -83,7 +83,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         for (int i = 0; i < led_count; i++)
         {
             QRectF rect = QRectF(0, i * interval, 1, 1);
-            painter->fillRect(rect, brush);
+            painter->drawRect(rect);
         }
     }
     else

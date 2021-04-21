@@ -11,6 +11,7 @@ LedItem::LedItem(int led_num, QPoint* led_position, GridSettings* settings) :
    settings(settings)
 {
     setFlag(ItemIsMovable);
+    setAcceptHoverEvents(true);
 
     std::string tooltip =
         "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
@@ -34,15 +35,15 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
     setY(led_position->y() * settings->grid_scale_factor);
 
     QRectF rect = boundingRect();
-    QPen pen(QColor(0, 0, 0, 0x00));
+    QPen pen(QColor(0, 0, 0, 0x80), 0.05);
 
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    QBrush brush = pressed ? moving_brush: selected ? selected_brush : default_brush;
+    QBrush brush = pressed ? moving_brush: hover ? hover_brush : selected ? selected_brush :  default_brush;
     painter->setBrush(brush);
 
-    painter->fillRect(rect, brush);
+    painter->drawRect(rect);
 
     QPen text_pen(QColor("#534e52"));
 
@@ -93,6 +94,18 @@ void LedItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void LedItem::SetSelected(bool value)
 {
     selected = value;
+}
+
+void LedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    hover = true;
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void LedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    hover = false;
+    QGraphicsItem::hoverLeaveEvent(event);
 }
 
 void LedItem::Restrict(int w, int h)
