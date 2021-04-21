@@ -109,6 +109,27 @@
           </layout>
          </item>
          <item>
+          <widget class="QPushButton" name="rotate_button">
+           <property name="text">
+            <string>Rotate</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="h_flip_button">
+           <property name="text">
+            <string>H-Flip</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="v_flip_button">
+           <property name="text">
+            <string>V-Flip</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="copy_shape_button">
            <property name="text">
             <string>Copy shape</string>

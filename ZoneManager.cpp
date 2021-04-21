@@ -184,7 +184,6 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
 
     ctrl_zone->settings.custom_shape->led_positions.resize(ctrl_zone->led_count());
 
-
     for(unsigned int h = 0; h < matrix_map->height; h++)
     {
         for(unsigned int w = 0; w < matrix_map->width; w++)
@@ -192,7 +191,7 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
             unsigned int led_num = matrix_map->map[h * matrix_map->width + w];
 
             if(led_num != NA)
-            {               
+            {
                 ctrl_zone->settings.custom_shape->led_positions[led_num] = new QPoint(w, h);
             }
         }

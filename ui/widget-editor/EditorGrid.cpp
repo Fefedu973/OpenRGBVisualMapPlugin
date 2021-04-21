@@ -29,13 +29,19 @@ void EditorGrid::Init(GridSettings* s)
 
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);
-
-    scale(scaleFactor, scaleFactor);
 }
 
 void EditorGrid::OnSettingsChanged()
 {
     scene->OnSettingsChanged();
+}
+
+void EditorGrid::UpdateItems()
+{
+    for(LedItem* led_item: led_items)
+    {
+        led_item->update();
+    }
 }
 
 void EditorGrid::wheelEvent(QWheelEvent *event)

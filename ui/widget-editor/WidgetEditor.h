@@ -25,8 +25,10 @@ private slots:
     void on_cancel_button_clicked();
     void on_save_button_clicked();
     void on_reset_button_clicked();
-    void on_copy_shape_button_clicked();
-
+    void on_copy_shape_button_clicked();    
+    void on_rotate_button_clicked();
+    void on_v_flip_button_clicked();
+    void on_h_flip_button_clicked();
     void on_w_spinBox_valueChanged(int);
     void on_h_spinBox_valueChanged(int);
     void on_auto_identify_stateChanged(int);

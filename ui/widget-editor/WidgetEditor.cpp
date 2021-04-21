@@ -10,6 +10,8 @@
 #include <QFile>
 #include <QPoint>
 #include <QInputDialog>
+#include <QTransform>
+#include <QRect>
 
 WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     QWidget(parent),
@@ -29,6 +31,9 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     settings->grid_scale_factor = 10;
 
     ui->grid->Init(settings);
+
+    // hide until correct impl
+    ui->rotate_button->hide();
 
     ui->identify_button->hide();
 
@@ -84,7 +89,7 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone)
 
     QVBoxLayout* dialog_layout = new QVBoxLayout(dialog);
 
-    dialog_layout->addWidget(editor);    
+    dialog_layout->addWidget(editor);
     dialog->setLayout(dialog_layout);
 
     editor->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -113,6 +118,8 @@ void WidgetEditor::Update()
     ui->led_count->setValue(ctrl_zone->led_count());
     ui->w_spinBox->setValue(ctrl_zone->settings.custom_shape->w);
     ui->h_spinBox->setValue(ctrl_zone->settings.custom_shape->h);
+
+    //ui->grid->UpdateItems();
 }
 
 void WidgetEditor::on_identify_button_clicked()
@@ -238,7 +245,7 @@ void WidgetEditor::on_save_button_clicked()
 
 void WidgetEditor::on_w_spinBox_valueChanged(int value)
 {
-    settings->w = value;    
+    settings->w = value;
     ctrl_zone->settings.custom_shape->w = value;
     ui->grid->OnSettingsChanged();
 }
@@ -266,3 +273,56 @@ void WidgetEditor::IdentifySelected()
         ZoneManager::Get()->IdentifyLed(ctrl_zone, led_num);
     }
 }
+
+void WidgetEditor::on_rotate_button_clicked()
+{
+    //    int new_width  = ctrl_zone->settings.custom_shape->h;
+    //    int new_height = ctrl_zone->settings.custom_shape->w;
+
+    //    QTransform t1 = QTransform().rotate(90);
+    //    QTransform t2 = QTransform().translate(new_width, 0);
+
+    //    ctrl_zone->settings.custom_shape->w = new_width;
+    //    ctrl_zone->settings.custom_shape->h = new_height;
+
+    //    for(unsigned int i = 0; i < ctrl_zone->settings.custom_shape->led_positions.size(); i++)
+    //    {
+    //        QPoint* point = ctrl_zone->settings.custom_shape->led_positions[i];
+    //        QPoint new_pos = t1.map(*point);
+    //        point->setX(new_pos.x() + new_width - 1);
+    //        point->setY(new_pos.y());
+    //    }
+
+    //    Update();
+}
+
+void WidgetEditor::on_v_flip_button_clicked()
+{
+    QTransform t = QTransform().scale(1,-1);
+
+    for(unsigned int i = 0; i < ctrl_zone->settings.custom_shape->led_positions.size(); i++)
+    {
+        QPoint* point = ctrl_zone->settings.custom_shape->led_positions[i];
+        QPoint new_pos = t.map(*point);
+        point->setX(new_pos.x());
+        point->setY(new_pos.y() +  ctrl_zone->settings.custom_shape->h - 1);
+    }
+
+    ui->grid->UpdateItems();
+}
+
+void WidgetEditor::on_h_flip_button_clicked()
+{
+    QTransform t = QTransform().scale(-1, 1);
+
+    for(unsigned int i = 0; i < ctrl_zone->settings.custom_shape->led_positions.size(); i++)
+    {
+        QPoint* point = ctrl_zone->settings.custom_shape->led_positions[i];
+        QPoint new_pos = t.map(*point);
+        point->setX(new_pos.x()  +  ctrl_zone->settings.custom_shape->w - 1 );
+        point->setY(new_pos.y());
+    }
+
+    ui->grid->UpdateItems();
+}
+

@@ -19,11 +19,11 @@ public:
 
     void Init(GridSettings*);
     void OnSettingsChanged();
-
     void SetSelected(int);
     int GetSelected();
-
     void CreateLEDItems(CustomShape*);
+
+    void UpdateItems();
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -35,7 +35,7 @@ signals:
 private:
     GridSettings* settings;
     Scene* scene;
-    float scaleFactor = 1.0f;
+
     int selected = -1;
 
     std::vector<LedItem*> led_items;
