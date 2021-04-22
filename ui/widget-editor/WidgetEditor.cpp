@@ -36,8 +36,8 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
 
     ui->identify_button->hide();
 
-    connect(ui->grid, &EditorGrid::ItemSelected, [=](int idx){
-        ui->identify_button->setVisible(idx >= 0);
+    connect(ui->grid, &EditorGrid::ItemSelected, [=](LedPosition* led_position){
+        ui->identify_button->setVisible(led_position != nullptr);
 
         if(ui->auto_identify->isChecked())
         {
@@ -281,11 +281,11 @@ void WidgetEditor::on_auto_identify_stateChanged(int state)
 
 void WidgetEditor::IdentifySelected()
 {
-    int led_num = ui->grid->GetSelected();
+    LedPosition* led_position = ui->grid->GetSelected();
 
-    if(led_num >= 0)
+    if(led_position)
     {
-        ZoneManager::Get()->IdentifyLed(ctrl_zone, led_num);
+        ZoneManager::Get()->IdentifyLed(ctrl_zone, led_position->led_num);
     }
 }
 

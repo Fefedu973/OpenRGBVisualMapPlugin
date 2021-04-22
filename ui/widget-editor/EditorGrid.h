@@ -19,8 +19,8 @@ public:
     explicit EditorGrid(QWidget*);
 
     void ApplySettings(GridSettings*);
-    void SetSelected(int);
-    int GetSelected();
+    void SetSelected(LedPosition*);
+    LedPosition* GetSelected();
     void CreateLEDItems(CustomShape*);
 
     void UpdateItems();
@@ -31,14 +31,14 @@ protected:
     void keyReleaseEvent(QKeyEvent*) override;
 
 signals:
-    void ItemSelected(int);
-    void ItemMoved(int);
+    void ItemSelected(LedPosition*);
+    void ItemMoved(LedPosition*);
 
 private:
     GridSettings* settings = nullptr;
     Scene* scene = nullptr;
 
-    int selected = -1;
+    LedPosition* selected = nullptr;
 
     std::vector<LedItem*> led_items;
 

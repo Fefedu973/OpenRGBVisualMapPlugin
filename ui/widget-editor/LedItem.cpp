@@ -5,8 +5,7 @@
 #include <QString>
 #include <QCursor>
 
-LedItem::LedItem(int led_num, LedPosition* led_position, GridSettings* settings) :
-   led_num(led_num),
+LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
    led_position(led_position),
    settings(settings)
 {
@@ -16,7 +15,7 @@ LedItem::LedItem(int led_num, LedPosition* led_position, GridSettings* settings)
 
     std::string tooltip =
         "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
-            + std::to_string(led_num + 1)
+            + std::to_string(led_position->led_num)
         + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
@@ -54,7 +53,7 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
 
     painter->setPen(text_pen);
     painter->setBrush(QColor("#534e52"));
-    painter->drawText(rect, Qt::AlignCenter, QString("%1").arg(led_num+1));
+    painter->drawText(rect, Qt::AlignCenter, QString("%1").arg(led_position->led_num));
 
 }
 
@@ -162,3 +161,7 @@ void LedItem::Restrict(int w, int h)
 
 }
 
+LedPosition* LedItem::GetLedPosition()
+{
+    return led_position;
+}

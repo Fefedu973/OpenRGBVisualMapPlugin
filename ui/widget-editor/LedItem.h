@@ -16,12 +16,13 @@ class LedItem: public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem);
 
 public:
-    LedItem(int, LedPosition*, GridSettings*);
+    LedItem(LedPosition*, GridSettings*);
     QRectF boundingRect() const;
     void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
     void SetSelected(bool);
     void Restrict(int,int);
     void MoveBy(int,int);
+    LedPosition* GetLedPosition();
 
 signals:
     void Selected();
@@ -30,7 +31,6 @@ signals:
     void Restricted(int,int);
 
 private:
-    int  led_num;
     LedPosition*  led_position;
     GridSettings* settings;
 
