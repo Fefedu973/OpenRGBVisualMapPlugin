@@ -302,7 +302,7 @@ void WidgetEditor::IdentifySelected()
 
 void WidgetEditor::on_rotate_button_clicked()
 {
-    // Resize first (swap w and h)
+    // Resize (swap w and h)
     int new_width  = temp_shape->h;
     int new_height = temp_shape->w;
 
@@ -311,7 +311,6 @@ void WidgetEditor::on_rotate_button_clicked()
 
     UpdateWidgetsValues();
 
-    // Apply clockwise rotation then
     QTransform t = QTransform().rotate(90);
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -321,9 +320,6 @@ void WidgetEditor::on_rotate_button_clicked()
         led_position->setY(new_pos.y());
     }
 
-    // Fix the glitch with UpdateItems (some leds disappear, need to zoom out/in after update)
-    // Lets recreate the items instead
-    //ui->grid->UpdateItems();
     ui->grid->CreateLEDItems(temp_shape);
 }
 
@@ -338,7 +334,7 @@ void WidgetEditor::on_v_flip_button_clicked()
         led_position->setY(new_pos.y() + temp_shape->h - 1);
     }
 
-    ui->grid->UpdateItems();
+    ui->grid->CreateLEDItems(temp_shape);
 }
 
 void WidgetEditor::on_h_flip_button_clicked()
@@ -352,6 +348,159 @@ void WidgetEditor::on_h_flip_button_clicked()
         led_position->setY(new_pos.y());
     }
 
-    ui->grid->UpdateItems();
+    ui->grid->CreateLEDItems(temp_shape);
 }
+
+void WidgetEditor::on_h_line_button_clicked()
+{
+    temp_shape->w = 0;
+    temp_shape->h = 1;
+
+    for(LedPosition* led_position: temp_shape->led_positions)
+    {
+       led_position->setX(temp_shape->w++);
+       led_position->setY(0);
+    }
+
+    UpdateWidgetsValues();
+
+    ui->grid->CreateLEDItems(temp_shape);
+}
+
+void WidgetEditor::on_v_line_button_clicked()
+{
+    temp_shape->w = 1;
+    temp_shape->h = 0;
+
+    for(LedPosition* led_position: temp_shape->led_positions)
+    {
+       led_position->setX(0);
+       led_position->setY(temp_shape->h++);
+    }
+
+    UpdateWidgetsValues();
+
+    ui->grid->CreateLEDItems(temp_shape);
+}
+
+void WidgetEditor::on_grow_button_clicked()
+{
+    temp_shape->w *= 2;
+    temp_shape->h *= 2;
+
+    UpdateWidgetsValues();
+
+    QTransform t = QTransform().scale(2, 2);
+
+    for(LedPosition* led_position : temp_shape->led_positions)
+    {
+        QPoint new_pos = t.map(led_position->point);
+        led_position->setX(new_pos.x());
+        led_position->setY(new_pos.y());
+    }
+
+    ui->grid->CreateLEDItems(temp_shape);
+}
+
+void WidgetEditor::on_shrink_button_clicked()
+{
+    temp_shape->w *= 0.5;
+    temp_shape->h *= 0.5;
+
+    temp_shape->w = std::max<int>(1,temp_shape->w);
+    temp_shape->h = std::max<int>(1,temp_shape->h);
+
+    UpdateWidgetsValues();
+
+    QTransform t = QTransform().scale(0.5, 0.5);
+
+    for(LedPosition* led_position : temp_shape->led_positions)
+    {
+        QPoint new_pos = t.map(led_position->point);
+        led_position->setX(new_pos.x());
+        led_position->setY(new_pos.y());
+    }
+
+    ui->grid->CreateLEDItems(temp_shape);
+}
+
+void WidgetEditor::on_circle_button_clicked()
+{
+    double PI = 3.14159265359l;
+
+    unsigned int leds_count = temp_shape->led_positions.size();
+
+    int radius = leds_count / 2;
+
+    temp_shape->w = 2 * radius + 1;
+    temp_shape->h = 2 * radius + 1;
+
+    UpdateWidgetsValues();
+
+    for(unsigned int i  = 0 ; i < leds_count; i++)
+    {
+        float theta = ((PI*2) / leds_count);
+        float angle = (theta * i);
+
+        int x = round(radius + radius * cos(angle));
+        int y = round(radius + radius * sin(angle));
+
+        temp_shape->led_positions[i]->setX(x);
+        temp_shape->led_positions[i]->setY(y);
+    }
+
+    ui->grid->CreateLEDItems(temp_shape);
+
+}
+
+void WidgetEditor::on_square_button_clicked()
+{
+    int side = temp_shape->led_positions.size() / 4 ;
+
+    temp_shape->w = side + 2;
+    temp_shape->h = side + 2;
+
+    UpdateWidgetsValues();
+
+    for(int i = 0; i < side; i++)
+    {
+        temp_shape->led_positions[i]->setX(1 + i);
+        temp_shape->led_positions[i]->setY(0);
+    }
+    for(int i = 0; i < side; i++)
+    {
+        temp_shape->led_positions[side + i]->setX(side + 1);
+        temp_shape->led_positions[side + i]->setY(i + 1);
+    }
+
+    for(int i = 0; i < side; i++)
+    {
+        temp_shape->led_positions[2 * side + i]->setX(side - i);
+        temp_shape->led_positions[2 * side + i]->setY(side + 1);
+    }
+
+    for(int i = 0; i < side; i++)
+    {
+        temp_shape->led_positions[3 * side + i]->setX(0);
+        temp_shape->led_positions[3 * side + i]->setY(side - i);
+    }
+
+    int offset = side * 4;
+
+    int rest = temp_shape->led_positions.size() - side * 4;
+
+    for(int i = 0; i < rest; i++)
+    {
+        temp_shape->led_positions[offset+i]->setX(i+1);
+        temp_shape->led_positions[offset+i]->setY(i+1);
+    }
+
+    ui->grid->CreateLEDItems(temp_shape);
+}
+
+
+
+
+
+
 

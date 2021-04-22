@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>692</width>
-    <height>463</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -126,6 +126,48 @@
           <widget class="QPushButton" name="v_flip_button">
            <property name="text">
             <string>V-Flip</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="h_line_button">
+           <property name="text">
+            <string>H-Line</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="v_line_button">
+           <property name="text">
+            <string>V-Line</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="square_button">
+           <property name="text">
+            <string>Square</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="circle_button">
+           <property name="text">
+            <string>Circle</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="grow_button">
+           <property name="text">
+            <string>Grow</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="shrink_button">
+           <property name="text">
+            <string>Shrink</string>
            </property>
           </widget>
          </item>
