@@ -18,8 +18,6 @@ ZoneManager* ZoneManager::Get()
 
 ZoneManager::ZoneManager()
 {
-    available_zones.clear();
-
     std::vector<RGBController*> controllers = OpenRGBVisualMapPlugin::RMPointer->GetRGBControllers();
 
     for (unsigned int i = 0; i < controllers.size(); i++)
@@ -35,11 +33,12 @@ ZoneManager::ZoneManager()
             {
                 for(unsigned int zone_idx = 0; zone_idx < controllers[i]->zones.size(); zone_idx++)
                 {
-                    ControllerZone* ctrl_zone = (struct ControllerZone*) malloc( sizeof(struct ControllerZone));
+                    ControllerZone* ctrl_zone = new ControllerZone();//(struct ControllerZone*) malloc(sizeof(struct ControllerZone));
 
                     ctrl_zone->controller = controllers[i];
                     ctrl_zone->zone_idx = zone_idx;
                     ctrl_zone->settings = ControllerZoneSettings::defaults();
+                    ctrl_zone->custom_zone_name = "";
 
                     if(ctrl_zone->controller->zones[ctrl_zone->zone_idx].type == ZONE_TYPE_MATRIX)
                     {

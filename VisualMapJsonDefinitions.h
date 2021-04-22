@@ -88,6 +88,7 @@ void to_json(json& j, const ControllerZone* ctrl_zone) {
     j = json{
     {"controller", ctrl_zone->controller},
     {"zone_idx", ctrl_zone->zone_idx},
+    {"custom_zone_name", ctrl_zone->custom_zone_name},
     {"settings", ctrl_zone->settings}
 };
 }

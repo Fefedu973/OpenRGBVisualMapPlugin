@@ -75,6 +75,8 @@ struct ControllerZone
     RGBController* controller;
     unsigned int zone_idx;
 
+    std::string custom_zone_name;
+
     ControllerZoneSettings settings;
 
     bool operator==(ControllerZone const & rhs) const {
@@ -87,7 +89,9 @@ struct ControllerZone
 
     std::string display_name()
     {
-        return this->controller->name + " " + this->controller->zones[this->zone_idx].name;
+        return this->custom_zone_name.empty() ?
+                    this->controller->name + " - " + this->controller->zones[this->zone_idx].name :
+                    this->custom_zone_name;
     }
 
     bool isCustomShape()  {

@@ -7,6 +7,7 @@
 #include "VisualMapJsonDefinitions.h"
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QTableWidgetItem>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -61,6 +62,25 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
         ui->backgroundApplier->SetSize(settings->w, settings->h);
         virtual_controller->UpdateSize(settings->w, settings->h);
     });
+
+    connect(ui->zoneList, &QTableWidget::cellDoubleClicked,[=](int r, int){
+
+        ControllerZone* ctrl_zone = ZoneManager::Get()->GetZone(r);
+
+        std::string old_name = ctrl_zone->controller->zones[ctrl_zone->zone_idx].name;
+
+        QString new_name = QInputDialog::getText(
+                    nullptr, "Rename zone", "Set the new name",
+                    QLineEdit::Normal, QString::fromUtf8(old_name.c_str())).trimmed();
+
+        if(!new_name.isEmpty())
+        {
+            ctrl_zone->custom_zone_name = new_name.toStdString();
+            ui->zoneList->item(r,0)->setText(new_name);
+        }
+
+    });
+
 
     virtual_controller->SetCallBack([=](QImage* image){
         emit ApplyBackground(image);
@@ -119,9 +139,8 @@ void VirtualControllerTab::InitZoneList()
     // Fill the table
     for(unsigned int i = 0; i < retained_zones.size(); i++)
     {
-        // Cell 1 : device name + zone name
-        std::string display_name = retained_zones[i]->controller->name + "\n" + retained_zones[i]->controller->zones[retained_zones[i]->zone_idx].name;
-        ui->zoneList->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(display_name)));
+        // Cell 1 : ControllerZone display name
+        ui->zoneList->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(retained_zones[i]->display_name())));
 
         // Cell 2 : add/remove button
         QWidget* widget = new QWidget();
@@ -261,6 +280,7 @@ void VirtualControllerTab::on_loadButton_clicked()
         for(unsigned int i= 0; i < available_zones.size(); i++)
         {
             ControllerZone* ctrl_zone = available_zones[i];
+
             if(
                     ctrl_zone->controller->name     == controller["name"]     &&
                     ctrl_zone->controller->location == controller["location"] &&
@@ -271,8 +291,17 @@ void VirtualControllerTab::on_loadButton_clicked()
             {
                 try
                 {
+                    if(entry.contains("custom_zone_name"))
+                    {
+                        ctrl_zone->custom_zone_name = entry["custom_zone_name"];
+                    }
+
                     ctrl_zone->settings = settings;
+
                     added_zones.push_back(available_zones[i]);
+
+                    ui->zoneList->item(i,0)->setText(QString::fromUtf8(ctrl_zone->display_name().c_str()));
+
                 } catch(const std::exception& e)
                 {
                     has_failures = true;
