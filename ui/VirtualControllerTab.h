@@ -30,6 +30,7 @@ public:
     ~VirtualControllerTab();
 
     void RenameController(std::string);
+    std::string GetControllerName();
 
 private slots:
     void OnZoneSelectionChanged();

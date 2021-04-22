@@ -4,6 +4,7 @@
 #include <QString>
 #include <QToolButton>
 #include <QLabel>
+#include <QInputDialog>
 
 OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QWidget(parent),
@@ -22,6 +23,26 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     connect(tb, SIGNAL(clicked()), this, SLOT(AddTab()));
 
+    connect(ui->virtual_controller_tabs, &QTabWidget::tabBarDoubleClicked, [=](int tab_index){
+        // real tab size (do not count the empty tab with the "+" button
+        int tab_size = ui->virtual_controller_tabs->count() - 1;
+        if(tab_index < tab_size)
+        {
+            VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_index);
+
+            QString new_name = QInputDialog::getText(
+                        nullptr, "Rename controller", "Set the new name",
+                        QLineEdit::Normal, QString::fromUtf8(vct->GetControllerName().c_str())).trimmed();
+
+            if(!new_name.isEmpty())
+            {
+                ui->virtual_controller_tabs->setTabText(tab_index, new_name);
+                vct->RenameController(new_name.toStdString());
+            }
+
+        }
+    });
+
     AddTab();
 }
 
@@ -35,6 +56,7 @@ void OpenRGBVisualMapTab::AddTab()
 
     ui->virtual_controller_tabs->insertTab(tab_size - 1, tab , QString::fromUtf8(tab_name.c_str()));
     ui->virtual_controller_tabs->setCurrentIndex(tab_size -1);
+
 }
 
 OpenRGBVisualMapTab::~OpenRGBVisualMapTab()

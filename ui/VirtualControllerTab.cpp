@@ -72,6 +72,11 @@ void VirtualControllerTab::RenameController(std::string value)
     virtual_controller->name = value;
 }
 
+std::string VirtualControllerTab::GetControllerName()
+{
+    return virtual_controller->name;
+}
+
 void VirtualControllerTab::DecorateButton(QPushButton* button, QIcon icon)
 {
     button->setIcon(icon);
