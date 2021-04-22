@@ -147,7 +147,7 @@ void WidgetEditor::ResetShape()
     {
         int led_count = ctrl_zone->led_count();
 
-        temp_shape->w = ctrl_zone->led_count();
+        temp_shape->w = led_count;
         temp_shape->h = 1;
         temp_shape->led_positions.resize(led_count);
 
@@ -250,7 +250,21 @@ void WidgetEditor::on_cancel_button_clicked()
 
 void WidgetEditor::on_save_button_clicked()
 {
-    ctrl_zone->settings.custom_shape = temp_shape;
+    ctrl_zone->settings.custom_shape = new CustomShape();
+
+    ctrl_zone->settings.custom_shape->w = temp_shape->w;
+    ctrl_zone->settings.custom_shape->h = temp_shape->h;
+
+    for(LedPosition* temp_led_position: temp_shape->led_positions)
+    {
+       LedPosition* led_position = new LedPosition();
+       led_position->led_num = temp_led_position->led_num;
+       led_position->setX(temp_led_position->x());
+       led_position->setY(temp_led_position->y());
+
+       ctrl_zone->settings.custom_shape->led_positions.push_back(led_position);
+    }
+
     emit Save();
 }
 
