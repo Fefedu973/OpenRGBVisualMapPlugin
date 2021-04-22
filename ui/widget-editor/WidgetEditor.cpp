@@ -157,8 +157,7 @@ void WidgetEditor::ResetShape()
             temp_led_position->led_num = i;
             temp_led_position->setX(i);
             temp_led_position->setY(0);
-
-            temp_shape->led_positions.push_back(temp_led_position);
+            temp_shape->led_positions[i] = temp_led_position;
         }
     }
 
@@ -226,8 +225,6 @@ void WidgetEditor::on_copy_shape_button_clicked()
         temp_shape = new CustomShape();
         temp_shape->w = selected_ctrl_zone->settings.custom_shape->w;
         temp_shape->h = selected_ctrl_zone->settings.custom_shape->h;
-
-        temp_shape->led_positions.resize(selected_ctrl_zone->settings.custom_shape->led_positions.size());
 
         for(LedPosition* led_position: selected_ctrl_zone->settings.custom_shape->led_positions)
         {
