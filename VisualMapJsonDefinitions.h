@@ -80,8 +80,13 @@ void from_json(const json& j, ControllerZoneSettings& s) {
     j.at("led_spacing").get_to(s.led_spacing);
     s.shape = static_cast<ZoneShape>(j.at("shape"));
     j.at("reverse").get_to(s.reverse);
-    s.custom_shape = new CustomShape();
-    j.at("custom_shape").get_to(s.custom_shape);
+
+    auto custom_shape = j.at("custom_shape");
+    if(!custom_shape.is_null())
+    {
+        s.custom_shape = new CustomShape();
+        j.at("custom_shape").get_to(s.custom_shape);
+    }
 }
 
 void to_json(json& j, const ControllerZone* ctrl_zone) {
