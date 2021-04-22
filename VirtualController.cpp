@@ -12,6 +12,7 @@ VirtualController::VirtualController()
     serial = VIRTUAL_CONTROLLER_SERIAL;
     location = "Somewhere over the rainbow";
     active_mode = 0;
+    type = DEVICE_TYPE_VIRTUAL;
 
     zones.resize(1);
     modes.resize(1);
