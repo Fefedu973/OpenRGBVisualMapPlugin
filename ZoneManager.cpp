@@ -159,12 +159,12 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage* image)
             break;
 
         case CUSTOM:
-            std::vector<QPoint*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
+            std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
 
             for(unsigned int i = 0; i < led_positions.size(); i++)
-            {
-              QColor color = image->pixelColor(settings.x + led_positions[i]->x(), settings.y + led_positions[i]->y());
-              controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            {                
+                QColor color = image->pixelColor(settings.x + led_positions[i]->x(), settings.y + led_positions[i]->y());
+                controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
             }
 
             break;
@@ -182,41 +182,21 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
     ctrl_zone->settings.custom_shape->w = matrix_map->width;
     ctrl_zone->settings.custom_shape->h = matrix_map->height;
 
-    // 1. dont trust leds_count, count them ourself.
-    int total_leds = 0;
-
     for(unsigned int h = 0; h < matrix_map->height; h++)
     {
         for(unsigned int w = 0; w < matrix_map->width; w++)
         {
             unsigned int led_num = matrix_map->map[h * matrix_map->width + w];
 
-            if(led_num == NA)
+            if(led_num != NA)
             {
-                continue;
-            }
+                LedPosition* led_position = new LedPosition();
+                led_position->led_num = led_num;
+                led_position->setX(w);
+                led_position->setY(h);
 
-            ++total_leds;
+                ctrl_zone->settings.custom_shape->led_positions.push_back(led_position);
+            }
         }
     }
-
-    // 2. change the leds_count number in case its not the same.
-    ctrl_zone->controller->zones[ctrl_zone->zone_idx].leds_count = total_leds;
-    ctrl_zone->settings.custom_shape->led_positions.resize(total_leds);
-
-    for(unsigned int h = 0; h < matrix_map->height; h++)
-    {
-        for(unsigned int w = 0; w < matrix_map->width; w++)
-        {
-            unsigned int led_num = matrix_map->map[h * matrix_map->width + w];
-
-            if(led_num == NA)
-            {
-                continue;
-            }
-
-            ctrl_zone->settings.custom_shape->led_positions[led_num] = new QPoint(w, h);
-        }
-    }
-
  }

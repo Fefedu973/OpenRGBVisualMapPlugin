@@ -6,6 +6,7 @@
 #include "hsv.h"
 #include "VisualMapJsonDefinitions.h"
 #include <QInputDialog>
+#include <QMessageBox>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -244,6 +245,8 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     auto ctrl_zones = j["ctrl_zones"];
 
+    bool has_failures = false;
+
     for (auto it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
     {
         auto entry = it.value();
@@ -261,11 +264,25 @@ void VirtualControllerTab::on_loadButton_clicked()
                     ctrl_zone->zone_idx == entry["zone_idx"]
                     )
             {
-                ctrl_zone->settings = settings;
-                added_zones.push_back(available_zones[i]);
+                try
+                {
+                    ctrl_zone->settings = settings;
+                    added_zones.push_back(available_zones[i]);
+                } catch(const std::exception& e)
+                {
+                    has_failures = true;
+                }
             }
         }
+    }
 
+    if(has_failures)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Some of the components could not be loaded, the format is probably out of date.");
+        msgBox.setWindowTitle("Sorry");
+        msgBox.move(button_pos.x(), button_pos.y());
+        msgBox.exec();
     }
 
     UpdateZoneButtons();

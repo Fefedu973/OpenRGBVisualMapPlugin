@@ -16,7 +16,7 @@ class EditorGrid : public QGraphicsView
      Q_OBJECT
 
 public:
-    explicit EditorGrid(QWidget *parent);
+    explicit EditorGrid(QWidget*);
 
     void ApplySettings(GridSettings*);
     void SetSelected(int);
@@ -26,9 +26,9 @@ public:
     void UpdateItems();
 
 protected:
-    void wheelEvent(QWheelEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
+    void wheelEvent(QWheelEvent*) override;
+    void keyPressEvent(QKeyEvent*) override;
+    void keyReleaseEvent(QKeyEvent*) override;
 
 signals:
     void ItemSelected(int);

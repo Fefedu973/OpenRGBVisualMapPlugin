@@ -56,9 +56,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     if(ctrl_zone->isCustomShape())
     {
-        std::vector<QPoint*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
-
-        for(QPoint* point : led_positions)
+        for(LedPosition* point : ctrl_zone->settings.custom_shape->led_positions)
         {
             QRectF rect = QRectF(point->x(), point->y(), 1, 1);
             painter->drawRect(rect);

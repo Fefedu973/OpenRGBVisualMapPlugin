@@ -5,7 +5,7 @@
 #include <QString>
 #include <QCursor>
 
-LedItem::LedItem(int led_num, QPoint* led_position, GridSettings* settings) :
+LedItem::LedItem(int led_num, LedPosition* led_position, GridSettings* settings) :
    led_num(led_num),
    led_position(led_position),
    settings(settings)

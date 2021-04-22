@@ -76,15 +76,17 @@ void ItemOptions::on_shape_comboBox_currentIndexChanged(int i)
         {
             ctrl_zone->settings.custom_shape = new CustomShape();
             ctrl_zone->settings.custom_shape->w = ctrl_zone->led_count();
-            ctrl_zone->settings.custom_shape->h = ctrl_zone->led_count();
-
-            // really needed ?
-            ctrl_zone->settings.custom_shape->led_positions = std::vector<QPoint*>();
-            // ---------------
+            ctrl_zone->settings.custom_shape->h = 1;
+            ctrl_zone->settings.custom_shape->led_positions.resize(ctrl_zone->led_count());
 
             for(unsigned int i = 0; i < ctrl_zone->led_count(); i++)
             {
-                ctrl_zone->settings.custom_shape->led_positions.push_back(new QPoint(i, 0));
+                LedPosition* led_position = new LedPosition();
+                led_position->led_num = i;
+                led_position->setX(i);
+                led_position->setY(0);
+
+                ctrl_zone->settings.custom_shape->led_positions.push_back(led_position);
             }
         }
 

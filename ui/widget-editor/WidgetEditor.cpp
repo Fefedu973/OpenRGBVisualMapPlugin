@@ -126,28 +126,39 @@ void WidgetEditor::ResetShape()
 {
     temp_shape = new CustomShape();
 
+    // custom shape already exists, copy it to temp shape
     if(ctrl_zone->settings.custom_shape)
     {
         temp_shape->w = ctrl_zone->settings.custom_shape->w;
         temp_shape->h = ctrl_zone->settings.custom_shape->h;
 
-        for(QPoint* point : ctrl_zone->settings.custom_shape->led_positions)
+        for(LedPosition* led_position : ctrl_zone->settings.custom_shape->led_positions)
         {
-            temp_shape->led_positions.push_back(new QPoint(point->x(), point->y()));
+            LedPosition* temp_led_position = new LedPosition();
+            temp_led_position->led_num = led_position->led_num;
+            temp_led_position->setX(led_position->x());
+            temp_led_position->setY(led_position->y());
+
+            temp_shape->led_positions.push_back(temp_led_position);
         }
     }
+    // custom shape does not exist, generate one (horizontal line)
     else
     {
         int led_count = ctrl_zone->led_count();
 
         temp_shape->w = ctrl_zone->led_count();
-        temp_shape->h = ctrl_zone->led_count();
-
+        temp_shape->h = 1;
         temp_shape->led_positions.resize(led_count);
 
         for(int i = 0; i < led_count; i++)
         {
-            temp_shape->led_positions.push_back(new QPoint(i, 0));
+            LedPosition* temp_led_position = new LedPosition();
+            temp_led_position->led_num = i;
+            temp_led_position->setX(i);
+            temp_led_position->setY(0);
+
+            temp_shape->led_positions.push_back(temp_led_position);
         }
     }
 
@@ -218,9 +229,14 @@ void WidgetEditor::on_copy_shape_button_clicked()
 
         temp_shape->led_positions.resize(selected_ctrl_zone->settings.custom_shape->led_positions.size());
 
-        for(QPoint* point : selected_ctrl_zone->settings.custom_shape->led_positions)
+        for(LedPosition* led_position: selected_ctrl_zone->settings.custom_shape->led_positions)
         {
-            temp_shape->led_positions.push_back(new QPoint(point->x(), point->y()));
+           LedPosition* temp_led_position = new LedPosition();
+           temp_led_position->led_num = led_position->led_num;
+           temp_led_position->setX(led_position->x());
+           temp_led_position->setY(led_position->y());
+
+           temp_shape->led_positions.push_back(temp_led_position);
         }
 
         ui->grid->CreateLEDItems(temp_shape);
@@ -287,11 +303,11 @@ void WidgetEditor::on_rotate_button_clicked()
     // Apply clockwise rotation then
     QTransform t = QTransform().rotate(90);
 
-    for(QPoint* point : temp_shape->led_positions)
+    for(LedPosition* led_position : temp_shape->led_positions)
     {
-        QPoint new_pos = t.map(*point);
-        point->setX(new_pos.x() + new_width - 1);
-        point->setY(new_pos.y());
+        QPoint new_pos = t.map(led_position->point);
+        led_position->setX(new_pos.x() + new_width - 1);
+        led_position->setY(new_pos.y());
     }
 
     // Fix the glitch with UpdateItems (some leds disappear, need to zoom out/in after update)
@@ -304,11 +320,11 @@ void WidgetEditor::on_v_flip_button_clicked()
 {
     QTransform t = QTransform().scale(1,-1);
 
-    for(QPoint* point : temp_shape->led_positions)
+    for(LedPosition* led_position : temp_shape->led_positions)
     {
-        QPoint new_pos = t.map(*point);
-        point->setX(new_pos.x());
-        point->setY(new_pos.y() + temp_shape->h - 1);
+        QPoint new_pos = t.map(led_position->point);
+        led_position->setX(new_pos.x());
+        led_position->setY(new_pos.y() + temp_shape->h - 1);
     }
 
     ui->grid->UpdateItems();
@@ -318,11 +334,11 @@ void WidgetEditor::on_h_flip_button_clicked()
 {
     QTransform t = QTransform().scale(-1, 1);
 
-    for(QPoint* point : temp_shape->led_positions)
+    for(LedPosition* led_position : temp_shape->led_positions)
     {
-        QPoint new_pos = t.map(*point);
-        point->setX(new_pos.x() + temp_shape->w - 1 );
-        point->setY(new_pos.y());
+        QPoint new_pos = t.map(led_position->point);
+        led_position->setX(new_pos.x() + temp_shape->w - 1 );
+        led_position->setY(new_pos.y());
     }
 
     ui->grid->UpdateItems();

@@ -8,6 +8,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 #include "GridSettings.h"
+#include "ControllerZone.h"
 
 class LedItem: public QObject, public QGraphicsItem
 {
@@ -15,7 +16,7 @@ class LedItem: public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem);
 
 public:
-    LedItem(int, QPoint*, GridSettings*);
+    LedItem(int, LedPosition*, GridSettings*);
     QRectF boundingRect() const;
     void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
     void SetSelected(bool);
@@ -30,7 +31,7 @@ signals:
 
 private:
     int  led_num;
-    QPoint*  led_position;
+    LedPosition*  led_position;
     GridSettings* settings;
 
     bool selected = false;

@@ -8,24 +8,29 @@
 
 using json = nlohmann::json;
 
-void to_json(json& j, const QPoint* point) {
-    j = json{
-    {"x", point->x()},
-    {"y", point->y()}
-};
+void to_json(json& j, LedPosition* led_position) {
+        j = json{
+        {"led_num",led_position->led_num},
+        {"x", led_position->x()},
+        {"y", led_position->y()}
+    };
 }
 
-void from_json(const json& j, std::vector<QPoint*>& points) {
+void from_json(const json& j, std::vector<LedPosition*>& led_positions) {
     for (auto it = j.begin(); it != j.end(); ++it)
     {
-        points.push_back(new QPoint(it.value().at("x"),  it.value().at("y")));
+        LedPosition* led_position = new LedPosition();
+        led_position->led_num = it.value().at("led_num");
+        led_position->setX(it.value().at("x"));
+        led_position->setY(it.value().at("y"));
+        led_positions.push_back(led_position);
     }
 }
 
-void to_json(json& j, const std::vector<QPoint*>& points) {
-    for(unsigned int i = 0; i < points.size(); i++)
+void to_json(json& j, const std::vector<LedPosition*>& led_positions) {
+    for(unsigned int i = 0; i < led_positions.size(); i++)
     {
-        j[i]=points[i];
+        j[i]=led_positions[i];
     }
 }
 

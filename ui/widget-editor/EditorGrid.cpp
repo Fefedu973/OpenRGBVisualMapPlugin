@@ -72,7 +72,7 @@ void EditorGrid::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void EditorGrid::keyReleaseEvent(QKeyEvent *event)
+void EditorGrid::keyReleaseEvent(QKeyEvent*)
 {
     setDragMode(QGraphicsView::ScrollHandDrag);
 }
@@ -83,6 +83,11 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
 
     for(int unsigned led_num = 0; led_num < shape->led_positions.size(); led_num++)
     {
+        if(!shape->led_positions[led_num])
+        {
+            continue;
+        }
+
         LedItem* led_item = new LedItem(led_num, shape->led_positions[led_num], settings);
 
         led_items.push_back(led_item);

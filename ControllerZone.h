@@ -6,11 +6,38 @@
 #include <QPoint>
 #include <QStringList>
 
+struct LedPosition
+{
+    unsigned int led_num;
+
+    QPoint point;
+
+    unsigned int x()
+    {
+        return point.x();
+    }
+
+    unsigned int y()
+    {
+        return point.y();
+    }
+
+    void setX(int x)
+    {
+        point.setX(x);
+    }
+
+    void setY(int y)
+    {
+        point.setY(y);
+    }
+};
+
 struct CustomShape
 {
     unsigned int w;
     unsigned int h;
-    std::vector<QPoint*> led_positions;
+    std::vector<LedPosition*> led_positions;
 };
 
 enum ZoneShape {
