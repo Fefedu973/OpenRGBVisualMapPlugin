@@ -19,10 +19,10 @@ public:
 
     void SetSize(int,int);
 
-    QImage* GetImage();
+    QImage GetImage();
 
 signals:
-    void BackgroundApplied(QImage*) const;
+    void BackgroundApplied(QImage) const;
 
 private slots:
     void on_presets_comboBox_currentIndexChanged(int);
@@ -36,7 +36,7 @@ private:
     int w;
     int h;
 
-    QImage* image;
+    QImage image;
     QGradient::Preset preset;
 
     std::vector<ColorStop*> color_stops;

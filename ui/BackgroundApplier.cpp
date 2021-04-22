@@ -44,7 +44,7 @@ BackgroundApplier::~BackgroundApplier()
     delete ui;
 }
 
-QImage* BackgroundApplier::GetImage()
+QImage BackgroundApplier::GetImage()
 {
     return image;
 }
@@ -85,7 +85,7 @@ void BackgroundApplier::on_add_color_stop_button_clicked()
 
 void BackgroundApplier::ApplyPreset()
 {
-    image = new QImage(w, h, QImage::Format_RGB32);
+    image = QImage(w, h, QImage::Format_RGB32);
     preset = presets[ui->presets_comboBox->currentIndex()];
 
     QGradient grad(preset);
@@ -93,15 +93,15 @@ void BackgroundApplier::ApplyPreset()
     QBrush brush(grad);
     QRectF rect(0, 0, w, h);
 
-    QPainter* painter = new QPainter(image);
-    painter->fillRect(rect, brush);
+    QPainter painter(&image);
+    painter.fillRect(rect, brush);
 
     emit BackgroundApplied(image);
 }
 
 void BackgroundApplier::ApplyCustom()
 {
-    image = new QImage(w, h, QImage::Format_RGB32);
+    image = QImage(w, h, QImage::Format_RGB32);
 
     QBrush brush;
 
@@ -123,7 +123,7 @@ void BackgroundApplier::ApplyCustom()
 
     QRectF rect(0, 0, w, h);
 
-    QPainter* painter = new QPainter(image);
+    QPainter* painter = new QPainter(&image);
     painter->fillRect(rect, brush);
 
     emit BackgroundApplied(image);
@@ -231,7 +231,7 @@ void BackgroundApplier::OpenFileDialog()
 
     QImage scaled_image = user_image.scaled(w, h, Qt::IgnoreAspectRatio);
 
-    emit BackgroundApplied(&scaled_image);
+    emit BackgroundApplied(scaled_image);
 }
 
 

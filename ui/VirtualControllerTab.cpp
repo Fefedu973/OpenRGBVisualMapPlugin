@@ -36,9 +36,9 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     ui->itemOptions->hide();
     ui->backgroundApplier->SetSize(settings->w, settings->h);
 
-    connect(this, SIGNAL(ApplyBackground(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
+    connect(this, SIGNAL(ApplyBackground(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
     connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
-    connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage*)), this, SLOT(OnBackgroundApplied(QImage*)));
+    connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
     connect(ui->zoneList->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(OnZoneSelectionChanged()));
 
     connect(ui->grid, &Grid::ItemSelected, [=](ControllerZone* ctrl_zone){
@@ -82,7 +82,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     });
 
 
-    virtual_controller->SetCallBack([=](QImage* image){
+    virtual_controller->SetCallBack([=](QImage image){
         emit ApplyBackground(image);
     });
 }
@@ -353,20 +353,13 @@ void VirtualControllerTab::UpdateZoneButtons()
     }
 }
 
-void VirtualControllerTab::OnBackgroundApplied(QImage* image)
+void VirtualControllerTab::OnBackgroundApplied(QImage image)
 {
-    if(!image)
-    {
-        return;
-    }
-
     if(settings->live_preview)
     {
         ui->grid->UpdatePreview(image);        
     }
 
     ZoneManager::Get()->ApplyImage(added_zones, image);
-
-    delete image;
 }
 

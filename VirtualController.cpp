@@ -67,7 +67,7 @@ void VirtualController::SetupVirtualZone()
 }
 
 void VirtualController::DeviceUpdateLEDs() {
-    QImage* image = new QImage(width, height, QImage::Format_ARGB32);
+    QImage image(width, height, QImage::Format_ARGB32);
 
     for(int h = 0; h<height; h++)
     {
@@ -75,7 +75,7 @@ void VirtualController::DeviceUpdateLEDs() {
         {
             int rgb = colors[(h*width) + w];
             QColor color = QColor(RGBGetRValue(rgb), RGBGetGValue(rgb), RGBGetBValue(rgb));
-            image->setPixelColor(w, h, color);
+            image.setPixelColor(w, h, color);
         }
     }
 
@@ -90,7 +90,7 @@ void VirtualController::UpdateSize(int w, int h)
     SetupVirtualZone();
 }
 
-void VirtualController::SetCallBack(std::function<void(QImage*)> callback)
+void VirtualController::SetCallBack(std::function<void(QImage)> callback)
 {
     this->callback = callback;
 }

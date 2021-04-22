@@ -27,7 +27,7 @@ public:
     // Internals
     void UpdateSize(int,int);
 
-    void SetCallBack(std::function<void(QImage*)>);
+    void SetCallBack(std::function<void(QImage)>);
 
 private:
     int width;
@@ -35,7 +35,7 @@ private:
 
     void SetupVirtualZone();    
 
-    std::function<void(QImage*)> callback;
+    std::function<void(QImage)> callback;
 };
 
 #endif // VIRTUALCONTROLLER_H

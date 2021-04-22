@@ -35,7 +35,7 @@ public:
 private slots:
     void OnZoneSelectionChanged();
     void OnItemOptionsChanged();
-    void OnBackgroundApplied(QImage*);
+    void OnBackgroundApplied(QImage);
 
     void on_saveButton_clicked();
     void on_loadButton_clicked();
@@ -43,7 +43,7 @@ private slots:
     void on_register_controller_stateChanged(int);
 
 signals:
-    void ApplyBackground(QImage*);
+    void ApplyBackground(QImage);
     void ControllerRenamed(std::string);
 
 private:

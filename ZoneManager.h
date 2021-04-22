@@ -15,7 +15,7 @@ public:
 
     void IdentifyZone(ControllerZone*);
     void IdentifyLed(ControllerZone*, int);
-    void ApplyImage(std::vector<ControllerZone*>, QImage*);
+    void ApplyImage(std::vector<ControllerZone*>, QImage);
 
 private:
     ZoneManager();
@@ -25,7 +25,7 @@ private:
 
     std::vector<ControllerZone*> available_zones;
 
-    void ApplyImage(ControllerZone*, QImage*);
+    void ApplyImage(ControllerZone*, QImage);
 
     void InitMatrixCustomShape(ControllerZone*);
 };

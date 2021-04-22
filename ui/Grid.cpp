@@ -42,7 +42,7 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
     scene->clear();
 
     preview = scene->addPixmap(preview_pixmap);
-    UpdatePreview(new QImage(0, 0, QImage::Format_RGB32));
+    UpdatePreview(QImage(0, 0, QImage::Format_RGB32));
 
     ctrl_zone_items.clear();
 
@@ -94,9 +94,9 @@ void Grid::UpdateItems()
     scene->update();
 }
 
-void Grid::UpdatePreview(QImage* image)
+void Grid::UpdatePreview(QImage image)
 {
-    preview_pixmap.convertFromImage(*image);
+    preview_pixmap.convertFromImage(image);
     preview->setPixmap(preview_pixmap);
     preview->update();
 }
