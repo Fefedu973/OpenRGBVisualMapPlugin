@@ -123,8 +123,8 @@ void BackgroundApplier::ApplyCustom()
 
     QRectF rect(0, 0, w, h);
 
-    QPainter* painter = new QPainter(&image);
-    painter->fillRect(rect, brush);
+    QPainter painter(&image);
+    painter.fillRect(rect, brush);
 
     emit BackgroundApplied(image);
 }
