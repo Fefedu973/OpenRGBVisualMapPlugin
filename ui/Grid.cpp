@@ -105,14 +105,14 @@ void Grid::wheelEvent(QWheelEvent *event)
 {
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
-    int angle = event->angleDelta().y();
-
     qreal factor;
 
+    int angle = event->angleDelta().y();
+
     if (angle > 0) {
-        factor = 1.05;
+        factor = event->modifiers() == Qt::ControlModifier ? 1.3 : 1.05;
     } else {
-        factor = 0.95;
+        factor = event->modifiers() == Qt::ControlModifier ? 0.7 : 0.95;
     }
 
     scale(factor, factor);
