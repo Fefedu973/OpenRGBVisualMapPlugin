@@ -33,7 +33,7 @@ ZoneManager::ZoneManager()
             {
                 for(unsigned int zone_idx = 0; zone_idx < controllers[i]->zones.size(); zone_idx++)
                 {
-                    ControllerZone* ctrl_zone = new ControllerZone();//(struct ControllerZone*) malloc(sizeof(struct ControllerZone));
+                    ControllerZone* ctrl_zone = new ControllerZone();
 
                     ctrl_zone->controller = controllers[i];
                     ctrl_zone->zone_idx = zone_idx;

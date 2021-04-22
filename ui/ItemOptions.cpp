@@ -74,14 +74,15 @@ void ItemOptions::on_shape_comboBox_currentIndexChanged(int i)
         // needs custon shape init
         if(ctrl_zone->isCustomShape() && !ctrl_zone->settings.custom_shape)
         {
-            ctrl_zone->settings.custom_shape = new CustomShape();
-            ctrl_zone->settings.custom_shape->w = ctrl_zone->led_count();
-            ctrl_zone->settings.custom_shape->h = 1;
-            ctrl_zone->settings.custom_shape->led_positions.resize(ctrl_zone->led_count());
+            unsigned int leds_count = ctrl_zone->led_count();
 
-            for(unsigned int i = 0; i < ctrl_zone->led_count(); i++)
+            ctrl_zone->settings.custom_shape = new CustomShape();
+            ctrl_zone->settings.custom_shape->w = leds_count;
+            ctrl_zone->settings.custom_shape->h = 1;            
+
+            for(unsigned int i = 0; i < leds_count; i++)
             {
-                LedPosition* led_position = new LedPosition();
+                LedPosition* led_position = new LedPosition();                
                 led_position->led_num = i;
                 led_position->setX(i);
                 led_position->setY(0);
