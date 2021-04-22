@@ -90,6 +90,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 void VirtualControllerTab::RenameController(std::string value)
 {
     virtual_controller->name = value;
+    emit ControllerRenamed(value);
 }
 
 std::string VirtualControllerTab::GetControllerName()
@@ -224,10 +225,13 @@ void VirtualControllerTab::on_resetButton_clicked()
 
 void VirtualControllerTab::on_saveButton_clicked()
 {
-    QString filename = QInputDialog::getText(nullptr, "Save current view", "Choose a filename").trimmed();
+    QString filename = QInputDialog::getText(
+                nullptr, "Save virtual controller", "Choose a filename",
+                QLineEdit::Normal, QString::fromUtf8(GetControllerName().c_str())).trimmed();
 
     if(!filename.isEmpty())
     {
+        RenameController(filename.toStdString());
         json j;
         j["ctrl_zones"] = added_zones;
         j["grid_settings"] = settings;
@@ -318,6 +322,8 @@ void VirtualControllerTab::on_loadButton_clicked()
         msgBox.move(button_pos.x(), button_pos.y());
         msgBox.exec();
     }
+
+    RenameController(filename.toStdString());
 
     UpdateZoneButtons();
 

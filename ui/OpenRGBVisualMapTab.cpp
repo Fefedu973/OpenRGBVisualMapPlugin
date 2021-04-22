@@ -57,6 +57,9 @@ void OpenRGBVisualMapTab::AddTab()
     ui->virtual_controller_tabs->insertTab(tab_size - 1, tab , QString::fromUtf8(tab_name.c_str()));
     ui->virtual_controller_tabs->setCurrentIndex(tab_size -1);
 
+    connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string name){
+        ui->virtual_controller_tabs->setTabText(tab_size - 1, QString::fromUtf8(name.c_str()));
+    });
 }
 
 OpenRGBVisualMapTab::~OpenRGBVisualMapTab()

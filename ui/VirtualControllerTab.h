@@ -44,6 +44,7 @@ private slots:
 
 signals:
     void ApplyBackground(QImage*);
+    void ControllerRenamed(std::string);
 
 private:
     Ui::VirtualControllerTab*   ui;
