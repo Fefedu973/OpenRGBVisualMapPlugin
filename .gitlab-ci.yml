@@ -220,7 +220,7 @@ before_script:
   - _fold_final_
 
   artifacts:
-    name: "${CI_PROJECT_NAME}_Windows_32_${CI_COMMIT_SHORT_SHA}"
+    name: "${CI_PROJECT_NAME}_Windows_64_${CI_COMMIT_SHORT_SHA}"
     paths:
     - OpenRGBVisualMapPlugin.dll
     expire_in: 30 days
