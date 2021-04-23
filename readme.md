@@ -10,18 +10,18 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 
 ### **windows**
 
-1. download the latest [Windows pipeline](https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows 64)
+1. download the latest [Windows pipeline](https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows%2064)
 
 2. copy ``OpenRGBVisualMapPlugin.dll`` from the 7z file to  ``C:\Users\Username\appdata\roaming\OpenRGB\plugins``
 
-3. Run the latest [Pipeline build of OpenRGB(At least until 0.6 is out)](https://gitlab.com/Calcprogrammer1/OpenRGB/-/jobs/artifacts/master/download?job=Windows 64)
+3. Run the latest [Pipeline build of OpenRGB(At least until 0.6 is out)](https://gitlab.com/Calcprogrammer1/OpenRGB/-/jobs/artifacts/master/download?job=Windows%2064)
 
 ### **linux**
 
-1. download the latest [linux pipeline](https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows 64)
+1. download the latest [linux pipeline](https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows%2064)
 
 2. Copy ``libOpenRGBVisualMapPlugin.so`` from the 7z to ``~/.config/OpenRGB/plugins``
 
-3. Run the latest [Pipeline build of OpenRGB(At least until 0.6 is out)](https://gitlab.com/Calcprogrammer1/OpenRGB/-/jobs/artifacts/master/download?job=Linux 64)
+3. Run the latest [Pipeline build of OpenRGB(At least until 0.6 is out)](https://gitlab.com/Calcprogrammer1/OpenRGB/-/jobs/artifacts/master/download?job=Linux%2064)
 
 
