@@ -1,5 +1,6 @@
 #include "OpenRGBVisualMapTab.h"
 #include "VirtualControllerTab.h"
+#include "PluginInfo.h"
 
 #include <QString>
 #include <QToolButton>
@@ -12,38 +13,43 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 {
     ui->setupUi(this);
 
+    // remove intial dummy tabs
     ui->virtual_controller_tabs->clear();
 
-    QToolButton *tb = new QToolButton();
-    tb->setText("+");
-
-    ui->virtual_controller_tabs->addTab(new QLabel(), QString());
-    ui->virtual_controller_tabs->setTabEnabled(0, false);
-    ui->virtual_controller_tabs->tabBar()->setTabButton(0, QTabBar::RightSide, tb);
-
+    // define tab style + settings
     ui->virtual_controller_tabs->setTabsClosable(true);
     ui->virtual_controller_tabs->setStyleSheet("QTabBar::close-button{image:url(:close.png);}");
     ui->virtual_controller_tabs->tabBar()->setStyleSheet("QTabBar::tab:hover {text-decoration: underline;}");
 
+    // First tab: plugin info
+    QToolButton *dummy_button = new QToolButton();
+    dummy_button->setText("");
+    ui->virtual_controller_tabs->addTab(new PluginInfo(), QString("Plugin info"));
+    ui->virtual_controller_tabs->tabBar()->setTabButton(0, QTabBar::RightSide, dummy_button);
+    dummy_button->setFixedWidth(0);
+    dummy_button->setFixedHeight(0);
+    dummy_button->hide();
+
+    // Second tab : Add button
+    QToolButton *tb = new QToolButton();
+    tb->setText("+");
+    ui->virtual_controller_tabs->addTab(new QLabel(), QString("New map"));
+    ui->virtual_controller_tabs->setTabEnabled(1, false);
+    ui->virtual_controller_tabs->tabBar()->setTabButton(1, QTabBar::RightSide, tb);
+
     connect(tb, SIGNAL(clicked()), this, SLOT(AddTab()));
 
     connect(ui->virtual_controller_tabs, &QTabWidget::tabBarDoubleClicked, [=](int tab_index){
-        // real tab size (do not count the empty tab with the "+" button
-        int tab_size = ui->virtual_controller_tabs->count() - 1;
-        if(tab_index < tab_size)
+        VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_index);
+
+        QString new_name = QInputDialog::getText(
+                    nullptr, "Rename controller", "Set the new name",
+                    QLineEdit::Normal, QString::fromUtf8(vct->GetControllerName().c_str())).trimmed();
+
+        if(!new_name.isEmpty())
         {
-            VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_index);
-
-            QString new_name = QInputDialog::getText(
-                        nullptr, "Rename controller", "Set the new name",
-                        QLineEdit::Normal, QString::fromUtf8(vct->GetControllerName().c_str())).trimmed();
-
-            if(!new_name.isEmpty())
-            {
-                ui->virtual_controller_tabs->setTabText(tab_index, new_name);
-                vct->RenameController(new_name.toStdString());
-            }
-
+            ui->virtual_controller_tabs->setTabText(tab_index, new_name);
+            vct->RenameController(new_name.toStdString());
         }
     });
 
@@ -59,6 +65,8 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 void OpenRGBVisualMapTab::AddTab()
 {
     int tab_size = ui->virtual_controller_tabs->count();
+
+    // insert just before the add button
     int tab_position = tab_size - 1;
 
     std::string tab_name = "New map";
