@@ -33,5 +33,6 @@ void PluginInfo::on_open_plugin_folder_clicked()
 
 void PluginInfo::on_download_latest_clicked()
 {
-    QDesktopServices::openUrl(QString::fromStdString(LATEST_BUILD_URL));
+    QUrl url(QString::fromStdString(LATEST_BUILD_URL));;
+    QDesktopServices::openUrl(url);
 }
