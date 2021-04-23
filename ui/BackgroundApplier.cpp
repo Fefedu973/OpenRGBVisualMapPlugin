@@ -20,15 +20,22 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     ui->setupUi(this);
 
     // presets
+    ui->presets_comboBox->blockSignals(true);
     ui->presets_comboBox->addItems(presets_names);
+    ui->presets_comboBox->blockSignals(false);
 
     // custom
     ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->color_stops->setLayout(new QHBoxLayout());
     ui->scrollArea->setWidgetResizable(true);
 
+    ui->gradient_type->blockSignals(true);
     ui->gradient_type->addItems(custom_names);
+    ui->gradient_type->blockSignals(false);
+
+    ui->spread_comboBox->blockSignals(true);
     ui->spread_comboBox->addItems(spread_names);
+    ui->spread_comboBox->blockSignals(false);
 
     color_stops.push_back(new ColorStop());
     color_stops.push_back(new ColorStop());
@@ -109,6 +116,7 @@ void BackgroundApplier::on_add_color_stop_button_clicked()
 
 void BackgroundApplier::ApplyPreset()
 {
+    printf("Apply Preset\n");
     image = QImage(w, h, QImage::Format_RGB32);
     preset = presets[ui->presets_comboBox->currentIndex()];
 
@@ -125,6 +133,7 @@ void BackgroundApplier::ApplyPreset()
 
 void BackgroundApplier::ApplyCustom()
 {
+    printf("ApplyCustom\n");
     image = QImage(w, h, QImage::Format_RGB32);
 
     QBrush brush;
