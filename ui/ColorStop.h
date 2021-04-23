@@ -17,6 +17,9 @@ public:
 
     QGradientStop GetGradientStop();
 
+private slots:
+    void on_stop_valueChanged(int);
+
 signals:
   void GradientStopChanged(QGradientStop);
 

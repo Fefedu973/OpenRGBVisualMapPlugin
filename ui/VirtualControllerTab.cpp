@@ -10,7 +10,7 @@
 #include <QTableWidgetItem>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
-    QWidget(parent),
+    QTabBar(parent),
     ui(new Ui::VirtualControllerTab),
     virtual_controller(new VirtualController())
 {

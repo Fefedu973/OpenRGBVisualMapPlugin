@@ -30,12 +30,15 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     ui->gradient_type->addItems(custom_names);
     ui->spread_comboBox->addItems(spread_names);
 
-    color_stops.push_back(new ColorStop);
-    color_stops.push_back(new ColorStop);
+    color_stops.push_back(new ColorStop());
+    color_stops.push_back(new ColorStop());
 
-    for(auto color_stop: color_stops)
+    for(ColorStop* color_stop: color_stops)
     {
         ui->color_stops->layout()->addWidget(color_stop);
+        connect(color_stop, &ColorStop::GradientStopChanged, [=](){
+            ApplyCustom();
+        });
     }
 }
 
@@ -61,6 +64,21 @@ void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int idx)
     ApplyPreset();
 }
 
+void BackgroundApplier::on_gradient_type_currentIndexChanged(int)
+{
+    ApplyCustom();
+}
+
+void BackgroundApplier::on_spread_comboBox_currentIndexChanged(int)
+{
+    ApplyCustom();
+}
+
+void BackgroundApplier::on_rotate_valueChanged(int)
+{
+    ApplyCustom();
+}
+
 void BackgroundApplier::on_apply_custom_button_clicked()
 {
     ApplyCustom();
@@ -78,9 +96,15 @@ void BackgroundApplier::on_choose_image_button_clicked()
 
 void BackgroundApplier::on_add_color_stop_button_clicked()
 {
-    ColorStop* item = new ColorStop;
-    color_stops.push_back(item);
-    ui->color_stops->layout()->addWidget(item);
+    ColorStop* color_stop = new ColorStop;
+    color_stops.push_back(color_stop);
+    ui->color_stops->layout()->addWidget(color_stop);
+
+    connect(color_stop, &ColorStop::GradientStopChanged, [=](){
+        ApplyCustom();
+    });
+
+    ApplyCustom();
 }
 
 void BackgroundApplier::ApplyPreset()
@@ -106,6 +130,7 @@ void BackgroundApplier::ApplyCustom()
     QBrush brush;
 
     QGradientStops stops;
+
     for(ColorStop* color_stop: color_stops)
     {
         stops << color_stop->GetGradientStop();
@@ -136,7 +161,7 @@ QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::S
     QPointF end_point = EdgeOfView(angle);
     QPointF start_point = EdgeOfView((angle + 180)%360);
 
-    QLinearGradient grad = QLinearGradient(start_point , end_point);
+    QLinearGradient grad(start_point , end_point);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -148,7 +173,7 @@ QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::S
 {
     float radius = sqrt(h*h + w*w) / 2;
 
-    QRadialGradient grad = QRadialGradient(w/2, h/2, radius);
+    QRadialGradient grad(w/2, h/2, radius);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -160,7 +185,7 @@ QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::
 {
     int angle = ui->rotate->value();
 
-    QConicalGradient grad = QConicalGradient(w/2,h/2, angle);
+    QConicalGradient grad(w/2,h/2, angle);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -170,61 +195,61 @@ QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::
 
 QPointF BackgroundApplier::EdgeOfView(int deg) {
 
-  float PI = 3.14159265359;
-  float twoPI = PI*2;
-  float theta = deg * PI / 180;
+    float PI = 3.14159265359;
+    float twoPI = PI*2;
+    float theta = deg * PI / 180;
 
-  while (theta < -PI) {
-    theta += twoPI;
-  }
+    while (theta < -PI) {
+        theta += twoPI;
+    }
 
-  while (theta > PI) {
-    theta -= twoPI;
-  }
+    while (theta > PI) {
+        theta -= twoPI;
+    }
 
-  float rectAtan = atan2(h, w);
-  float tanTheta = tan(theta);
+    float rectAtan = atan2(h, w);
+    float tanTheta = tan(theta);
 
-  int region;
+    int region;
 
-  if ((theta > -rectAtan) && (theta <= rectAtan)) {
-      region = 1;
-  } else if ((theta > rectAtan) && (theta <= (PI - rectAtan))) {
-      region = 2;
-  } else if ((theta > (PI - rectAtan)) || (theta <= -(PI - rectAtan))) {
-      region = 3;
-  } else {
-      region = 4;
-  }
+    if ((theta > -rectAtan) && (theta <= rectAtan)) {
+        region = 1;
+    } else if ((theta > rectAtan) && (theta <= (PI - rectAtan))) {
+        region = 2;
+    } else if ((theta > (PI - rectAtan)) || (theta <= -(PI - rectAtan))) {
+        region = 3;
+    } else {
+        region = 4;
+    }
 
-  QPointF edgePoint(w/2, h/2);
+    QPointF edgePoint(w/2, h/2);
 
-  float xFactor = 1.01;
-  float yFactor = 1.01;
+    float xFactor = 1.01;
+    float yFactor = 1.01;
 
-  switch (region) {
+    switch (region) {
     case 1: yFactor = -1.01; break;
     case 2: yFactor = -1.01; break;
     case 3: xFactor = -1.01; break;
     case 4: xFactor = -1.01; break;
-  }
+    }
 
-  if ((region == 1) || (region == 3)) {
-    edgePoint.setX(edgePoint.x() + xFactor * (w / 2.0f));
-    edgePoint.setY(edgePoint.y() + yFactor * (w / 2.0f) * tanTheta);
-  } else {
-      edgePoint.setX(edgePoint.x() + xFactor * (h / (2. * tanTheta)));
-      edgePoint.setY(edgePoint.y() + yFactor * (h /  2.0f));
-  }
+    if ((region == 1) || (region == 3)) {
+        edgePoint.setX(edgePoint.x() + xFactor * (w / 2.0f));
+        edgePoint.setY(edgePoint.y() + yFactor * (w / 2.0f) * tanTheta);
+    } else {
+        edgePoint.setX(edgePoint.x() + xFactor * (h / (2. * tanTheta)));
+        edgePoint.setY(edgePoint.y() + yFactor * (h /  2.0f));
+    }
 
-  return edgePoint;
+    return edgePoint;
 };
 
 
 void BackgroundApplier::OpenFileDialog()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+                                                    tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
 
     QImage user_image;
     user_image.load(fileName);

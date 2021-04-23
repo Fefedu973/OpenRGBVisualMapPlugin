@@ -25,16 +25,19 @@ LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
 
 QRectF LedItem::boundingRect() const
 {
-    return QRectF(0, 0, 1 * settings->grid_scale_factor , 1 * settings->grid_scale_factor);
+    return QRectF(0, 0, shape_offset + 1 * settings->grid_scale_factor , shape_offset + 1 * settings->grid_scale_factor);
 }
 
 void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     // scale to display
-    setX(led_position->x() * settings->grid_scale_factor);
-    setY(led_position->y() * settings->grid_scale_factor);
+    int scale_x = led_position->x() * settings->grid_scale_factor - shape_offset/2;
+    int scale_y =led_position->y() * settings->grid_scale_factor - shape_offset/2;
 
-    QRectF rect = boundingRect();
+    setX(scale_x);
+    setY(scale_y);
+
+    QRectF rect (shape_offset/2, shape_offset/2, 1 * settings->grid_scale_factor , 1 * settings->grid_scale_factor);
     QPen pen(QColor(0, 0, 0, 0x80), 0.05);
 
     painter->setPen(pen);
@@ -126,8 +129,8 @@ void LedItem::Restrict(int w, int h)
     int original_x = led_position->x();
     int original_y = led_position->y();
 
-    int new_x = x();    
-    int new_y = y();
+    int new_x = x() + shape_offset/2;
+    int new_y = y() + shape_offset/2;
 
     // ease moves
     if(new_x % settings->grid_scale_factor >= settings->grid_scale_factor/2)

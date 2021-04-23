@@ -52,6 +52,7 @@ void OpenRGBVisualMapTab::AddTab()
     std::string tab_name = "Virtual controller #" + std::to_string(tab_size);
 
     VirtualControllerTab* tab = new VirtualControllerTab();
+
     tab->RenameController(tab_name);
 
     ui->virtual_controller_tabs->insertTab(tab_size - 1, tab , QString::fromUtf8(tab_name.c_str()));
@@ -59,7 +60,18 @@ void OpenRGBVisualMapTab::AddTab()
 
     connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string name){
         ui->virtual_controller_tabs->setTabText(tab_size - 1, QString::fromUtf8(name.c_str()));
+    });    
+
+    QPushButton * close_button = new QPushButton ("close");
+
+    connect(close_button, &QPushButton::clicked, [=](){
+        // todo debug this
+        ui->virtual_controller_tabs->removeTab(tab_size - 1);
+        delete tab;
     });
+
+    ui->virtual_controller_tabs->tabBar()->setTabButton(tab_size - 1, QTabBar::LeftSide, close_button);
+
 }
 
 OpenRGBVisualMapTab::~OpenRGBVisualMapTab()

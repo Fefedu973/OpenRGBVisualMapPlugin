@@ -34,6 +34,8 @@ private:
     LedPosition*  led_position;
     GridSettings* settings;
 
+    inline static const unsigned int shape_offset = 8;
+
     bool selected = false;
     bool pressed = false;
     bool moving = false;

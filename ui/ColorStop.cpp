@@ -22,6 +22,10 @@ QGradientStop ColorStop::GetGradientStop()
     return stop;
 }
 
+void ColorStop::on_stop_valueChanged(int)
+{
+    emit GradientStopChanged(GetGradientStop());
+}
 
 ColorStop::~ColorStop()
 {

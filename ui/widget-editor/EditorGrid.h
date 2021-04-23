@@ -27,8 +27,8 @@ public:
 
 protected:
     void wheelEvent(QWheelEvent*) override;
-    void keyPressEvent(QKeyEvent*) override;
-    void keyReleaseEvent(QKeyEvent*) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 signals:
     void ItemSelected(LedPosition*);
@@ -43,6 +43,9 @@ private:
     std::vector<LedItem*> led_items;
 
     void Clear();
+
+    bool pressed = false;
+    bool is_hovering = false;
 };
 
 #endif // EDITORGRID_H

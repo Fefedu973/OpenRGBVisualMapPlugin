@@ -10,7 +10,7 @@ EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
     setInteractive(true);
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);
-    setDragMode(QGraphicsView::ScrollHandDrag);
+    // setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 void EditorGrid::ApplySettings(GridSettings* s)
@@ -60,21 +60,42 @@ void EditorGrid::wheelEvent(QWheelEvent *event)
     event->accept();
 }
 
-void EditorGrid::keyPressEvent(QKeyEvent *event)
+void EditorGrid::mousePressEvent(QMouseEvent *event)
 {
-    if(event->modifiers() == Qt::ShiftModifier)
+    if(pressed)
     {
-        setDragMode(QGraphicsView::RubberBandDrag);
+        return;
     }
-    else
+
+    pressed = true;
+
+    if(event->button() == Qt::RightButton)
     {
-        setDragMode(QGraphicsView::ScrollHandDrag);
+        setDragMode(QGraphicsView::DragMode::RubberBandDrag);
+
+        mousePressEvent(new QMouseEvent(QEvent::GraphicsSceneMousePress,
+                                        event->pos(), Qt::MouseButton::LeftButton,
+                                        Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier));
     }
+    else if(event->button() == Qt::LeftButton)
+    {
+        setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+
+        mousePressEvent(new QMouseEvent(QEvent::GraphicsSceneMousePress,
+                                        event->pos(), Qt::MouseButton::LeftButton,
+                                        Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier));
+    }
+
+    QGraphicsView::mousePressEvent(event);
 }
 
-void EditorGrid::keyReleaseEvent(QKeyEvent*)
+void EditorGrid::mouseReleaseEvent(QMouseEvent *event)
 {
-    setDragMode(QGraphicsView::ScrollHandDrag);
+    pressed = false;
+
+    setDragMode(QGraphicsView::DragMode::NoDrag);
+
+    QGraphicsView::mouseReleaseEvent(event);
 }
 
 void EditorGrid::CreateLEDItems(CustomShape* shape)
