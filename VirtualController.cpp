@@ -1,4 +1,5 @@
 #include "VirtualController.h"
+#include "OpenRGBVisualMapPlugin.h"
 
 VirtualController::VirtualController()
 {
@@ -23,6 +24,11 @@ VirtualController::VirtualController()
     zones[0].matrix_map = new matrix_map_type();
 
     SetupVirtualZone();
+}
+
+VirtualController::~VirtualController()
+{
+    Register(false);
 }
 
 void VirtualController::SetupVirtualZone()
@@ -80,7 +86,7 @@ void VirtualController::DeviceUpdateLEDs() {
     }
 
     callback(image);
-};
+}
 
 void VirtualController::UpdateSize(int w, int h)
 {
@@ -93,5 +99,25 @@ void VirtualController::UpdateSize(int w, int h)
 void VirtualController::SetCallBack(std::function<void(QImage)> callback)
 {
     this->callback = callback;
+}
+
+void VirtualController::Register(bool state)
+{
+    if(state)
+    {
+        if(!registered)
+        {
+            OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(this);
+            registered = true;
+        }
+    }
+    else
+    {
+        if(registered)
+        {
+            OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(this);
+            registered = false;
+        }
+    }
 }
 

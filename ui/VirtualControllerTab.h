@@ -21,7 +21,7 @@ namespace Ui {
 class VirtualControllerTab;
 }
 
-class VirtualControllerTab : public QTabBar
+class VirtualControllerTab : public QWidget
 {
     Q_OBJECT
 

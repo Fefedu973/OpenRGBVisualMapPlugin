@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>remove.png</file>
         <file>add.png</file>
+        <file>close.png</file>
     </qresource>
 </RCC>

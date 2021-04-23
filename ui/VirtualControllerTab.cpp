@@ -1,5 +1,4 @@
 #include "VirtualControllerTab.h"
-#include "OpenRGBVisualMapPlugin.h"
 #include "VisualMapSettingsManager.h"
 #include "ZoneManager.h"
 #include "WidgetEditor.h"
@@ -10,7 +9,7 @@
 #include <QTableWidgetItem>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
-    QTabBar(parent),
+    QWidget(parent),
     ui(new Ui::VirtualControllerTab),
     virtual_controller(new VirtualController())
 {
@@ -110,6 +109,7 @@ void VirtualControllerTab::resizeEvent(QResizeEvent*)
 
 VirtualControllerTab::~VirtualControllerTab()
 {
+    delete virtual_controller;
     delete ui;
 }
 
@@ -197,14 +197,7 @@ void VirtualControllerTab::OnItemOptionsChanged()
 
 void VirtualControllerTab::on_register_controller_stateChanged(int value)
 {
-    if(value)
-    {
-        OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(virtual_controller);
-    }
-    else
-    {
-        OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(virtual_controller);
-    }
+    virtual_controller->Register(value);
 }
 
 void VirtualControllerTab::on_resetButton_clicked()

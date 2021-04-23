@@ -12,6 +12,7 @@ public:
     inline const static std::string VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
 
     VirtualController();
+    ~VirtualController();
 
     // RGBController overrides
     void DeviceUpdateLEDs()    override;
@@ -29,9 +30,13 @@ public:
 
     void SetCallBack(std::function<void(QImage)>);
 
+    void Register(bool);
+
 private:
     int width;
     int height;
+
+    bool registered = false;
 
     void SetupVirtualZone();    
 

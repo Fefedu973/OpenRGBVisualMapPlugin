@@ -21,6 +21,10 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     ui->virtual_controller_tabs->setTabEnabled(0, false);
     ui->virtual_controller_tabs->tabBar()->setTabButton(0, QTabBar::RightSide, tb);
 
+    ui->virtual_controller_tabs->setTabsClosable(true);
+    ui->virtual_controller_tabs->setStyleSheet("QTabBar::close-button{image:url(:close.png);}");
+    ui->virtual_controller_tabs->tabBar()->setStyleSheet("QTabBar::tab:hover {text-decoration: underline;}");
+
     connect(tb, SIGNAL(clicked()), this, SLOT(AddTab()));
 
     connect(ui->virtual_controller_tabs, &QTabWidget::tabBarDoubleClicked, [=](int tab_index){
@@ -43,34 +47,32 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
         }
     });
 
+    connect(ui->virtual_controller_tabs, &QTabWidget::tabCloseRequested, [=](int tab_idx){
+        QWidget* tab = ui->virtual_controller_tabs->widget(tab_idx);
+        ui->virtual_controller_tabs->removeTab(tab_idx);
+        delete tab;
+    });
+
     AddTab();
 }
 
 void OpenRGBVisualMapTab::AddTab()
 {
     int tab_size = ui->virtual_controller_tabs->count();
-    std::string tab_name = "Virtual controller #" + std::to_string(tab_size);
+    int tab_position = tab_size - 1;
+
+    std::string tab_name = "New map";
 
     VirtualControllerTab* tab = new VirtualControllerTab();
 
     tab->RenameController(tab_name);
 
-    ui->virtual_controller_tabs->insertTab(tab_size - 1, tab , QString::fromUtf8(tab_name.c_str()));
-    ui->virtual_controller_tabs->setCurrentIndex(tab_size -1);
+    ui->virtual_controller_tabs->insertTab(tab_position, tab , QString::fromUtf8(tab_name.c_str()));
+    ui->virtual_controller_tabs->setCurrentIndex(tab_position);
 
     connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string name){
-        ui->virtual_controller_tabs->setTabText(tab_size - 1, QString::fromUtf8(name.c_str()));
-    });    
-
-    QPushButton * close_button = new QPushButton ("close");
-
-    connect(close_button, &QPushButton::clicked, [=](){
-        // todo debug this
-        ui->virtual_controller_tabs->removeTab(tab_size - 1);
-        delete tab;
+        ui->virtual_controller_tabs->setTabText(tab_position, QString::fromUtf8(name.c_str()));
     });
-
-    ui->virtual_controller_tabs->tabBar()->setTabButton(tab_size - 1, QTabBar::LeftSide, close_button);
 
 }
 
