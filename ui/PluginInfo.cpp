@@ -3,6 +3,7 @@
 #include "ui_PluginInfo.h"
 
 #include <QDesktopServices>
+#include <QUrl>
 
 PluginInfo::PluginInfo(QWidget *parent) :
     QWidget(parent),
