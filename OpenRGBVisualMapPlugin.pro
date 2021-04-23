@@ -28,12 +28,17 @@ GIT_COMMIT_ID   = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PR
 GIT_COMMIT_DATE = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PRO_FILE_PWD_ show -s --format=%ci HEAD)
 GIT_BRANCH      = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PRO_FILE_PWD_ rev-parse --abbrev-ref HEAD)
 
+
+win32:LATEST_BUILD_URL="https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows%2064"
+unix:LATEST_BUILD_URL="https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Linux%2064"
+
 DEFINES +=                                                                                      \
     VERSION_STRING=\\"\"\"$$PLUGIN_VERSION\\"\"\"                                               \
     BUILDDATE_STRING=\\"\"\"$$BUILDDATE\\"\"\"                                                  \
     GIT_COMMIT_ID=\\"\"\"$$GIT_COMMIT_ID\\"\"\"                                                 \
     GIT_COMMIT_DATE=\\"\"\"$$GIT_COMMIT_DATE\\"\"\"                                             \
-    GIT_BRANCH=\\"\"\"$$GIT_BRANCH\\"\"\"
+    GIT_BRANCH=\\"\"\"$$GIT_BRANCH\\"\"\"                                                       \
+    LATEST_BUILD_URL=\\"\"\"$$LATEST_BUILD_URL\\"\"\"                                           \
 
 #-------------------------------------------------------------------#
 # Includes                                                          #
