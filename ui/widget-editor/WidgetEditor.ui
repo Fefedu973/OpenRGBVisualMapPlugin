@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>692</width>
-    <height>580</height>
+    <height>736</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -107,6 +107,13 @@
             </widget>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="undo_button">
+           <property name="text">
+            <string>Undo</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="rotate_button">

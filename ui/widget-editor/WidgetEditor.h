@@ -38,6 +38,7 @@ private slots:
     void on_shrink_button_clicked();
     void on_circle_button_clicked();
     void on_square_button_clicked();
+    void on_undo_button_clicked();
 
 private:
     explicit WidgetEditor(QWidget *parent = nullptr, ControllerZone* ctrl_zone = nullptr);
@@ -52,6 +53,11 @@ private:
     Ui::WidgetEditor *ui;
     ControllerZone* ctrl_zone;
     GridSettings* settings;
+
+    std::vector<CustomShape> states;
+
+    void SaveState();
+    void RestoreState(CustomShape shape);
 };
 
 #endif // WIDGETEDITOR_H

@@ -79,7 +79,9 @@ void LedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     setCursor(Qt::OpenHandCursor);
 
-    emit Released();
+    Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
+
+    emit Moved();
 
     QGraphicsItem::mouseReleaseEvent(event);
 }

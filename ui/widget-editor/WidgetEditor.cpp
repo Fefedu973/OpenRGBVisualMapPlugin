@@ -48,11 +48,59 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     ui->grid->CreateLEDItems(temp_shape);
 
     UpdateWidgetsValues();
+
+    SaveState();
 }
 
 WidgetEditor::~WidgetEditor()
 {
     delete ui;
+}
+
+void WidgetEditor::SaveState()
+{
+    CustomShape saved_shape;
+    saved_shape.w = temp_shape->w;
+    saved_shape.h = temp_shape->h;
+
+    for(LedPosition* led_position:temp_shape->led_positions)
+    {
+        LedPosition* saved_position = new LedPosition();
+        saved_position->setX(led_position->x());
+        saved_position->setY(led_position->y());
+        saved_position->led_num = led_position->led_num;
+
+        saved_shape.led_positions.push_back(saved_position);
+    }
+
+    states.push_back(saved_shape);
+
+    ui->undo_button->setEnabled(states.size() > 1);
+}
+
+void WidgetEditor::RestoreState(CustomShape shape)
+{
+    temp_shape = new CustomShape();
+
+    temp_shape->w = shape.w;
+    temp_shape->h = shape.h;
+
+    for(LedPosition* led_position : shape.led_positions)
+    {
+        LedPosition* temp_led_position = new LedPosition();
+        temp_led_position->led_num = led_position->led_num;
+        temp_led_position->setX(led_position->x());
+        temp_led_position->setY(led_position->y());
+
+        temp_shape->led_positions.push_back(temp_led_position);
+    }
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    UpdateWidgetsValues();
+
+    ui->grid->CreateLEDItems(temp_shape);
 }
 
 int WidgetEditor::Show(ControllerZone* ctrl_zone)
@@ -218,7 +266,10 @@ void WidgetEditor::on_copy_shape_button_clicked()
     inp->setWindowTitle("Choose shape");
     inp->move(button_pos.x(), button_pos.y());
 
-    if(inp->exec()){        
+    if(inp->exec()){
+
+        SaveState();
+
         QString selected = inp->textValue();
         ControllerZone* selected_ctrl_zone = ctrl_zones_choices[selected];
 
@@ -239,6 +290,7 @@ void WidgetEditor::on_copy_shape_button_clicked()
         ui->grid->CreateLEDItems(temp_shape);
 
         UpdateWidgetsValues();
+
     }
 
 }
@@ -302,6 +354,8 @@ void WidgetEditor::IdentifySelected()
 
 void WidgetEditor::on_rotate_button_clicked()
 {
+    SaveState();
+
     // Resize (swap w and h)
     int new_width  = temp_shape->h;
     int new_height = temp_shape->w;
@@ -325,6 +379,8 @@ void WidgetEditor::on_rotate_button_clicked()
 
 void WidgetEditor::on_v_flip_button_clicked()
 {
+    SaveState();
+
     QTransform t = QTransform().scale(1,-1);
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -339,6 +395,8 @@ void WidgetEditor::on_v_flip_button_clicked()
 
 void WidgetEditor::on_h_flip_button_clicked()
 {
+    SaveState();
+
     QTransform t = QTransform().scale(-1, 1);
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -353,6 +411,8 @@ void WidgetEditor::on_h_flip_button_clicked()
 
 void WidgetEditor::on_h_line_button_clicked()
 {
+    SaveState();
+
     temp_shape->w = 0;
     temp_shape->h = 1;
 
@@ -369,6 +429,8 @@ void WidgetEditor::on_h_line_button_clicked()
 
 void WidgetEditor::on_v_line_button_clicked()
 {
+    SaveState();
+
     temp_shape->w = 1;
     temp_shape->h = 0;
 
@@ -385,6 +447,8 @@ void WidgetEditor::on_v_line_button_clicked()
 
 void WidgetEditor::on_grow_button_clicked()
 {
+    SaveState();
+
     temp_shape->w *= 2;
     temp_shape->h *= 2;
 
@@ -404,6 +468,8 @@ void WidgetEditor::on_grow_button_clicked()
 
 void WidgetEditor::on_shrink_button_clicked()
 {
+    SaveState();
+
     temp_shape->w *= 0.5;
     temp_shape->h *= 0.5;
 
@@ -426,6 +492,8 @@ void WidgetEditor::on_shrink_button_clicked()
 
 void WidgetEditor::on_circle_button_clicked()
 {
+    SaveState();
+
     double PI = 3.14159265359l;
 
     unsigned int leds_count = temp_shape->led_positions.size();
@@ -455,6 +523,8 @@ void WidgetEditor::on_circle_button_clicked()
 
 void WidgetEditor::on_square_button_clicked()
 {
+    SaveState();
+
     int side = temp_shape->led_positions.size() / 4 ;
 
     temp_shape->w = side + 2;
@@ -498,6 +568,20 @@ void WidgetEditor::on_square_button_clicked()
     ui->grid->CreateLEDItems(temp_shape);
 }
 
+void WidgetEditor::on_undo_button_clicked()
+{
+    if(!states.empty())
+    {
+        RestoreState(states.back());
+
+        if(states.size() > 1)
+        {
+            states.pop_back();
+        }
+
+        ui->undo_button->setEnabled(states.size() > 1);
+    }
+}
 
 
 

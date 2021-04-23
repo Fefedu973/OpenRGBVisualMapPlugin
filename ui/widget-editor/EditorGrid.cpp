@@ -118,11 +118,10 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
         });
 
         connect(led_item, &LedItem::Moving, [=](){
-            emit ItemMoved(led_position);
+            emit ItemMoving(led_position);
         });
 
-        connect(led_item, &LedItem::Released, [=](){
-            led_item->Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
+        connect(led_item, &LedItem::Moved, [=](){
             emit ItemMoved(led_position);
         });
 
@@ -134,6 +133,8 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
                     item->MoveBy(delta_x, delta_y);
                 }
             }
+
+            emit Restricted(led_position);
         });
     }
 }

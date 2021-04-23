@@ -32,7 +32,9 @@ protected:
 
 signals:
     void ItemSelected(LedPosition*);
+    void ItemMoving(LedPosition*);
     void ItemMoved(LedPosition*);
+    void Restricted(LedPosition*);
 
 private:
     GridSettings* settings = nullptr;

@@ -27,7 +27,7 @@ public:
 signals:
     void Selected();
     void Moving();
-    void Released();
+    void Moved();
     void Restricted(int,int);
 
 private:
