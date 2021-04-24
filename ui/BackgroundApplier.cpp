@@ -91,11 +91,6 @@ void BackgroundApplier::on_apply_custom_button_clicked()
     ApplyCustom();
 }
 
-void BackgroundApplier::on_apply_preset_button_clicked()
-{
-    ApplyPreset();
-}
-
 void BackgroundApplier::on_choose_image_button_clicked()
 {
     OpenFileDialog();

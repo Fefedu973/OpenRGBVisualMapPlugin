@@ -29,7 +29,6 @@ private slots:
     void on_gradient_type_currentIndexChanged(int);
     void on_spread_comboBox_currentIndexChanged(int);
     void on_rotate_valueChanged(int);
-    void on_apply_preset_button_clicked();    
     void on_add_color_stop_button_clicked();
     void on_apply_custom_button_clicked();
     void on_choose_image_button_clicked();

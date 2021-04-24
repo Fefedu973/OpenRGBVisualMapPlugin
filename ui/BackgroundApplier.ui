@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>953</width>
+    <width>913</width>
     <height>306</height>
    </rect>
   </property>
@@ -67,7 +67,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="custom_tab">
         <property name="sizePolicy">
@@ -215,7 +215,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>717</width>
+                <width>677</width>
                 <height>245</height>
                </rect>
               </property>
@@ -269,12 +269,12 @@
           <rect>
            <x>20</x>
            <y>10</y>
-           <width>631</width>
-           <height>191</height>
+           <width>441</width>
+           <height>111</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,4">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
             <property name="sizeConstraint">
              <enum>QLayout::SetMinimumSize</enum>
@@ -291,14 +291,7 @@
             </item>
            </layout>
           </item>
-          <item>
-           <widget class="QPushButton" name="apply_preset_button">
-            <property name="text">
-             <string>Apply</string>
-            </property>
-           </widget>
-          </item>
-          <item>
+          <item row="1" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -323,12 +316,12 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>941</width>
-           <height>201</height>
+           <width>201</width>
+           <height>37</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item alignment="Qt::AlignHCenter">
              <widget class="QPushButton" name="choose_image_button">
