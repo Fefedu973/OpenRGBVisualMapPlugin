@@ -46,8 +46,8 @@ private:
 
     void Clear();
 
-    bool pressed = false;
-    bool is_hovering = false;
+    bool left_button_pressed = false;
+    bool right_button_pressed = false;
 };
 
 #endif // EDITORGRID_H

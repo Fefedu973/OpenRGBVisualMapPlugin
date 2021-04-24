@@ -62,36 +62,47 @@ void EditorGrid::wheelEvent(QWheelEvent *event)
 
 void EditorGrid::mousePressEvent(QMouseEvent *event)
 {
-    if(pressed)
-    {
+    if(left_button_pressed)
+    {    
         return;
     }
 
-    pressed = true;
-
-    if(event->button() == Qt::RightButton)
+    if(right_button_pressed)
     {
+        QGraphicsView::mousePressEvent(event);
+        return;
+    }
+
+    if(event->button() == Qt::LeftButton)
+    {
+        left_button_pressed = true;
+
         setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 
         mousePressEvent(new QMouseEvent(QEvent::GraphicsSceneMousePress,
                                         event->pos(), Qt::MouseButton::LeftButton,
                                         Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier));
+
+        QGraphicsView::mousePressEvent(event);
     }
-    else if(event->button() == Qt::LeftButton)
+    else  if(event->button() == Qt::RightButton)
     {
+        right_button_pressed = true;
+
         setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 
         mousePressEvent(new QMouseEvent(QEvent::GraphicsSceneMousePress,
                                         event->pos(), Qt::MouseButton::LeftButton,
                                         Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier));
-    }
 
-    QGraphicsView::mousePressEvent(event);
+        QGraphicsView::mousePressEvent(event);
+    }
 }
 
 void EditorGrid::mouseReleaseEvent(QMouseEvent *event)
 {
-    pressed = false;
+    left_button_pressed = false;
+    right_button_pressed = false;
 
     setDragMode(QGraphicsView::DragMode::NoDrag);
 
