@@ -95,16 +95,17 @@ void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color
     }
 }
 
-void ZoneManager::IdentifyLed(ControllerZone* ctrl_zone,  int led_num)
+void ZoneManager::IdentifyLeds(ControllerZone* ctrl_zone, std::vector<unsigned int> led_nums)
 {
     RGBController* controller = ctrl_zone->controller;
     zone z = controller->zones[ctrl_zone->zone_idx];
-    int leds_count = z.leds_count;
-    int start_idx = z.start_idx;
 
-    for(int i = 0; i < leds_count; i++)
+    unsigned int leds_count = z.leds_count;
+    unsigned int start_idx = z.start_idx;
+
+    for(unsigned int i = 0; i < leds_count; i++)
     {
-        QColor color = i == led_num ? Qt::green : Qt::black;
+        QColor color = std::find(led_nums.begin(), led_nums.end(), i) != led_nums.end() ? Qt::green : Qt::black;
         controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
     }
 

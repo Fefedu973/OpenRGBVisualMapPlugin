@@ -10,7 +10,6 @@ EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
     setInteractive(true);
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);
-    // setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 void EditorGrid::ApplySettings(GridSettings* s)
@@ -21,13 +20,13 @@ void EditorGrid::ApplySettings(GridSettings* s)
     {
         scene = new Scene(settings);
         setScene(scene);
-        resize(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
+        resize(settings->w, settings->h);
     }
 
-    setSceneRect(- (settings->w * settings->grid_scale_factor) / 2,
-                 - (settings->h * settings->grid_scale_factor) / 2,
-                 settings->w * settings->grid_scale_factor * 2,
-                 settings->h * settings->grid_scale_factor * 2);
+    setSceneRect(- (settings->w) / 2,
+                 - (settings->h) / 2,
+                 settings->w * 2,
+                 settings->h * 2);
 
     scene->ApplySettings(settings);
 }
@@ -38,6 +37,7 @@ void EditorGrid::UpdateItems()
     {
         led_item->update();
     }
+
     scene->update();
 }
 
@@ -101,6 +101,11 @@ void EditorGrid::mousePressEvent(QMouseEvent *event)
 
 void EditorGrid::mouseReleaseEvent(QMouseEvent *event)
 {
+    if(left_button_pressed)
+    {
+        emit SelectionChanged();
+    }
+
     left_button_pressed = false;
     right_button_pressed = false;
 
@@ -119,33 +124,17 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
 
         led_items.push_back(led_item);
 
-        led_item->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+        led_item->setCacheMode(QGraphicsItem::NoCache);
 
         scene->addItem(led_item);
 
-        connect(led_item, &LedItem::Selected, [=](){
-            SetSelected(led_position);
-            emit ItemSelected(led_position);
-        });
-
-        connect(led_item, &LedItem::Moving, [=](){
-            emit ItemMoving(led_position);
-        });
-
-        connect(led_item, &LedItem::Moved, [=](){
-            emit ItemMoved(led_position);
-        });
-
-        connect(led_item, &LedItem::Restricted, [=](int delta_x, int delta_y){
+        connect(led_item, &LedItem::Released, [=](){
             for(LedItem* item : led_items)
             {
-                if(item->isSelected() && item != led_item)
-                {
-                    item->MoveBy(delta_x, delta_y);
-                }
+                item->Restrict();
             }
 
-            emit Restricted(led_position);
+            emit Changed();
         });
     }
 }
@@ -156,18 +145,21 @@ void EditorGrid::Clear()
     led_items.clear();
 }
 
-void EditorGrid::SetSelected(LedPosition* led_position)
+std::vector<LedPosition*> EditorGrid::GetSelection()
 {
-    selected = led_position;
+    std::vector<LedPosition*> selection;
 
     for(LedItem* led_item: led_items)
     {
-        led_item->SetSelected(selected == led_item->GetLedPosition());
-        led_item->update();
+        if(led_item->isSelected())
+        {
+            selection.push_back(led_item->GetLedPosition());
+        }
     }
+
+    return selection;
 }
 
-LedPosition* EditorGrid::GetSelected()
-{
-    return selected;
-}
+
+
+

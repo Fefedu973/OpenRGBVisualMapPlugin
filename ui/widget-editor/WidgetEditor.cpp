@@ -13,106 +13,6 @@
 #include <QTransform>
 #include <QRect>
 
-WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
-    QWidget(parent),
-    ui(new Ui::WidgetEditor),
-    ctrl_zone(ctrl_zone)
-{
-    ui->setupUi(this);
-
-    ResetShape();
-
-    settings = new GridSettings();
-
-    settings->w = temp_shape->w;
-    settings->h = temp_shape->h;
-    settings->show_grid = true;
-    settings->show_bounds = true;
-    settings->live_preview = false;
-    settings->grid_size = 1;
-    settings->grid_scale_factor = 10;
-
-    ui->grid->ApplySettings(settings);
-
-    ui->identify_button->hide();
-
-    connect(ui->grid, &EditorGrid::ItemSelected, [=](LedPosition* led_position){
-        ui->identify_button->setVisible(led_position != nullptr);
-
-        if(ui->auto_identify->isChecked())
-        {
-            IdentifySelected();
-        }
-    });
-
-    ui->grid->CreateLEDItems(temp_shape);
-
-    UpdateWidgetsValues();
-
-    SaveState();
-}
-
-WidgetEditor::~WidgetEditor()
-{
-    delete ui;
-}
-
-void WidgetEditor::SaveState()
-{
-    CustomShape saved_shape;
-    saved_shape.w = temp_shape->w;
-    saved_shape.h = temp_shape->h;
-
-    for(LedPosition* led_position:temp_shape->led_positions)
-    {
-        LedPosition* saved_position = new LedPosition();
-        saved_position->setX(led_position->x());
-        saved_position->setY(led_position->y());
-        saved_position->led_num = led_position->led_num;
-
-        saved_shape.led_positions.push_back(saved_position);
-    }
-
-    states.push_back(saved_shape);
-
-    ui->undo_button->setEnabled(states.size() > 1);
-}
-
-void WidgetEditor::RestoreState(CustomShape shape)
-{
-    temp_shape = new CustomShape();
-
-    temp_shape->w = shape.w;
-    temp_shape->h = shape.h;
-
-    for(LedPosition* led_position : shape.led_positions)
-    {
-        LedPosition* temp_led_position = new LedPosition();
-        temp_led_position->led_num = led_position->led_num;
-        temp_led_position->setX(led_position->x());
-        temp_led_position->setY(led_position->y());
-
-        temp_shape->led_positions.push_back(temp_led_position);
-    }
-
-    settings->w = temp_shape->w;
-    settings->h = temp_shape->h;
-
-    UpdateWidgetsValues();
-
-    ui->grid->CreateLEDItems(temp_shape);
-}
-
-void WidgetEditor::keyPressEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Z && event->modifiers() == Qt::CTRL)
-    {
-        Undo();
-    }
-
-    QWidget::keyPressEvent(event);
-}
-
 int WidgetEditor::Show(ControllerZone* ctrl_zone)
 {
     WidgetEditor* editor = new WidgetEditor(nullptr, ctrl_zone);
@@ -136,7 +36,6 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone)
     dialog->setMinimumSize(814,489);
     dialog->setModal(true);
 
-
     QVBoxLayout* dialog_layout = new QVBoxLayout(dialog);
 
     dialog_layout->addWidget(editor);
@@ -152,22 +51,156 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone)
         dialog->reject();
     });
 
-    int result = dialog->exec();
+    return dialog->exec();
+}
 
-    // hmmmm delete anyway ?
-    if (result)
+WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
+    QWidget(parent),
+    ui(new Ui::WidgetEditor),
+    ctrl_zone(ctrl_zone)
+{
+    ui->setupUi(this);
+
+    InitShape();
+
+    settings = new GridSettings();
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+    settings->show_grid = true;
+    settings->show_bounds = true;
+    settings->live_preview = false;
+    settings->grid_size = 1;
+
+    ui->grid->ApplySettings(settings);
+
+    ui->identify_button->hide();
+
+    connect(ui->grid, &EditorGrid::SelectionChanged, [=](){
+        ui->identify_button->setVisible(!ui->grid->GetSelection().empty());
+
+        if(ui->auto_identify->isChecked())
+        {
+            IdentifySelected();
+        }
+    });
+
+    connect(ui->grid, &EditorGrid::Changed, [=](){
+        SaveState();
+    });
+
+    ui->grid->CreateLEDItems(temp_shape);
+
+    ui->undo_button->setEnabled(false);
+
+    UpdateWidgetsValues();
+}
+
+WidgetEditor::~WidgetEditor()
+{
+    delete settings;
+    delete ui;
+}
+
+void WidgetEditor::InitShape()
+{
+    // if custom shape already exists, copy it to temp shape
+    // else, generate one (horizontal line)
+
+    if(ctrl_zone->settings.custom_shape)
     {
-        delete dialog;
+        temp_shape = ctrl_zone->settings.custom_shape->clone();
+    }
+    else
+    {
+        temp_shape = CustomShape::HorizontalLine(ctrl_zone->led_count());
     }
 
-    return result;
+    states.push_back(temp_shape->clone());
+}
+
+bool WidgetEditor::StateChanged()
+{
+    return temp_shape->differs(states.back());
+}
+
+void WidgetEditor::SaveState()
+{
+    if(StateChanged())
+    {
+        states.push_back(temp_shape->clone());
+        ui->undo_button->setEnabled(true);
+    }
+}
+
+void WidgetEditor::Undo()
+{
+    if(states.size() > 1)
+    {
+        RestoreState(states[states.size() -2]);
+
+        if(states.size() > 1)
+        {
+            states.pop_back();
+        }
+
+        ui->undo_button->setEnabled(states.size() > 1);
+    }
+}
+
+void WidgetEditor::RestoreState(CustomShape* shape)
+{    
+    temp_shape = shape->clone();
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    UpdateWidgetsValues();
+
+    ui->grid->ApplySettings(settings);
+    ui->grid->CreateLEDItems(temp_shape);
+}
+
+void WidgetEditor::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Z && event->modifiers() == Qt::CTRL)
+    {
+        Undo();
+    }
+
+    QWidget::keyPressEvent(event);
 }
 
 void WidgetEditor::UpdateWidgetsValues()
-{
+{   
+    ui->led_count->blockSignals(true);
+    ui->w_spinBox->blockSignals(true);
+    ui->h_spinBox->blockSignals(true);
+
     ui->led_count->setValue(ctrl_zone->led_count());
     ui->w_spinBox->setValue(temp_shape->w);
     ui->h_spinBox->setValue(temp_shape->h);
+
+    ui->led_count->blockSignals(false);
+    ui->w_spinBox->blockSignals(false);
+    ui->h_spinBox->blockSignals(false);
+}
+
+void WidgetEditor::IdentifySelected()
+{
+    std::vector<LedPosition*> selection = ui->grid->GetSelection();
+
+    std::vector<unsigned int> selected_led_nums;
+
+    for(LedPosition* led_position: selection)
+    {
+        selected_led_nums.push_back(led_position->led_num);
+    }
+
+    if(!selected_led_nums.empty())
+    {
+        ZoneManager::Get()->IdentifyLeds(ctrl_zone, selected_led_nums);
+    }
 }
 
 void WidgetEditor::on_identify_button_clicked()
@@ -177,48 +210,21 @@ void WidgetEditor::on_identify_button_clicked()
 
 void WidgetEditor::on_reset_button_clicked()
 {
-    ResetShape();
-}
+    temp_shape = states[0]->clone();
 
-void WidgetEditor::ResetShape()
-{
-    temp_shape = new CustomShape();
+    states.clear();
 
-    // custom shape already exists, copy it to temp shape
-    if(ctrl_zone->settings.custom_shape)
-    {
-        temp_shape->w = ctrl_zone->settings.custom_shape->w;
-        temp_shape->h = ctrl_zone->settings.custom_shape->h;
+    states.push_back(temp_shape->clone());
 
-        for(LedPosition* led_position : ctrl_zone->settings.custom_shape->led_positions)
-        {
-            LedPosition* temp_led_position = new LedPosition();
-            temp_led_position->led_num = led_position->led_num;
-            temp_led_position->setX(led_position->x());
-            temp_led_position->setY(led_position->y());
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
 
-            temp_shape->led_positions.push_back(temp_led_position);
-        }
-    }
-    // custom shape does not exist, generate one (horizontal line)
-    else
-    {
-        int led_count = ctrl_zone->led_count();
+    UpdateWidgetsValues();
 
-        temp_shape->w = led_count;
-        temp_shape->h = 1;
-        temp_shape->led_positions.resize(led_count);
+    ui->grid->ApplySettings(settings);
+    ui->grid->CreateLEDItems(temp_shape);
 
-        for(int i = 0; i < led_count; i++)
-        {
-            LedPosition* temp_led_position = new LedPosition();
-            temp_led_position->led_num = i;
-            temp_led_position->setX(i);
-            temp_led_position->setY(0);
-            temp_shape->led_positions[i] = temp_led_position;
-        }
-    }
-
+    ui->undo_button->setEnabled(false);
 }
 
 void WidgetEditor::on_copy_shape_button_clicked()
@@ -229,7 +235,9 @@ void WidgetEditor::on_copy_shape_button_clicked()
 
     std::map<QString, ControllerZone*> ctrl_zones_choices;
 
+    // generate choice list
     int i = 0;
+
     for(ControllerZone* ctrl_zone_it : ctrl_zones)
     {
         // ignore current ctrl_zone
@@ -276,31 +284,19 @@ void WidgetEditor::on_copy_shape_button_clicked()
     inp->setWindowTitle("Choose shape");
     inp->move(button_pos.x(), button_pos.y());
 
-    if(inp->exec()){
-
-        SaveState();
+    if(inp->exec()){        
 
         QString selected = inp->textValue();
+
         ControllerZone* selected_ctrl_zone = ctrl_zones_choices[selected];
 
-        temp_shape = new CustomShape();
-        temp_shape->w = selected_ctrl_zone->settings.custom_shape->w;
-        temp_shape->h = selected_ctrl_zone->settings.custom_shape->h;
-
-        for(LedPosition* led_position: selected_ctrl_zone->settings.custom_shape->led_positions)
-        {
-           LedPosition* temp_led_position = new LedPosition();
-           temp_led_position->led_num = led_position->led_num;
-           temp_led_position->setX(led_position->x());
-           temp_led_position->setY(led_position->y());
-
-           temp_shape->led_positions.push_back(temp_led_position);
-        }
+        temp_shape = selected_ctrl_zone->settings.custom_shape->clone();
 
         ui->grid->CreateLEDItems(temp_shape);
 
-        UpdateWidgetsValues();
+        SaveState();
 
+        UpdateWidgetsValues();
     }
 
 }
@@ -312,21 +308,7 @@ void WidgetEditor::on_cancel_button_clicked()
 
 void WidgetEditor::on_save_button_clicked()
 {
-    ctrl_zone->settings.custom_shape = new CustomShape();
-
-    ctrl_zone->settings.custom_shape->w = temp_shape->w;
-    ctrl_zone->settings.custom_shape->h = temp_shape->h;
-
-    for(LedPosition* temp_led_position: temp_shape->led_positions)
-    {
-       LedPosition* led_position = new LedPosition();
-       led_position->led_num = temp_led_position->led_num;
-       led_position->setX(temp_led_position->x());
-       led_position->setY(temp_led_position->y());
-
-       ctrl_zone->settings.custom_shape->led_positions.push_back(led_position);
-    }
-
+    ctrl_zone->settings.custom_shape = temp_shape->clone();
     emit Save();
 }
 
@@ -334,6 +316,9 @@ void WidgetEditor::on_w_spinBox_valueChanged(int value)
 {
     settings->w = value;
     temp_shape->w = value;
+
+    SaveState();
+
     ui->grid->ApplySettings(settings);
 }
 
@@ -341,7 +326,10 @@ void WidgetEditor::on_h_spinBox_valueChanged(int value)
 {
     settings->h = value;
     temp_shape->h = value;
-    ui->grid->ApplySettings(settings);
+
+    SaveState();
+
+    ui->grid->ApplySettings(settings);    
 }
 
 void WidgetEditor::on_auto_identify_stateChanged(int state)
@@ -352,26 +340,19 @@ void WidgetEditor::on_auto_identify_stateChanged(int state)
     }
 }
 
-void WidgetEditor::IdentifySelected()
-{
-    LedPosition* led_position = ui->grid->GetSelected();
-
-    if(led_position)
-    {
-        ZoneManager::Get()->IdentifyLed(ctrl_zone, led_position->led_num);
-    }
-}
-
 void WidgetEditor::on_rotate_button_clicked()
 {
-    SaveState();
-
     // Resize (swap w and h)
     int new_width  = temp_shape->h;
     int new_height = temp_shape->w;
 
     temp_shape->w = new_width;
     temp_shape->h = new_height;
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
 
     UpdateWidgetsValues();
 
@@ -385,12 +366,12 @@ void WidgetEditor::on_rotate_button_clicked()
     }
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_v_flip_button_clicked()
 {
-    SaveState();
-
     QTransform t = QTransform().scale(1,-1);
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -401,12 +382,12 @@ void WidgetEditor::on_v_flip_button_clicked()
     }
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_h_flip_button_clicked()
 {
-    SaveState();
-
     QTransform t = QTransform().scale(-1, 1);
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -417,14 +398,19 @@ void WidgetEditor::on_h_flip_button_clicked()
     }
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_h_line_button_clicked()
 {
-    SaveState();
-
     temp_shape->w = 0;
     temp_shape->h = 1;
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
 
     for(LedPosition* led_position: temp_shape->led_positions)
     {
@@ -435,14 +421,19 @@ void WidgetEditor::on_h_line_button_clicked()
     UpdateWidgetsValues();
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_v_line_button_clicked()
 {
-    SaveState();
-
     temp_shape->w = 1;
     temp_shape->h = 0;
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
 
     for(LedPosition* led_position: temp_shape->led_positions)
     {
@@ -453,14 +444,19 @@ void WidgetEditor::on_v_line_button_clicked()
     UpdateWidgetsValues();
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_grow_button_clicked()
 {
-    SaveState();
-
     temp_shape->w *= 2;
     temp_shape->h *= 2;
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
 
     UpdateWidgetsValues();
 
@@ -474,18 +470,22 @@ void WidgetEditor::on_grow_button_clicked()
     }
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_shrink_button_clicked()
 {
-    SaveState();
-
     temp_shape->w *= 0.5;
     temp_shape->h *= 0.5;
 
     temp_shape->w = std::max<int>(1,temp_shape->w);
     temp_shape->h = std::max<int>(1,temp_shape->h);
 
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
     UpdateWidgetsValues();
 
     QTransform t = QTransform().scale(0.5, 0.5);
@@ -498,12 +498,12 @@ void WidgetEditor::on_shrink_button_clicked()
     }
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_circle_button_clicked()
 {
-    SaveState();
-
     double PI = 3.14159265359l;
 
     unsigned int leds_count = temp_shape->led_positions.size();
@@ -512,6 +512,11 @@ void WidgetEditor::on_circle_button_clicked()
 
     temp_shape->w = 2 * radius + 1;
     temp_shape->h = 2 * radius + 1;
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
 
     UpdateWidgetsValues();
 
@@ -529,16 +534,20 @@ void WidgetEditor::on_circle_button_clicked()
 
     ui->grid->CreateLEDItems(temp_shape);
 
+    SaveState();
 }
 
 void WidgetEditor::on_square_button_clicked()
 {
-    SaveState();
-
     int side = temp_shape->led_positions.size() / 4 ;
 
     temp_shape->w = side + 2;
     temp_shape->h = side + 2;
+
+    settings->w = temp_shape->w;
+    settings->h = temp_shape->h;
+
+    ui->grid->ApplySettings(settings);
 
     UpdateWidgetsValues();
 
@@ -576,26 +585,13 @@ void WidgetEditor::on_square_button_clicked()
     }
 
     ui->grid->CreateLEDItems(temp_shape);
+
+    SaveState();
 }
 
 void WidgetEditor::on_undo_button_clicked()
 {
     Undo();
-}
-
-void WidgetEditor::Undo()
-{
-    if(!states.empty())
-    {
-        RestoreState(states.back());
-
-        if(states.size() > 1)
-        {
-            states.pop_back();
-        }
-
-        ui->undo_button->setEnabled(states.size() > 1);
-    }
 }
 
 

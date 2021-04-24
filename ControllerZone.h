@@ -31,6 +31,14 @@ struct LedPosition
     {
         point.setY(y);
     }
+
+    LedPosition* clone()
+    {
+        LedPosition* clone = new LedPosition();
+        clone->led_num = led_num;
+        clone->point = QPoint(x(), y());
+        return clone;
+    }
 };
 
 struct CustomShape
@@ -38,6 +46,78 @@ struct CustomShape
     unsigned int w;
     unsigned int h;
     std::vector<LedPosition*> led_positions;
+
+    CustomShape* clone()
+    {
+        CustomShape* clone = new CustomShape();
+        clone->w = w;
+        clone->h = h;
+
+        for(LedPosition* led_position: led_positions)
+        {
+            clone->led_positions.push_back(led_position->clone());
+        }
+
+        return clone;
+    }
+
+    static CustomShape* HorizontalLine(unsigned int led_count)
+    {
+        CustomShape* shape = new CustomShape();
+        shape->w = led_count;
+        shape->h = 1;
+        shape->led_positions.resize(led_count);
+
+        for(unsigned int i = 0; i < led_count; i++)
+        {
+            LedPosition* led_position = new LedPosition();
+            led_position->led_num = i;
+            led_position->setX(i);
+            led_position->setY(0);
+            shape->led_positions[i] = led_position;
+        }
+
+        return shape;
+    }
+
+    bool differs(CustomShape* other)
+    {
+
+        if(w != other->w)
+        {
+            printf("w changed \n");
+            return true;
+        }
+
+        if(h != other->h)
+        {
+            printf("h changed \n");
+            return true;
+        }
+
+        if(led_positions.size() != other->led_positions.size())
+        {
+            printf("size changed\n");
+            return true;
+        }
+
+        for(unsigned int i = 0; i < led_positions.size(); i++)
+        {
+            if(led_positions[i]->x() != other->led_positions[i]->x())
+            {
+                printf("led %d x changed \n", i);
+                return true;
+            }
+
+            if(led_positions[i]->y() != other->led_positions[i]->y())
+            {
+                printf("led %d y changed \n", i);
+                return true;
+            }
+        }
+
+        return false;
+    }
 };
 
 enum ZoneShape {

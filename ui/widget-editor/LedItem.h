@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QGraphicsItem>
+#include <QGraphicsTextItem>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 
@@ -17,40 +18,35 @@ class LedItem: public QObject, public QGraphicsItem
 
 public:
     LedItem(LedPosition*, GridSettings*);
+
     QRectF boundingRect() const;
+
     void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
-    void SetSelected(bool);
-    void Restrict(int,int);
-    void MoveBy(int,int);
+
     LedPosition* GetLedPosition();
 
+    void Restrict();
+
 signals:
-    void Selected();
-    void Moving();
-    void Moved();
-    void Restricted(int,int);
+      void Released();
 
 private:
     LedPosition*  led_position;
     GridSettings* settings;
 
-    inline static const unsigned int shape_offset = 8;
-
-    bool selected = false;
-    bool pressed = false;
-    bool moving = false;
     bool hover = false;
+    bool pressed = false;
 
-    inline static const QBrush selected_brush = QBrush(QColor("#c7956d"));
-    inline static const QBrush moving_brush =   QBrush(QColor("#965d62"));
-    inline static const QBrush default_brush =  QBrush(QColor("#f2d974"));
-    inline static const QBrush hover_brush =    QBrush(QColor("#00ff00"));
+    inline static const QBrush selected_brush  = QBrush(QColor("#c7956d"));
+    inline static const QBrush focus_brush       =   QBrush(QColor("#965d62"));
+    inline static const QBrush default_brush     =  QBrush(QColor("#f2d974"));
+    inline static const QBrush hover_brush   =    QBrush(QColor("#00ff00"));
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent*);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent*);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent*) ;
+
 };
 #endif // LEDITEM_H

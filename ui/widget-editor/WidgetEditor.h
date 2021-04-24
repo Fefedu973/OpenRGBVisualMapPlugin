@@ -49,19 +49,20 @@ private:
 
     void UpdateWidgetsValues();
     void IdentifySelected();
-    void ResetShape();
+    void InitShape();
 
-    CustomShape* temp_shape;
+    CustomShape* temp_shape = nullptr;
 
     Ui::WidgetEditor *ui;
     ControllerZone* ctrl_zone;
     GridSettings* settings;
 
-    std::vector<CustomShape> states;
+    std::vector<CustomShape*> states;
 
+    bool StateChanged();
     void SaveState();
     void Undo();
-    void RestoreState(CustomShape shape);
+    void RestoreState(CustomShape* shape);
 };
 
 #endif // WIDGETEDITOR_H

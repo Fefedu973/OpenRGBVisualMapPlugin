@@ -14,7 +14,7 @@ public:
     ControllerZone* GetZone(int);
 
     void IdentifyZone(ControllerZone*);
-    void IdentifyLed(ControllerZone*, int);
+    void IdentifyLeds(ControllerZone*, std::vector<unsigned int>);
     void ApplyImage(std::vector<ControllerZone*>, QImage);
 
 private:

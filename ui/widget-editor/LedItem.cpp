@@ -6,47 +6,43 @@
 #include <QCursor>
 
 LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
-   led_position(led_position),
-   settings(settings)
+    led_position(led_position),
+    settings(settings)
 {
-    setFlag(ItemIsMovable);
-    setFlag(ItemIsSelectable);
-    setAcceptHoverEvents(true);
-
     std::string tooltip =
-        "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
+            "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
             + std::to_string(led_position->led_num)
-        + "</div>";
+            + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
-
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
+    setAcceptHoverEvents(true);
     setCursor(Qt::OpenHandCursor);
+    setScale(0.1);
+    setX(led_position->x());
+    setY(led_position->y());
+    setZValue(1);
 }
 
 QRectF LedItem::boundingRect() const
 {
-    return QRectF(0, 0, shape_offset + 1 * settings->grid_scale_factor , shape_offset + 1 * settings->grid_scale_factor);
+    return QRectF(0, 0, 10, 10);
 }
 
 void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-    // scale to display
-    int scale_x = led_position->x() * settings->grid_scale_factor - shape_offset/2;
-    int scale_y =led_position->y() * settings->grid_scale_factor - shape_offset/2;
+    QRectF rect = boundingRect();
 
-    setX(scale_x);
-    setY(scale_y);
-
-    QRectF rect (shape_offset/2, shape_offset/2, 1 * settings->grid_scale_factor , 1 * settings->grid_scale_factor);
     QPen pen(QColor(0, 0, 0, 0x80), 0.05);
 
     painter->setPen(pen);
-    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::Antialiasing);  
 
-    QBrush brush = pressed ? moving_brush: hover ? hover_brush : selected || isSelected() ? selected_brush :  default_brush;
+    QBrush brush =  isSelected() ? selected_brush : hasFocus() ? focus_brush:  hover ? hover_brush :  default_brush;
     painter->setBrush(brush);
 
     painter->drawRect(rect);
+    painter->setBrush(QColor("#534e52"));
 
     QPen text_pen(QColor("#534e52"));
 
@@ -55,118 +51,58 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
     painter->setFont(font);
 
     painter->setPen(text_pen);
-    painter->setBrush(QColor("#534e52"));
-    painter->drawText(rect, Qt::AlignCenter, QString("%1").arg(led_position->led_num));
-
+    painter->drawText(rect, Qt::AlignCenter, QString::number(led_position->led_num));
 }
 
-void LedItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void LedItem::Restrict()
 {
-    pressed = true;
-    setCursor(Qt::ClosedHandCursor);
-
-    emit Selected();
-
-    update();
-
-    QGraphicsItem::mousePressEvent(event);
-}
-
-void LedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    pressed = false;
-    moving = false;
-
-    setCursor(Qt::OpenHandCursor);
-
-    Restrict(settings->w * settings->grid_scale_factor, settings->h * settings->grid_scale_factor);
-
-    emit Moved();
-
-    QGraphicsItem::mouseReleaseEvent(event);
-}
-
-void LedItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    moving = true;
-
-    emit Moving();
-
-    QGraphicsItem::mouseMoveEvent(event);
-}
-
-void LedItem::SetSelected(bool value)
-{
-    selected = value;
-}
-
-void LedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    hover = true;
-    QGraphicsItem::hoverEnterEvent(event);
-}
-
-void LedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    hover = false;
-    QGraphicsItem::hoverLeaveEvent(event);
-}
-
-void LedItem::MoveBy(int x, int y)
-{
-    int new_x = led_position->x() + x;
-    int new_y = led_position->y() + y;
-
-    new_x = std::min<int>(std::max<int>(0,new_x), settings->w-1);
-    new_y = std::min<int>(std::max<int>(0,new_y), settings->h-1);
-
-    led_position->setX(new_x);
-    led_position->setY(new_y);
-
-    update();
-}
-
-void LedItem::Restrict(int w, int h)
-{
-    int original_x = led_position->x();
-    int original_y = led_position->y();
-
-    int new_x = x() + shape_offset/2;
-    int new_y = y() + shape_offset/2;
-
-    // ease moves
-    if(new_x % settings->grid_scale_factor >= settings->grid_scale_factor/2)
-    {
-        new_x += settings->grid_scale_factor/2;
-    }
-
-    if(new_y % settings->grid_scale_factor >= settings->grid_scale_factor/2)
-    {
-        new_y += settings->grid_scale_factor/2;
-    }
+    //printf("LedItem::Restrict %d \n", led_position->led_num);
+    int round_x = round(x());
+    int round_y = round(y());
 
     // restrict to bounds
-    new_x = std::min<int>(std::max<int>(0,new_x), w-1);
-    new_y = std::min<int>(std::max<int>(0,new_y), h-1);
+    int new_x = std::min<int>(std::max<int>(0,round_x), settings->w - 1);
+    int new_y = std::min<int>(std::max<int>(0,round_y), settings->h - 1);
 
-    // normalize
-    new_x = (new_x/settings->grid_scale_factor);
-    new_y = (new_y/settings->grid_scale_factor);
-
-    // update led real position
+    // update led position
     led_position->setX(new_x);
     led_position->setY(new_y);
 
+    setX(led_position->x());
+    setY(led_position->y());
+
     update();
-
-    int delta_x = new_x - original_x;
-    int delta_y = new_y - original_y;
-
-    emit Restricted(delta_x, delta_y);
-
 }
 
 LedPosition* LedItem::GetLedPosition()
 {
     return led_position;
 }
+
+void LedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    hover = true;
+    QGraphicsItem::hoverEnterEvent( event );
+}
+
+void LedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    hover = false;
+    QGraphicsItem::hoverLeaveEvent( event );
+}
+
+void LedItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    pressed = true;
+    setZValue(10);
+    setCursor(Qt::ClosedHandCursor);
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void LedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    pressed = false;
+    setZValue(1);
+    setCursor(Qt::OpenHandCursor);
+    emit Released();
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+

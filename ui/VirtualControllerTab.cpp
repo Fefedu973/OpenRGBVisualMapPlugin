@@ -23,7 +23,6 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     settings->show_grid = true;
     settings->live_preview = true;
     settings->grid_size = 1;
-    settings->grid_scale_factor = 1;
 
     ui->grid->Init(settings);
     ui->gridOptions->Init(settings);

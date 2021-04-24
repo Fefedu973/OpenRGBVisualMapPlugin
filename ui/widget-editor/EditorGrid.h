@@ -17,12 +17,9 @@ class EditorGrid : public QGraphicsView
 
 public:
     explicit EditorGrid(QWidget*);
-
     void ApplySettings(GridSettings*);
-    void SetSelected(LedPosition*);
-    LedPosition* GetSelected();
+    std::vector<LedPosition*> GetSelection();
     void CreateLEDItems(CustomShape*);
-
     void UpdateItems();
 
 protected:
@@ -31,23 +28,18 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 signals:
-    void ItemSelected(LedPosition*);
-    void ItemMoving(LedPosition*);
-    void ItemMoved(LedPosition*);
-    void Restricted(LedPosition*);
+    void SelectionChanged();
+    void Changed();    
 
 private:
     GridSettings* settings = nullptr;
     Scene* scene = nullptr;
-
     LedPosition* selected = nullptr;
-
-    std::vector<LedItem*> led_items;
-
-    void Clear();
-
+    std::vector<LedItem*> led_items;    
     bool left_button_pressed = false;
     bool right_button_pressed = false;
+
+    void Clear();
 };
 
 #endif // EDITORGRID_H
