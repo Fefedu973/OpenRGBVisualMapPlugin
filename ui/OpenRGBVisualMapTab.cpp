@@ -39,8 +39,17 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     connect(tb, SIGNAL(clicked()), this, SLOT(AddTab()));
 
-    connect(ui->virtual_controller_tabs, &QTabWidget::tabBarDoubleClicked, [=](int tab_index){
-        VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_index);
+    connect(ui->virtual_controller_tabs, &QTabWidget::tabBarDoubleClicked, [=](int tab_idx){
+
+        int tab_count = ui->virtual_controller_tabs->count();
+
+        // dont rename 1st and last tabs
+        if(tab_idx == 0 || tab_idx == tab_count - 1)
+        {
+            return;
+        }
+
+        VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_idx);
 
         QString new_name = QInputDialog::getText(
                     nullptr, "Rename controller", "Set the new name",
@@ -48,7 +57,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
         if(!new_name.isEmpty())
         {
-            ui->virtual_controller_tabs->setTabText(tab_index, new_name);
+            ui->virtual_controller_tabs->setTabText(tab_idx, new_name);
             vct->RenameController(new_name.toStdString());
         }
     });
