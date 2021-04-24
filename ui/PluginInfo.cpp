@@ -27,14 +27,17 @@ PluginInfo::~PluginInfo()
 
 void PluginInfo::on_open_plugin_folder_clicked()
 {
-    std::string config_dir = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + "/plugins";
-    QUrl url(QString::fromStdString(config_dir));
+    std::string config_dir = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + "plugins";
+    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
+
+    printf("Opening %s\n", url.path().toStdString().c_str());
+
     QDesktopServices::openUrl(url);
 }
 
 void PluginInfo::on_download_latest_clicked()
 {
     std::string url_string = LATEST_BUILD_URL;
-    QUrl url(QString::fromStdString(url_string));;
+    QUrl url(QString::fromStdString(url_string));
     QDesktopServices::openUrl(url);
 }
