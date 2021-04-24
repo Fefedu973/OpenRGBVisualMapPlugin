@@ -103,6 +103,16 @@ void WidgetEditor::RestoreState(CustomShape shape)
     ui->grid->CreateLEDItems(temp_shape);
 }
 
+void WidgetEditor::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Z && event->modifiers() == Qt::CTRL)
+    {
+        Undo();
+    }
+
+    QWidget::keyPressEvent(event);
+}
+
 int WidgetEditor::Show(ControllerZone* ctrl_zone)
 {
     WidgetEditor* editor = new WidgetEditor(nullptr, ctrl_zone);
@@ -569,6 +579,11 @@ void WidgetEditor::on_square_button_clicked()
 }
 
 void WidgetEditor::on_undo_button_clicked()
+{
+    Undo();
+}
+
+void WidgetEditor::Undo()
 {
     if(!states.empty())
     {

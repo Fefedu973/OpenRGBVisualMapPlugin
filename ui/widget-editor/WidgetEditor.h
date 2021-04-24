@@ -40,6 +40,9 @@ private slots:
     void on_square_button_clicked();
     void on_undo_button_clicked();
 
+protected:
+    void keyPressEvent(QKeyEvent *event);
+
 private:
     explicit WidgetEditor(QWidget *parent = nullptr, ControllerZone* ctrl_zone = nullptr);
     ~WidgetEditor();
@@ -57,6 +60,7 @@ private:
     std::vector<CustomShape> states;
 
     void SaveState();
+    void Undo();
     void RestoreState(CustomShape shape);
 };
 
