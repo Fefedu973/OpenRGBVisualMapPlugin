@@ -111,7 +111,6 @@ void BackgroundApplier::on_add_color_stop_button_clicked()
 
 void BackgroundApplier::ApplyPreset()
 {
-    printf("Apply Preset\n");
     image = QImage(w, h, QImage::Format_RGB32);
     preset = presets[ui->presets_comboBox->currentIndex()];
 
@@ -128,7 +127,6 @@ void BackgroundApplier::ApplyPreset()
 
 void BackgroundApplier::ApplyCustom()
 {
-    printf("ApplyCustom\n");
     image = QImage(w, h, QImage::Format_RGB32);
 
     QBrush brush;

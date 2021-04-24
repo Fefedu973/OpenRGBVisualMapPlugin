@@ -56,7 +56,6 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
 
 void LedItem::Restrict()
 {
-    //printf("LedItem::Restrict %d \n", led_position->led_num);
     int round_x = round(x());
     int round_y = round(y());
 

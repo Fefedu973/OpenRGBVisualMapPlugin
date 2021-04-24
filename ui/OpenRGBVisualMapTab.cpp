@@ -66,8 +66,6 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
             return;
         }
 
-        printf("Current is %d, requested %d\n",current,  tab_idx);
-
         if(current == tab_idx)
         {
             VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_idx);
