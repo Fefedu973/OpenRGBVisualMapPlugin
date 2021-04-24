@@ -39,8 +39,25 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     connect(tb, SIGNAL(clicked()), this, SLOT(AddTab()));
 
-    connect(ui->virtual_controller_tabs, &QTabWidget::tabBarDoubleClicked, [=](int tab_idx){
+    connect(ui->virtual_controller_tabs, &QTabWidget::tabCloseRequested, [=](int tab_idx){
+        QWidget* tab = ui->virtual_controller_tabs->widget(tab_idx);
+        ui->virtual_controller_tabs->removeTab(tab_idx);
+        delete tab;
 
+        // dont let the last tab beeing able to be the current
+        int current = ui->virtual_controller_tabs->currentIndex();
+        int tab_count = ui->virtual_controller_tabs->count();
+
+        if(current == tab_count -1)
+        {
+            ui->virtual_controller_tabs->setCurrentIndex(tab_count - 2);
+        }
+
+    });
+
+    connect(ui->virtual_controller_tabs, &QTabWidget::tabBarClicked, [=](int tab_idx){
+
+        int current = ui->virtual_controller_tabs->currentIndex();
         int tab_count = ui->virtual_controller_tabs->count();
 
         // dont rename 1st and last tabs
@@ -49,23 +66,23 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
             return;
         }
 
-        VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_idx);
+        printf("Current is %d, requested %d\n",current,  tab_idx);
 
-        QString new_name = QInputDialog::getText(
-                    nullptr, "Rename controller", "Set the new name",
-                    QLineEdit::Normal, QString::fromUtf8(vct->GetControllerName().c_str())).trimmed();
-
-        if(!new_name.isEmpty())
+        if(current == tab_idx)
         {
-            ui->virtual_controller_tabs->setTabText(tab_idx, new_name);
-            vct->RenameController(new_name.toStdString());
-        }
-    });
+            VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_idx);
 
-    connect(ui->virtual_controller_tabs, &QTabWidget::tabCloseRequested, [=](int tab_idx){
-        QWidget* tab = ui->virtual_controller_tabs->widget(tab_idx);
-        ui->virtual_controller_tabs->removeTab(tab_idx);
-        delete tab;
+            QString new_name = QInputDialog::getText(
+                        nullptr, "Rename controller", "Set the new name",
+                        QLineEdit::Normal, QString::fromUtf8(vct->GetControllerName().c_str())).trimmed();
+
+            if(!new_name.isEmpty())
+            {
+                ui->virtual_controller_tabs->setTabText(tab_idx, new_name);
+                vct->RenameController(new_name.toStdString());
+            }
+        }
+
     });
 
     AddTab();
