@@ -93,7 +93,15 @@ void LedItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     pressed = true;
     setZValue(10);
     setCursor(Qt::ClosedHandCursor);
-    QGraphicsItem::mousePressEvent(event);
+
+    if(event->modifiers() == Qt::ShiftModifier)
+    {
+        event->accept();
+    }
+    else
+    {
+        QGraphicsItem::mousePressEvent(event);
+    }
 }
 
 void LedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -102,6 +110,15 @@ void LedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     setZValue(1);
     setCursor(Qt::OpenHandCursor);
     emit Released();
-    QGraphicsItem::mouseReleaseEvent(event);
+
+    if(event->modifiers() == Qt::ShiftModifier)
+    {
+        emit RectSelectionRequest();
+        event->accept();
+    }
+    else
+    {
+        QGraphicsItem::mouseReleaseEvent(event);
+    }
 }
 

@@ -1,6 +1,7 @@
 #include "EditorGrid.h"
 #include "ControllerZone.h"
 #include "LedItem.h"
+#include "stdlib.h"
 
 EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
     setStyleSheet("background-color: #534e52;");
@@ -145,6 +146,28 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
 
             emit Changed();
         });
+
+
+        connect(led_item, &LedItem::RectSelectionRequest, [=](){
+
+            std::vector<LedPosition*> items = GetSelection();
+            if(items.size() == 1)
+            {
+
+                LedPosition* start = items.front();
+                LedPosition* end = led_item->GetLedPosition();
+                QRect selection_rect(start->point, end->point);
+
+                for(LedItem* item : led_items)
+                {
+                    item->setSelected(selection_rect.contains(item->GetLedPosition()->point));
+                }
+
+                emit SelectionChanged();
+            }
+
+        });
+
     }
 }
 

@@ -29,6 +29,7 @@ public:
 
 signals:
       void Released();
+      void RectSelectionRequest();
 
 private:
     LedPosition*  led_position;
