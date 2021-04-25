@@ -64,12 +64,24 @@ json VisualMapSettingsManager::LoadSettings(std::string filename)
 
 bool VisualMapSettingsManager::CreateSettingsDirectory()
 {
-    std::string directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
+    std::string settings_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + settings_folder;
 
-    if(std::filesystem::exists(directory))
+    if(std::filesystem::exists(settings_directory))
     {
             return true;
     }
 
-    return std::filesystem::create_directory(directory);
+    if(!std::filesystem::create_directory(settings_directory))
+    {
+        return false;
+    }
+
+    std::string saves_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
+
+    if(std::filesystem::exists(saves_directory))
+    {
+            return true;
+    }
+
+    return std::filesystem::create_directory(saves_directory);
 }
