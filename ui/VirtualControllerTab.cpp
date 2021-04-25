@@ -199,7 +199,7 @@ void VirtualControllerTab::on_register_controller_stateChanged(int value)
     virtual_controller->Register(value);
 }
 
-void VirtualControllerTab::on_resetButton_clicked()
+void VirtualControllerTab::on_clearButton_clicked()
 {   
     for(ControllerZone* ctrl_zone: added_zones)
     {

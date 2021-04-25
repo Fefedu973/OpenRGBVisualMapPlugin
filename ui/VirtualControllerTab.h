@@ -39,7 +39,7 @@ private slots:
 
     void on_saveButton_clicked();
     void on_loadButton_clicked();
-    void on_resetButton_clicked();
+    void on_clearButton_clicked();
     void on_register_controller_stateChanged(int);
 
 signals:

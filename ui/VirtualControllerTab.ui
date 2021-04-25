@@ -104,9 +104,9 @@
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QPushButton" name="resetButton">
+            <widget class="QPushButton" name="clearButton">
              <property name="text">
-              <string>Reset</string>
+              <string>Clear</string>
              </property>
             </widget>
            </item>
