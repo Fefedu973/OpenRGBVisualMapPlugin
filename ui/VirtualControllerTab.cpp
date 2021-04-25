@@ -154,15 +154,15 @@ void VirtualControllerTab::InitZoneList()
         ui->zoneList->setCellWidget(i, 1, widget);
 
         connect(button, &QPushButton::clicked, [=]() {
-            if(std::find(added_zones.begin(), added_zones.end(),retained_zones[i]) == added_zones.end())
+            if(!virtual_controller->HasZone(retained_zones[i]))
             {
-                added_zones.push_back(retained_zones[i]);
+                virtual_controller->Add(retained_zones[i]);
                 ui->zoneList->selectRow(i);
                 DecorateButton(button, remove_icon);
             }
             else
             {
-                added_zones.erase(std::find(added_zones.begin(), added_zones.end(),retained_zones[i]));
+                virtual_controller->Remove(retained_zones[i]);
 
                 if(selected_ctrl_zone == retained_zones[i])
                 {
@@ -174,7 +174,7 @@ void VirtualControllerTab::InitZoneList()
                 DecorateButton(button, add_icon);
             }
 
-            ui->grid->ResetItems(added_zones);
+            ui->grid->ResetItems(virtual_controller->GetZones());
         });
     }
 
@@ -201,14 +201,14 @@ void VirtualControllerTab::on_register_controller_stateChanged(int value)
 
 void VirtualControllerTab::on_clearButton_clicked()
 {   
-    for(ControllerZone* ctrl_zone: added_zones)
+    for(ControllerZone* ctrl_zone: virtual_controller->GetZones())
     {
         ctrl_zone->settings = ControllerZoneSettings::defaults();
     }
 
-    added_zones.clear();
+    virtual_controller->Clear();
 
-    ui->grid->ResetItems(added_zones);
+    ui->grid->ResetItems(virtual_controller->GetZones());
 
     UpdateZoneButtons();
 
@@ -225,7 +225,7 @@ void VirtualControllerTab::on_saveButton_clicked()
     {
         RenameController(filename.toStdString());
         json j;
-        j["ctrl_zones"] = added_zones;
+        j["ctrl_zones"] = virtual_controller->GetZones();
         j["grid_settings"] = settings;
         VisualMapSettingsManager::SaveSettings(filename.toStdString(), j);
     }
@@ -261,7 +261,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
 
-    added_zones.clear();
+     virtual_controller->Clear();
 
     auto ctrl_zones = j["ctrl_zones"];
 
@@ -294,7 +294,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 
                     ctrl_zone->settings = settings;
 
-                    added_zones.push_back(available_zones[i]);
+                    virtual_controller->Add(available_zones[i]);
 
                     ui->zoneList->item(i,0)->setText(QString::fromUtf8(ctrl_zone->display_name().c_str()));
 
@@ -323,7 +323,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     ui->gridOptions->SetSettings(settings);
 
-    ui->grid->ResetItems(added_zones);
+    ui->grid->ResetItems(virtual_controller->GetZones());
 
     virtual_controller->UpdateSize(settings->w, settings->h);
 }
@@ -338,8 +338,7 @@ void VirtualControllerTab::UpdateZoneButtons()
 
         if(buttons.size() == 1)
         {
-            bool zone_added = std::find(added_zones.begin(), added_zones.end(), available_zones[i]) != added_zones.end();
-            DecorateButton(buttons[0], zone_added ? remove_icon : add_icon);
+            DecorateButton(buttons[0], virtual_controller->HasZone(available_zones[i]) ? remove_icon : add_icon);
         }
 
     }
@@ -352,6 +351,6 @@ void VirtualControllerTab::OnBackgroundApplied(QImage image)
         ui->grid->UpdatePreview(image);        
     }
 
-    ZoneManager::Get()->ApplyImage(added_zones, image);
+    virtual_controller->ApplyImage(image);
 }
 

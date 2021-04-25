@@ -1,5 +1,8 @@
 #include "VirtualController.h"
 #include "OpenRGBVisualMapPlugin.h"
+#include "RGBController.h"
+#include "ZoneManager.h"
+#include <set>
 
 VirtualController::VirtualController()
 {
@@ -107,6 +110,7 @@ void VirtualController::Register(bool state)
     {
         if(!registered)
         {
+            ForceDirectMode();
             OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(this);
             registered = true;
         }
@@ -121,3 +125,58 @@ void VirtualController::Register(bool state)
     }
 }
 
+void VirtualController::ForceDirectMode(){
+    std::set<RGBController*> controllers;
+
+    for(ControllerZone* ctrl_zone: added_zones)
+    {
+        controllers.insert(ctrl_zone->controller);
+    }
+
+    for(RGBController* controller : controllers)
+    {
+        for(unsigned int i =0 ; i < controller->modes.size(); i++)
+        {
+            if(controller->modes[i].name == "Direct")
+            {
+                controller->SetMode(i);
+            }
+        }
+    }
+}
+
+bool VirtualController::HasZone(ControllerZone* ctrl_zone)
+{
+    return std::find(added_zones.begin(), added_zones.end(),ctrl_zone) != added_zones.end();
+}
+
+void VirtualController::Add(ControllerZone* ctrl_zone)
+{
+    if(!HasZone(ctrl_zone))
+    {
+        added_zones.push_back(ctrl_zone);
+    }
+}
+
+void VirtualController::Remove(ControllerZone* ctrl_zone)
+{
+    if(HasZone(ctrl_zone))
+    {
+        added_zones.erase(std::find(added_zones.begin(), added_zones.end(), ctrl_zone));
+    }
+}
+
+void VirtualController::Clear()
+{
+    added_zones.clear();
+}
+
+std::vector<ControllerZone*> VirtualController::GetZones()
+{
+    return added_zones;
+}
+
+void VirtualController::ApplyImage(QImage image)
+{
+    ZoneManager::Get()->ApplyImage(added_zones, image);
+}

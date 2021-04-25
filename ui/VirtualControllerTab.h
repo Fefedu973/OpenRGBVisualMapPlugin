@@ -60,8 +60,6 @@ private:
     void UpdateZoneButtons();
     void InitZoneList();
     void resizeEvent(QResizeEvent*);
-
-    std::vector<ControllerZone*> added_zones;
 };
 
 #endif // VIRTUALCONTROLLERTAB_H

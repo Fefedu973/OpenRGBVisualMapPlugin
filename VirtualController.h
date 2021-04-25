@@ -32,15 +32,26 @@ public:
 
     void Register(bool);
 
+    bool HasZone(ControllerZone*);
+    void Add(ControllerZone*);
+    void Remove(ControllerZone*);
+    void Clear();
+    std::vector<ControllerZone*> GetZones();
+    void ApplyImage(QImage);
+
 private:
     int width;
     int height;
 
     bool registered = false;
 
-    void SetupVirtualZone();    
+    void SetupVirtualZone();
+
+    void ForceDirectMode();
 
     std::function<void(QImage)> callback;
+
+    std::vector<ControllerZone*> added_zones;
 };
 
 #endif // VIRTUALCONTROLLER_H
