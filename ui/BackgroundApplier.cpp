@@ -43,9 +43,12 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     for(ColorStop* color_stop: color_stops)
     {
         ui->color_stops->layout()->addWidget(color_stop);
+
         connect(color_stop, &ColorStop::GradientStopChanged, [=](){
             ApplyCustom();
         });
+
+        ui->color_stops->layout()->setAlignment(color_stop, Qt::AlignLeft | Qt::AlignTop);
     }
 }
 
@@ -100,7 +103,9 @@ void BackgroundApplier::on_add_color_stop_button_clicked()
 {
     ColorStop* color_stop = new ColorStop;
     color_stops.push_back(color_stop);
-    ui->color_stops->layout()->addWidget(color_stop);
+
+    ui->color_stops->layout()->addWidget(color_stop);    
+    ui->color_stops->layout()->setAlignment(color_stop, Qt::AlignLeft | Qt::AlignTop);
 
     connect(color_stop, &ColorStop::GradientStopChanged, [=](){
         ApplyCustom();
