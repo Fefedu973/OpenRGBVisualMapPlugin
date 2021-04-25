@@ -37,8 +37,11 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     ui->spread_comboBox->addItems(spread_names);
     ui->spread_comboBox->blockSignals(false);
 
-    color_stops.push_back(new ColorStop());
-    color_stops.push_back(new ColorStop());
+    ColorStop* first_stop = new ColorStop();
+    ColorStop* second_stop = new ColorStop();
+
+    color_stops.push_back(first_stop);
+    color_stops.push_back(second_stop);
 
     for(ColorStop* color_stop: color_stops)
     {

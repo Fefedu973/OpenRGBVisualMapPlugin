@@ -9,6 +9,9 @@ ColorStop::ColorStop(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //default values
+    stop.second = Qt::white;
+
     connect(ui->color_picker, &ColorPicker::ColorSelected, [=](QColor color){
         stop.second = color;
         emit GradientStopChanged(GetGradientStop());
