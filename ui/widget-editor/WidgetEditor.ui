@@ -179,6 +179,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="auto_resize_button">
+           <property name="text">
+            <string>Auto resize</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="copy_shape_button">
            <property name="text">
             <string>Copy shape</string>

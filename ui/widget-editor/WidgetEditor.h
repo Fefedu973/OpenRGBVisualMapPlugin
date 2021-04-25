@@ -39,6 +39,7 @@ private slots:
     void on_circle_button_clicked();
     void on_square_button_clicked();
     void on_undo_button_clicked();
+    void on_auto_resize_button_clicked();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -47,10 +48,6 @@ private:
     explicit WidgetEditor(QWidget *parent = nullptr, ControllerZone* ctrl_zone = nullptr);
     ~WidgetEditor();
 
-    void UpdateWidgetsValues();
-    void IdentifySelected();
-    void InitShape();
-
     CustomShape* temp_shape = nullptr;
 
     Ui::WidgetEditor *ui;
@@ -58,6 +55,12 @@ private:
     GridSettings* settings;
 
     std::vector<CustomShape*> states;
+
+    void UpdateWidgetsValues();
+    void IdentifySelected();
+    void InitShape();
+    void AutoResize();
+    QPoint GetCenter(std::vector<LedPosition*>);
 
     bool StateChanged();
     void SaveState();

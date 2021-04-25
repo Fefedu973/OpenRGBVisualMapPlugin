@@ -12,12 +12,12 @@ struct LedPosition
 
     QPoint point;
 
-    unsigned int x()
+    int x()
     {
         return point.x();
     }
 
-    unsigned int y()
+    int y()
     {
         return point.y();
     }
@@ -30,6 +30,12 @@ struct LedPosition
     void setY(int y)
     {
         point.setY(y);
+    }
+
+    void shift(int shift_x, int shift_y)
+    {
+        setX(x() + shift_x);
+        setY(y() + shift_y);
     }
 
     LedPosition* clone()
