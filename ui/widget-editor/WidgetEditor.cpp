@@ -94,6 +94,7 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     ui->undo_button->setEnabled(false);
 
     UpdateWidgetsValues();
+
 }
 
 WidgetEditor::~WidgetEditor()

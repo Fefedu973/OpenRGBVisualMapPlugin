@@ -40,8 +40,6 @@ private:
     QGraphicsPixmapItem* preview;
     QPixmap preview_pixmap;
 
-    float scaleFactor = 1.0f;
-
     GridSettings* settings;
 
     std::vector<ControllerZoneItem*> ctrl_zone_items;

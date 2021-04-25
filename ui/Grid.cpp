@@ -14,7 +14,7 @@ void Grid::Init(GridSettings* s)
 
     setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    resize(settings->w, settings->h );
+    resize(settings->w, settings->h);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -27,7 +27,7 @@ void Grid::Init(GridSettings* s)
     setFrameShadow(QFrame::Raised);
     setFrameStyle(QFrame::NoFrame);
 
-    scale(scaleFactor, scaleFactor);
+    scale(4, 4);
 }
 
 void Grid::ApplySettings(GridSettings* settings)
