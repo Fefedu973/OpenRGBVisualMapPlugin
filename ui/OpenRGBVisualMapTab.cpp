@@ -1,5 +1,6 @@
 #include "OpenRGBVisualMapTab.h"
 #include "VirtualControllerTab.h"
+#include "VisualMapSettingsManager.h"
 #include "PluginInfo.h"
 
 #include <QString>
@@ -37,7 +38,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     ui->virtual_controller_tabs->setTabEnabled(1, false);
     ui->virtual_controller_tabs->tabBar()->setTabButton(1, QTabBar::RightSide, tb);
 
-    connect(tb, SIGNAL(clicked()), this, SLOT(AddTab()));
+    connect(tb, SIGNAL(clicked()), this, SLOT(AddTabSlot()));
 
     connect(ui->virtual_controller_tabs, &QTabWidget::tabCloseRequested, [=](int tab_idx){
         QWidget* tab = ui->virtual_controller_tabs->widget(tab_idx);
@@ -81,12 +82,26 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
             }
         }
 
-    });
+    });  
 
+    if(!SearchAndAutoLoad())
+    {
+         AddTab();
+    }
+
+}
+
+OpenRGBVisualMapTab::~OpenRGBVisualMapTab()
+{
+    delete ui;
+}
+
+void OpenRGBVisualMapTab::AddTabSlot()
+{
     AddTab();
 }
 
-void OpenRGBVisualMapTab::AddTab()
+VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 {
     int tab_size = ui->virtual_controller_tabs->count();
 
@@ -107,9 +122,36 @@ void OpenRGBVisualMapTab::AddTab()
         ui->virtual_controller_tabs->setTabText(tab_position, QString::fromUtf8(name.c_str()));
     });
 
+    return tab;
 }
 
-OpenRGBVisualMapTab::~OpenRGBVisualMapTab()
+
+bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 {
-    delete ui;
+    bool has_loaded = false;
+
+    std::vector<std::string> filenames = VisualMapSettingsManager::GetFileNames();
+    for(std::string filename : filenames)
+    {
+        try
+        {
+            json j = VisualMapSettingsManager::LoadSettings(filename);
+
+            bool auto_load = j["grid_settings"]["auto_load"];
+
+            if(auto_load)
+            {
+                printf("Auto load: loading file %s\n", filename.c_str());
+                VirtualControllerTab* tab = AddTab();
+                tab->LoadFile(filename);
+                has_loaded = true;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            printf("Not able to load file %s: \n%s\n", filename.c_str(), e.what());
+        }
+    }
+
+    return has_loaded;
 }

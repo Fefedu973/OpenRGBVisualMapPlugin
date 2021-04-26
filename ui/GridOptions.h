@@ -29,6 +29,8 @@ private slots:
     void on_grid_checkBox_stateChanged(int);
     void on_bounds_checkBox_stateChanged(int);
     void on_live_preview_checkBox_stateChanged(int);
+    void on_auto_load_checkBox_stateChanged(int);
+    void on_auto_register_checkBox_stateChanged(int);
 
 private:
     Ui::GridOptions *ui;

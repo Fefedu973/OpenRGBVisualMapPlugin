@@ -48,11 +48,25 @@ void GridOptions::on_live_preview_checkBox_stateChanged(int value)
     emit SettingsChanged();
 }
 
+void GridOptions::on_auto_load_checkBox_stateChanged(int value)
+{
+    settings->auto_load = value;
+    emit SettingsChanged();
+}
+
+void GridOptions::on_auto_register_checkBox_stateChanged(int value)
+{
+    settings->auto_register = value;
+    emit SettingsChanged();
+}
+
 void GridOptions::Update()
 {
     ui->bounds_checkBox->setChecked(settings->show_bounds);
     ui->grid_checkBox->setChecked(settings->show_grid);
     ui->live_preview_checkBox->setChecked(settings->live_preview);
+    ui->auto_load_checkBox->setChecked(settings->auto_load);
+    ui->auto_register_checkBox->setChecked(settings->auto_register);
     ui->w_spinBox->setValue(settings->w);
     ui->h_spinBox->setValue(settings->h);
 }

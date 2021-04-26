@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "ui_OpenRGBVisualMapTab.h"
+#include "VirtualControllerTab.h"
 
 namespace Ui {
 class OpenRGBVisualMapTab;
@@ -17,10 +18,14 @@ public:
     ~OpenRGBVisualMapTab();
 
 private slots:
-    void AddTab();
+    void AddTabSlot();
 
 private:
-    Ui::OpenRGBVisualMapTab*   ui;   
+    Ui::OpenRGBVisualMapTab*   ui;
+
+    bool SearchAndAutoLoad();
+
+    VirtualControllerTab* AddTab();
 
 };
 

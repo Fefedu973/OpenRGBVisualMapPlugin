@@ -234,9 +234,7 @@ void VirtualControllerTab::on_saveButton_clicked()
 }
 
 void VirtualControllerTab::on_loadButton_clicked()
-{    
-    QPoint button_pos = ui->loadButton->cursor().pos();
-
+{
     QStringList file_list;
 
     std::vector<std::string> filenames = VisualMapSettingsManager::GetFileNames();
@@ -251,6 +249,8 @@ void VirtualControllerTab::on_loadButton_clicked()
     inp->setOptions(QInputDialog::UseListViewForComboBoxItems);
     inp->setComboBoxItems(file_list);
     inp->setWindowTitle("Choose file");
+
+    QPoint button_pos = ui->loadButton->cursor().pos();
     inp->move(button_pos.x(), button_pos.y());
 
     if(!inp->exec()){
@@ -259,11 +259,16 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     QString filename = inp->textValue();
 
-    json j = VisualMapSettingsManager::LoadSettings(filename.toStdString());
+    LoadFile(filename.toStdString());
+}
+
+void VirtualControllerTab::LoadFile(std::string filename)
+{
+    json j = VisualMapSettingsManager::LoadSettings(filename);
 
     std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
 
-     virtual_controller->Clear();
+    virtual_controller->Clear();
 
     auto ctrl_zones = j["ctrl_zones"];
 
@@ -308,6 +313,8 @@ void VirtualControllerTab::on_loadButton_clicked()
         }
     }
 
+    QPoint button_pos = ui->loadButton->cursor().pos();
+
     if(has_failures)
     {
         QMessageBox msgBox;
@@ -317,7 +324,7 @@ void VirtualControllerTab::on_loadButton_clicked()
         msgBox.exec();
     }
 
-    RenameController(filename.toStdString());
+    RenameController(filename);
 
     UpdateZoneButtons();
 
@@ -328,6 +335,12 @@ void VirtualControllerTab::on_loadButton_clicked()
     ui->grid->ResetItems(virtual_controller->GetZones());
 
     virtual_controller->UpdateSize(settings->w, settings->h);
+
+    if(settings->auto_register)
+    {
+        // will auto trigger registering
+        ui->register_controller->setChecked(true);
+    }
 }
 
 void VirtualControllerTab::UpdateZoneButtons()

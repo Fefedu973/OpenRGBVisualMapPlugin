@@ -32,6 +32,8 @@ public:
     void RenameController(std::string);
     std::string GetControllerName();
 
+    void LoadFile(std::string);
+
 private slots:
     void OnZoneSelectionChanged();
     void OnItemOptionsChanged();
