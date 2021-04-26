@@ -69,9 +69,16 @@ void to_json(json& j, const ControllerZoneSettings settings) {
     {"x", settings.x},
     {"y", settings.y},
     {"led_spacing", settings.led_spacing},
-    {"reverse", settings.reverse},
-    {"custom_shape", settings.custom_shape}
+    {"reverse", settings.reverse}
 };
+    if(settings.shape == CUSTOM)
+    {
+        j["custom_shape"] = settings.custom_shape;
+    }
+    else
+    {
+        j["custom_shape"] = nullptr;
+    }
 }
 
 void from_json(const json& j, ControllerZoneSettings& s) {
@@ -83,7 +90,7 @@ void from_json(const json& j, ControllerZoneSettings& s) {
 
     auto custom_shape = j.at("custom_shape");
 
-    if(!custom_shape.is_null())
+    if(!custom_shape.is_null() && s.shape == CUSTOM)
     {
         s.custom_shape = new CustomShape();
         j.at("custom_shape").get_to(s.custom_shape);

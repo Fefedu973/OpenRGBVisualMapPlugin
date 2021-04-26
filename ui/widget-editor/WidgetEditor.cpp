@@ -108,7 +108,7 @@ void WidgetEditor::InitShape()
     // if custom shape already exists, copy it to temp shape
     // else, generate one (horizontal line)
 
-    if(ctrl_zone->settings.custom_shape)
+    if(ctrl_zone->isCustomShape() && ctrl_zone->settings.custom_shape)
     {
         temp_shape = ctrl_zone->settings.custom_shape->clone();
     }

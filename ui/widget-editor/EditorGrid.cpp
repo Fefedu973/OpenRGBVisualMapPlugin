@@ -24,12 +24,15 @@ void EditorGrid::ApplySettings(GridSettings* s)
         resize(settings->w, settings->h);
 
         // auto scale on first run
-        qreal w_factor = width() / settings->w;
-        qreal h_factor = height() / settings->h;
+        if(settings->w > 0 && settings->h > 0)
+        {
+            qreal w_factor = width() / settings->w;
+            qreal h_factor = height() / settings->h;
 
-        qreal factor = std::min<qreal>(w_factor, h_factor);
+            qreal factor = std::min<qreal>(w_factor, h_factor);
 
-        scale(factor, factor);
+            scale(factor, factor);
+        }
 
     }
 
