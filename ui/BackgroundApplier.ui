@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>878</width>
-    <height>284</height>
+    <height>267</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -44,12 +44,12 @@
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_4">
      <property name="sizeConstraint">
-      <enum>QLayout::SetMinimumSize</enum>
+      <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item row="0" column="0">
       <widget class="QTabWidget" name="tabs">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -86,9 +86,9 @@
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,10,0">
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="custom_layout" stretch="1,1,1,1,1,5">
+            <layout class="QVBoxLayout" name="custom_layout" stretch="1,1,1,1,1000">
              <property name="sizeConstraint">
-              <enum>QLayout::SetMinimumSize</enum>
+              <enum>QLayout::SetDefaultConstraint</enum>
              </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -175,19 +175,6 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="apply_custom_button">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Apply</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="verticalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -205,7 +192,7 @@
            <item row="0" column="1">
             <widget class="QScrollArea" name="scrollArea">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -213,13 +200,16 @@
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
              <widget class="QWidget" name="color_stops">
               <property name="geometry">
                <rect>
                 <x>0</x>
                 <y>0</y>
                 <width>642</width>
-                <height>223</height>
+                <height>206</height>
                </rect>
               </property>
               <property name="sizePolicy">
@@ -270,30 +260,13 @@
         <widget class="QWidget" name="verticalLayoutWidget">
          <property name="geometry">
           <rect>
-           <x>20</x>
+           <x>10</x>
            <y>10</y>
-           <width>441</width>
-           <height>111</height>
+           <width>391</width>
+           <height>91</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0">
-           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetMinimumSize</enum>
-            </property>
-            <item>
-             <widget class="QLabel" name="Presets">
-              <property name="text">
-               <string>Preset</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="presets_comboBox"/>
-            </item>
-           </layout>
-          </item>
           <item row="1" column="0">
            <spacer name="verticalSpacer">
             <property name="orientation">
@@ -307,10 +280,33 @@
             </property>
            </spacer>
           </item>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+            <item>
+             <widget class="QLabel" name="Presets">
+              <property name="text">
+               <string>Preset</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="presets_comboBox"/>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </widget>
        <widget class="QWidget" name="file_tab">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <attribute name="title">
          <string>File</string>
         </attribute>

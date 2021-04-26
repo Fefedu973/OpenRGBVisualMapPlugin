@@ -19,9 +19,11 @@ public:
 
 private slots:
     void on_stop_valueChanged(int);
+    void on_remove_button_clicked();
 
 signals:
   void GradientStopChanged(QGradientStop);
+  void RemoveRequest();
 
 private:
     Ui::ColorStop *ui;

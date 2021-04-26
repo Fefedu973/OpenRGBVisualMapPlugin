@@ -27,6 +27,7 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     // custom
     ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->color_stops->setLayout(new QHBoxLayout());
+    ui->color_stops->layout()->setSizeConstraint(QLayout::SetFixedSize);
     ui->scrollArea->setWidgetResizable(true);
 
     ui->gradient_type->blockSignals(true);
@@ -36,23 +37,6 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     ui->spread_comboBox->blockSignals(true);
     ui->spread_comboBox->addItems(spread_names);
     ui->spread_comboBox->blockSignals(false);
-
-    ColorStop* first_stop = new ColorStop();
-    ColorStop* second_stop = new ColorStop();
-
-    color_stops.push_back(first_stop);
-    color_stops.push_back(second_stop);
-
-    for(ColorStop* color_stop: color_stops)
-    {
-        ui->color_stops->layout()->addWidget(color_stop);
-
-        connect(color_stop, &ColorStop::GradientStopChanged, [=](){
-            ApplyCustom();
-        });
-
-        ui->color_stops->layout()->setAlignment(color_stop, Qt::AlignLeft | Qt::AlignTop);
-    }
 }
 
 BackgroundApplier::~BackgroundApplier()
@@ -92,11 +76,6 @@ void BackgroundApplier::on_rotate_valueChanged(int)
     ApplyCustom();
 }
 
-void BackgroundApplier::on_apply_custom_button_clicked()
-{
-    ApplyCustom();
-}
-
 void BackgroundApplier::on_choose_image_button_clicked()
 {
     OpenFileDialog();
@@ -104,14 +83,24 @@ void BackgroundApplier::on_choose_image_button_clicked()
 
 void BackgroundApplier::on_add_color_stop_button_clicked()
 {
-    ColorStop* color_stop = new ColorStop;
+    AddColorStop(new ColorStop());
+    ApplyCustom();
+}
+
+void BackgroundApplier::AddColorStop(ColorStop* color_stop)
+{
     color_stops.push_back(color_stop);
 
-    ui->color_stops->layout()->addWidget(color_stop);    
+    ui->color_stops->layout()->addWidget(color_stop);
     ui->color_stops->layout()->setAlignment(color_stop, Qt::AlignLeft | Qt::AlignTop);
 
     connect(color_stop, &ColorStop::GradientStopChanged, [=](){
         ApplyCustom();
+    });
+
+    connect(color_stop, &ColorStop::RemoveRequest, [=](){
+        ui->color_stops->layout()->removeWidget(color_stop);
+        color_stops.erase(std::find(color_stops.begin(), color_stops.end(), color_stop));
     });
 
     ApplyCustom();

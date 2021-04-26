@@ -48,9 +48,9 @@
     <number>6</number>
    </property>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="1000000,1">
      <item row="0" column="0">
-      <layout class="QHBoxLayout" name="mapLayout" stretch="1,5,1">
+      <layout class="QHBoxLayout" name="mapLayout" stretch="1,1000,1">
        <item>
         <layout class="QVBoxLayout" name="zonesLayout" stretch="0,100">
          <property name="sizeConstraint">
@@ -172,7 +172,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>250</height>
+         <height>0</height>
         </size>
        </property>
        <property name="styleSheet">

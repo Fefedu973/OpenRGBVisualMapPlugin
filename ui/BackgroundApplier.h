@@ -30,7 +30,6 @@ private slots:
     void on_spread_comboBox_currentIndexChanged(int);
     void on_rotate_valueChanged(int);
     void on_add_color_stop_button_clicked();
-    void on_apply_custom_button_clicked();
     void on_choose_image_button_clicked();
 
 private:
@@ -46,6 +45,7 @@ private:
     void ApplyPreset();
     void ApplyCustom();
     void OpenFileDialog();
+    void AddColorStop(ColorStop*);
 
     QBrush ApplyLinearGradient(QGradientStops, QGradient::Spread);
     QBrush ApplyRadialGradient(QGradientStops, QGradient::Spread);
