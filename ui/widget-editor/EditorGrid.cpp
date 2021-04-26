@@ -48,10 +48,14 @@ void EditorGrid::UpdateItems()
 {
     for(LedItem* led_item: led_items)
     {
+        led_item->setX(led_item->GetLedPosition()->x());
+        led_item->setY(led_item->GetLedPosition()->y());
         led_item->update();
     }
 
     scene->update();
+
+    update();
 }
 
 void EditorGrid::wheelEvent(QWheelEvent *event)
@@ -136,8 +140,6 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
         LedItem* led_item = new LedItem(led_position, settings);
 
         led_items.push_back(led_item);
-
-        led_item->setCacheMode(QGraphicsItem::NoCache);
 
         scene->addItem(led_item);
 

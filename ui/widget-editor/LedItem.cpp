@@ -16,7 +16,8 @@ LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
     setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
-    setAcceptHoverEvents(true);
+    setAcceptHoverEvents(true);    
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     setCursor(Qt::OpenHandCursor);
     setScale(0.1);
     setX(led_position->x());

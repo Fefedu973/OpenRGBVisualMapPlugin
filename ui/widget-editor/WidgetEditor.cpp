@@ -363,15 +363,13 @@ void WidgetEditor::on_rotate_button_clicked()
     for(LedPosition* led_position : led_positions)
     {
         QPoint new_pos = t.map(led_position->point);
-        //led_position->setX(new_pos.x() + new_width - 1);
-        ///led_position->setX(new_pos.x() + start_position.x());
         led_position->setX(new_pos.x());
         led_position->setY(new_pos.y());
     }
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -399,7 +397,7 @@ void WidgetEditor::on_v_flip_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -427,7 +425,7 @@ void WidgetEditor::on_h_flip_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -456,7 +454,7 @@ void WidgetEditor::on_h_line_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -485,7 +483,7 @@ void WidgetEditor::on_v_line_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -506,7 +504,7 @@ void WidgetEditor::on_grow_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -527,7 +525,7 @@ void WidgetEditor::on_shrink_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);    
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -560,7 +558,7 @@ void WidgetEditor::on_circle_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -614,7 +612,7 @@ void WidgetEditor::on_square_button_clicked()
 
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);   
+    ui->grid->UpdateItems();
 
     SaveState();
 }
@@ -628,7 +626,7 @@ void WidgetEditor::on_auto_resize_button_clicked()
 {
     AutoResize();
 
-    ui->grid->CreateLEDItems(temp_shape);
+    ui->grid->UpdateItems();
 
     SaveState();
 }
