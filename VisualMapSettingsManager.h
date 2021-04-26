@@ -16,8 +16,8 @@ public:
 private:
     static bool CreateSettingsDirectory();
 
-    static inline const std::string settings_folder = "/plugins/settings/";
-    static inline const std::string saves_folder = "/plugins/settings/virtual-controllers/";
+    static inline const std::string settings_folder = "plugins/settings/";
+    static inline const std::string saves_folder = "plugins/settings/virtual-controllers/";
 };
 
 #endif // VISUALMAPSETTINGSMANAGER_H
