@@ -224,9 +224,11 @@ void VirtualControllerTab::on_saveButton_clicked()
     if(!filename.isEmpty())
     {
         RenameController(filename.toStdString());
+        printf("JSON serialization of profile...\n");
         json j;
         j["ctrl_zones"] = virtual_controller->GetZones();
-        j["grid_settings"] = settings;
+        j["grid_settings"] = settings;        
+        printf("JSON serialization done!\n");
         VisualMapSettingsManager::SaveSettings(filename.toStdString(), j);
     }
 }

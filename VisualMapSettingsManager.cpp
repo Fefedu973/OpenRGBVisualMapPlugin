@@ -31,10 +31,12 @@ void VisualMapSettingsManager::SaveSettings(std::string filename, json settings)
     {
         try{
             SFile << settings.dump(4);
+            SFile.close();
+            printf("Virtual controller file successfully written.\n");
         }
-        catch(const std::exception&)
+        catch(const std::exception& e)
         {
-            printf("Cannot write settings.\n");
+            printf("Cannot write virtual controller file.\n %s\n", e.what());
         }
         SFile.close();
     }
@@ -52,10 +54,11 @@ json VisualMapSettingsManager::LoadSettings(std::string filename)
         {
             SFile >> Settings;
             SFile.close();
+            printf("Virtual controller file successfully read.\n");
         }
-        catch(const std::exception&)
+        catch(const std::exception& e)
         {
-             printf("Cannot read settings.\n");
+             printf("Cannot read virtual controller file.\n %s\n", e.what());
         }
     }
 

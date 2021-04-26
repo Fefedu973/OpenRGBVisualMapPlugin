@@ -82,10 +82,15 @@ void from_json(const json& j, ControllerZoneSettings& s) {
     j.at("reverse").get_to(s.reverse);
 
     auto custom_shape = j.at("custom_shape");
+
     if(!custom_shape.is_null())
     {
         s.custom_shape = new CustomShape();
         j.at("custom_shape").get_to(s.custom_shape);
+    }
+    else
+    {
+        s.custom_shape = nullptr;
     }
 }
 

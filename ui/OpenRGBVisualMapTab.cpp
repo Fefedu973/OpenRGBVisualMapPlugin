@@ -103,6 +103,7 @@ void OpenRGBVisualMapTab::AddTab()
     ui->virtual_controller_tabs->setCurrentIndex(tab_position);
 
     connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string name){
+        printf("Virtual controller has been renamed, updating tab title \"%s\" \n", name.c_str());
         ui->virtual_controller_tabs->setTabText(tab_position, QString::fromUtf8(name.c_str()));
     });
 
