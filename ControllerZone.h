@@ -91,19 +91,16 @@ struct CustomShape
 
         if(w != other->w)
         {
-            printf("w changed \n");
             return true;
         }
 
         if(h != other->h)
         {
-            printf("h changed \n");
             return true;
         }
 
         if(led_positions.size() != other->led_positions.size())
         {
-            printf("size changed\n");
             return true;
         }
 
@@ -111,13 +108,11 @@ struct CustomShape
         {
             if(led_positions[i]->x() != other->led_positions[i]->x())
             {
-                printf("led %d x changed \n", i);
                 return true;
             }
 
             if(led_positions[i]->y() != other->led_positions[i]->y())
             {
-                printf("led %d y changed \n", i);
                 return true;
             }
         }
