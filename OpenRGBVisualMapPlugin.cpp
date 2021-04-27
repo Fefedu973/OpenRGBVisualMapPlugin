@@ -1,6 +1,7 @@
 #include "OpenRGBVisualMapPlugin.h"
 #include "OpenRGBVisualMapTab.h"
 #include "TooltipProxy.h"
+#include "VisualMapSettingsManager.h"
 
 bool OpenRGBVisualMapPlugin::DarkTheme = false;
 ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
@@ -21,6 +22,7 @@ OpenRGBPluginInfo OpenRGBVisualMapPlugin::Initialize(bool Dt, ResourceManager *R
 
 QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
 {
+    VisualMapSettingsManager::CreateSettingsDirectory();
     OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();
 
     OpenRGBVisualMapTab* pluginGUI = new OpenRGBVisualMapTab(parent);

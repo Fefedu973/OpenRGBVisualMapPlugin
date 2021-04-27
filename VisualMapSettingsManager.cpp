@@ -69,21 +69,19 @@ bool VisualMapSettingsManager::CreateSettingsDirectory()
 {
     std::string settings_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + settings_folder;
 
-    if(std::filesystem::exists(settings_directory))
+    if(!std::filesystem::exists(settings_directory))
     {
-            return true;
-    }
-
-    if(!std::filesystem::create_directory(settings_directory))
-    {
-        return false;
-    }
+        if(!std::filesystem::create_directory(settings_directory))
+        {
+            return false;
+        }
+    }    
 
     std::string saves_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
 
     if(std::filesystem::exists(saves_directory))
     {
-            return true;
+        return true;
     }
 
     return std::filesystem::create_directory(saves_directory);
