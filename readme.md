@@ -18,7 +18,7 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 
 ### **linux**
 
-1. download the latest [linux pipeline](https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows%2064)
+1. download the latest [linux pipeline](https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Linux%2064%20AppImage)
 
 2. Copy ``libOpenRGBVisualMapPlugin.so`` from the 7z to ``~/.config/OpenRGB/plugins``
 
