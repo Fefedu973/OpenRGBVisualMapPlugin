@@ -83,6 +83,8 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     virtual_controller->SetCallBack([=](QImage image){
         emit ApplyBackground(image);
     });
+
+    UpdateVirtualControllerDetails();
 }
 
 void VirtualControllerTab::RenameController(std::string value)
@@ -110,6 +112,15 @@ VirtualControllerTab::~VirtualControllerTab()
 {
     delete virtual_controller;
     delete ui;
+}
+
+void VirtualControllerTab::UpdateVirtualControllerDetails()
+{
+    int total_leds = virtual_controller->GetTotalLeds();
+
+    std::string details = "Total leds: " + std::to_string(total_leds);
+
+    ui->virtual_controller_details_label->setText(QString::fromStdString(details));
 }
 
 void VirtualControllerTab::InitZoneList()
@@ -158,7 +169,7 @@ void VirtualControllerTab::InitZoneList()
             {
                 virtual_controller->Add(retained_zones[i]);
                 ui->zoneList->selectRow(i);
-                DecorateButton(button, remove_icon);
+                DecorateButton(button, remove_icon);                
             }
             else
             {
@@ -173,6 +184,9 @@ void VirtualControllerTab::InitZoneList()
 
                 DecorateButton(button, add_icon);
             }
+
+
+            UpdateVirtualControllerDetails();
 
             ui->grid->ResetItems(virtual_controller->GetZones());
         });
@@ -341,6 +355,8 @@ void VirtualControllerTab::LoadFile(std::string filename)
         // will auto trigger registering
         ui->register_controller->setChecked(true);
     }
+
+    UpdateVirtualControllerDetails();
 }
 
 void VirtualControllerTab::UpdateZoneButtons()

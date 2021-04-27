@@ -176,6 +176,18 @@ std::vector<ControllerZone*> VirtualController::GetZones()
     return added_zones;
 }
 
+unsigned int VirtualController::GetTotalLeds()
+{
+    unsigned int result = 0;
+
+    for(ControllerZone* ctrl_zone : added_zones)
+    {
+        result += ctrl_zone->led_count();
+    }
+
+    return result;
+}
+
 void VirtualController::ApplyImage(QImage image)
 {
     ZoneManager::Get()->ApplyImage(added_zones, image);

@@ -38,6 +38,7 @@ public:
     void Clear();
     std::vector<ControllerZone*> GetZones();
     void ApplyImage(QImage);
+    unsigned int GetTotalLeds();
 
 private:
     int width;

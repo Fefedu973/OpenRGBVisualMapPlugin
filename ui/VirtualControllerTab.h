@@ -61,6 +61,8 @@ private:
     void DecorateButton(QPushButton*, QIcon);
     void UpdateZoneButtons();
     void InitZoneList();
+    void UpdateVirtualControllerDetails();
+
     void resizeEvent(QResizeEvent*);
 };
 
