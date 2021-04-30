@@ -264,8 +264,8 @@ void VirtualControllerTab::on_loadButton_clicked()
     inp->setComboBoxItems(file_list);
     inp->setWindowTitle("Choose file");
 
-    QPoint button_pos = ui->loadButton->cursor().pos();
-    inp->move(button_pos.x(), button_pos.y());
+    QPoint position = ui->optionsLayout->contentsRect().topLeft();
+    inp->move(position.x(), position.y());
 
     if(!inp->exec()){
         return;

@@ -97,7 +97,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,100">
+        <layout class="QGridLayout" name="optionsLayout" rowstretch="0,0,0,100">
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
