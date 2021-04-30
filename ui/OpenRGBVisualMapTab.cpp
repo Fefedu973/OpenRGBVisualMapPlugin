@@ -2,6 +2,7 @@
 #include "VirtualControllerTab.h"
 #include "VisualMapSettingsManager.h"
 #include "PluginInfo.h"
+#include "TabHeader.h"
 
 #include <QString>
 #include <QToolButton>
@@ -32,57 +33,13 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     dummy_button->hide();
 
     // Second tab : Add button
-    QToolButton *tb = new QToolButton();
-    tb->setText("+");
+    QToolButton *new_map_button = new QToolButton();
+    new_map_button->setText("+");
     ui->virtual_controller_tabs->addTab(new QLabel(), QString("New map"));
     ui->virtual_controller_tabs->setTabEnabled(1, false);
-    ui->virtual_controller_tabs->tabBar()->setTabButton(1, QTabBar::RightSide, tb);
+    ui->virtual_controller_tabs->tabBar()->setTabButton(1, QTabBar::RightSide, new_map_button);
 
-    connect(tb, SIGNAL(clicked()), this, SLOT(AddTabSlot()));
-
-    connect(ui->virtual_controller_tabs, &QTabWidget::tabCloseRequested, [=](int tab_idx){
-        QWidget* tab = ui->virtual_controller_tabs->widget(tab_idx);
-        ui->virtual_controller_tabs->removeTab(tab_idx);
-        delete tab;
-
-        // dont let the last tab beeing able to be the current
-        int current = ui->virtual_controller_tabs->currentIndex();
-        int tab_count = ui->virtual_controller_tabs->count();
-
-        if(current == tab_count -1)
-        {
-            ui->virtual_controller_tabs->setCurrentIndex(tab_count - 2);
-        }
-
-    });
-
-    connect(ui->virtual_controller_tabs, &QTabWidget::tabBarClicked, [=](int tab_idx){
-
-        int current = ui->virtual_controller_tabs->currentIndex();
-        int tab_count = ui->virtual_controller_tabs->count();
-
-        // dont rename 1st and last tabs
-        if(tab_idx == 0 || tab_idx == tab_count - 1)
-        {
-            return;
-        }
-
-        if(current == tab_idx)
-        {
-            VirtualControllerTab* vct = (VirtualControllerTab*) ui->virtual_controller_tabs->widget(tab_idx);
-
-            QString new_name = QInputDialog::getText(
-                        nullptr, "Rename controller", "Set the new name",
-                        QLineEdit::Normal, QString::fromUtf8(vct->GetControllerName().c_str())).trimmed();
-
-            if(!new_name.isEmpty())
-            {
-                ui->virtual_controller_tabs->setTabText(tab_idx, new_name);
-                vct->RenameController(new_name.toStdString());
-            }
-        }
-
-    });  
+    connect(new_map_button, SIGNAL(clicked()), this, SLOT(AddTabSlot()));
 
     if(!SearchAndAutoLoad())
     {
@@ -111,15 +68,45 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
     std::string tab_name = "New map";
 
     VirtualControllerTab* tab = new VirtualControllerTab();
+    TabHeader* tab_header = new TabHeader();
+    tab_header->Rename(QString::fromUtf8(tab_name.c_str()));
 
     tab->RenameController(tab_name);
 
-    ui->virtual_controller_tabs->insertTab(tab_position, tab , QString::fromUtf8(tab_name.c_str()));
+    ui->virtual_controller_tabs->insertTab(tab_position, tab , "");
     ui->virtual_controller_tabs->setCurrentIndex(tab_position);
+    ui->virtual_controller_tabs->tabBar()->setTabButton(tab_position, QTabBar::RightSide, tab_header);
 
-    connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string name){
-        printf("Virtual controller has been renamed, updating tab title \"%s\" \n", name.c_str());
-        ui->virtual_controller_tabs->setTabText(tab_position, QString::fromUtf8(name.c_str()));
+    connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string new_name){
+        tab_header->Rename(QString::fromUtf8(new_name.c_str()));
+    });
+
+    connect(tab_header, &TabHeader::RenameRequest, [=](QString new_name){
+        tab->RenameController(new_name.toStdString());
+    });
+
+    connect(tab_header, &TabHeader::SelectRequest, [=](){
+        int tab_idx = ui->virtual_controller_tabs->indexOf(tab);
+        ui->virtual_controller_tabs->setCurrentIndex(tab_idx);
+    });
+
+    connect(tab_header, &TabHeader::CloseRequest, [=](){
+        int tab_idx = ui->virtual_controller_tabs->indexOf(tab);
+
+        ui->virtual_controller_tabs->removeTab(tab_idx);
+
+        delete tab;
+        delete tab_header;
+
+        // dont let the last tab beeing able to be the current
+        int current = ui->virtual_controller_tabs->currentIndex();
+        int tab_count = ui->virtual_controller_tabs->count();
+
+        if(current == tab_count -1)
+        {
+            ui->virtual_controller_tabs->setCurrentIndex(tab_count - 2);
+        }
+
     });
 
     return tab;

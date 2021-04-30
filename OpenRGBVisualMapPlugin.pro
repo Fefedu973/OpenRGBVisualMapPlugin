@@ -76,9 +76,11 @@ HEADERS +=                                                                      
     ui/ColorPicker.h                                                                            \
     ui/ColorStop.h                                                                              \
     ui/ControllerZoneItem.h                                                                     \
+    ui/EditableLabel.h                                                                          \
     ui/GridSettings.h                                                                           \
-    ui/PluginInfo.h \
+    ui/PluginInfo.h                                                                             \
     ui/Scene.h                                                                                  \
+    ui/TabHeader.h                                                                              \
     ui/TooltipProxy.h                                                                           \
     ui/VirtualControllerTab.h                                                                   \
     ui/widget-editor/EditorGrid.h                                                               \
@@ -102,12 +104,14 @@ SOURCES +=                                                                      
     ui/ColorPicker.cpp                                                                          \
     ui/ColorStop.cpp                                                                            \
     ui/ControllerZoneItem.cpp                                                                   \
+    ui/EditableLabel.cpp                                                                        \
     ui/Grid.cpp                                                                                 \
     ui/GridOptions.cpp                                                                          \
     ui/ItemOptions.cpp                                                                          \
     ui/OpenRGBVisualMapTab.cpp                                                                  \
-    ui/PluginInfo.cpp \
+    ui/PluginInfo.cpp                                                                           \
     ui/Scene.cpp                                                                                \
+    ui/TabHeader.cpp                                                                            \
     ui/VirtualControllerTab.cpp                                                                 \
     ui/widget-editor/EditorGrid.cpp                                                             \
     ui/widget-editor/LedItem.cpp                                                                \
@@ -122,7 +126,8 @@ FORMS +=                                                                        
     ui/GridOptions.ui                                                                           \
     ui/ItemOptions.ui                                                                           \
     ui/OpenRGBVisualMapTab.ui                                                                   \
-    ui/PluginInfo.ui \
+    ui/PluginInfo.ui                                                                            \
+    ui/TabHeader.ui                                                                             \
     ui/VirtualControllerTab.ui                                                                  \
     ui/widget-editor/WidgetEditor.ui                                                            \
 
