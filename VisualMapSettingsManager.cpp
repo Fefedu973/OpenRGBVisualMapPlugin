@@ -54,7 +54,6 @@ json VisualMapSettingsManager::LoadSettings(std::string filename)
         {
             SFile >> Settings;
             SFile.close();
-            printf("Virtual controller file successfully read.\n");
         }
         catch(const std::exception& e)
         {
