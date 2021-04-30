@@ -37,6 +37,12 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     ui->spread_comboBox->blockSignals(true);
     ui->spread_comboBox->addItems(spread_names);
     ui->spread_comboBox->blockSignals(false);
+
+    // files
+    ui->images_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->images->setLayout(new QHBoxLayout());
+    ui->images->layout()->setSizeConstraint(QLayout::SetFixedSize);
+    ui->images_scrollArea->setWidgetResizable(true);
 }
 
 BackgroundApplier::~BackgroundApplier()
@@ -247,15 +253,33 @@ QPointF BackgroundApplier::EdgeOfView(int deg) {
 
 void BackgroundApplier::OpenFileDialog()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+    // Load and trigger the preview
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
 
     QImage user_image;
     user_image.load(fileName);
+    emit BackgroundApplied(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
 
-    QImage scaled_image = user_image.scaled(w, h, Qt::IgnoreAspectRatio);
+    // Add this image to already applied list
+    QPixmap pm(fileName);
+    QPushButton* button = new QPushButton();
+    QPixmap pixmap = pm.scaled(64,64,Qt::KeepAspectRatio);
+    QIcon icon(pixmap);
 
-    emit BackgroundApplied(scaled_image);
+    button->setFixedWidth(64);
+    button->setFixedHeight(64);
+    button->setIcon(icon);
+    button->show();
+    button->setCursor(Qt::PointingHandCursor);
+    button->setFlat(true);
+    button->setIconSize(pixmap.rect().size());
+
+    ui->images->layout()->addWidget(button);
+    ui->images->layout()->setAlignment(button, Qt::AlignLeft | Qt::AlignTop);
+
+    connect(button, &QPushButton::clicked, [=](){
+        emit BackgroundApplied(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
+    });
 }
 
 
