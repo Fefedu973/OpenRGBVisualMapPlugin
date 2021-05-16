@@ -119,3 +119,11 @@ void Grid::wheelEvent(QWheelEvent *event)
 
     event->accept();
 }
+
+void Grid::Clear()
+{
+    selected_ctrl_zone = nullptr;
+    scene->clear();
+    ctrl_zone_items.clear();
+    scene->update();
+}

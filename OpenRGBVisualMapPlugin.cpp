@@ -1,7 +1,7 @@
 #include "OpenRGBVisualMapPlugin.h"
-#include "OpenRGBVisualMapTab.h"
 #include "TooltipProxy.h"
 #include "VisualMapSettingsManager.h"
+#include "ZoneManager.h"
 
 bool OpenRGBVisualMapPlugin::DarkTheme = false;
 ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
@@ -25,10 +25,27 @@ QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
     VisualMapSettingsManager::CreateSettingsDirectory();
     OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();
 
-    OpenRGBVisualMapTab* pluginGUI = new OpenRGBVisualMapTab(parent);
+    ui = new OpenRGBVisualMapTab(parent);
 
-    pluginGUI->setStyle(new TooltipProxy(pluginGUI->style()));
-    pluginGUI->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    ui->setStyle(new TooltipProxy(ui->style()));
+    ui->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-    return pluginGUI;
+    RMPointer->RegisterDetectionStartCallback(DetectionStart, ui);
+    RMPointer->RegisterDetectionEndCallback(DetectionEnd, ui);
+
+    return ui;
+}
+
+void OpenRGBVisualMapPlugin::DetectionStart(void* o)
+{
+    printf("DetectionStart\n");
+    ZoneManager::Get()->Clear();
+
+    QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "Clear", Qt::QueuedConnection);
+}
+void OpenRGBVisualMapPlugin::DetectionEnd(void* o)
+{
+    printf("DetectionEnd\n");
+    ZoneManager::Get()->ResetControllerZones();
+    QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "DeviceListChanged", Qt::QueuedConnection);
 }

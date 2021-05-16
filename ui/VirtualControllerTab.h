@@ -33,6 +33,8 @@ public:
     std::string GetControllerName();
 
     void LoadFile(std::string);
+    void Clear();
+    void DeviceListChanged();
 
 private slots:
     void OnZoneSelectionChanged();
@@ -64,6 +66,7 @@ private:
     void UpdateVirtualControllerDetails();
 
     void resizeEvent(QResizeEvent*);
+
 };
 
 #endif // VIRTUALCONTROLLERTAB_H

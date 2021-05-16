@@ -18,6 +18,18 @@ ZoneManager* ZoneManager::Get()
 
 ZoneManager::ZoneManager()
 {
+    ResetControllerZones();
+}
+
+void ZoneManager::Clear()
+{
+    available_zones.clear();
+}
+
+void ZoneManager::ResetControllerZones(){
+
+    available_zones.clear();
+
     std::vector<RGBController*> controllers = OpenRGBVisualMapPlugin::RMPointer->GetRGBControllers();
 
     for (unsigned int i = 0; i < controllers.size(); i++)
@@ -53,6 +65,7 @@ ZoneManager::ZoneManager()
         }
     }
 }
+
 
 std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
 {

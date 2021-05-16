@@ -3,6 +3,7 @@
 #include "VisualMapSettingsManager.h"
 #include "PluginInfo.h"
 #include "TabHeader.h"
+#include "OpenRGBVisualMapPlugin.h"
 
 #include <QString>
 #include <QToolButton>
@@ -53,9 +54,20 @@ OpenRGBVisualMapTab::~OpenRGBVisualMapTab()
     delete ui;
 }
 
-void OpenRGBVisualMapTab::AddTabSlot()
+void OpenRGBVisualMapTab::Clear()
 {
-    AddTab();
+    for(VirtualControllerTab* controller_tab: controller_tabs)
+    {
+        controller_tab->Clear();
+    }
+}
+
+void OpenRGBVisualMapTab::DeviceListChanged()
+{
+    for(VirtualControllerTab* controller_tab: controller_tabs)
+    {
+        controller_tab->DeviceListChanged();
+    }
 }
 
 VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
@@ -95,6 +107,8 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 
         ui->virtual_controller_tabs->removeTab(tab_idx);
 
+        controller_tabs.erase(std::find(controller_tabs.begin(), controller_tabs.end(), tab));
+
         delete tab;
         delete tab_header;
 
@@ -108,6 +122,8 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
         }
 
     });
+
+    controller_tabs.push_back(tab);
 
     return tab;
 }
@@ -141,4 +157,9 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
     }
 
     return has_loaded;
+}
+
+void OpenRGBVisualMapTab::AddTabSlot()
+{
+    AddTab();
 }

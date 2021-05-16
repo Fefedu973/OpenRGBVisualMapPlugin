@@ -25,9 +25,9 @@ public:
     void UpdateItems();
     void SetSelected(ControllerZone*);
     void ClearSelection();
-
     void ApplySettings(GridSettings* settings);
     void UpdatePreview(QImage image);
+    void Clear();
 
 signals:
     void ItemSelected(ControllerZone*);

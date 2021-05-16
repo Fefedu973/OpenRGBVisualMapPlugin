@@ -17,16 +17,20 @@ public:
     explicit OpenRGBVisualMapTab(QWidget *parent = nullptr);
     ~OpenRGBVisualMapTab();
 
+public slots:
+    void Clear();
+    void DeviceListChanged();
+
 private slots:
     void AddTabSlot();
 
 private:
     Ui::OpenRGBVisualMapTab*   ui;
 
+    std::vector<VirtualControllerTab*> controller_tabs;
+
     bool SearchAndAutoLoad();
-
     VirtualControllerTab* AddTab();
-
 };
 
 #endif // OPENRGBVISUALMAPTAB_H

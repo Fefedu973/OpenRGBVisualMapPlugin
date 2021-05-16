@@ -3,6 +3,7 @@
 
 #include "OpenRGBPluginInterface.h"
 #include "ResourceManager.h"
+#include "OpenRGBVisualMapTab.h"
 
 #include <QObject>
 #include <QString>
@@ -28,6 +29,11 @@ public:
     static bool             DarkTheme;
     static ResourceManager* RMPointer;
 
+     OpenRGBVisualMapTab* ui;
+
+private:
+    static void DetectionStart(void*);
+    static void DetectionEnd(void* );
 };
 
 #endif // OPENRGBVISUALMAPPLUGIN_H

@@ -385,3 +385,14 @@ void VirtualControllerTab::OnBackgroundApplied(QImage image)
     virtual_controller->ApplyImage(image);
 }
 
+void VirtualControllerTab::Clear()
+{
+    ui->zoneList->clear();
+    ui->grid->Clear();
+    virtual_controller->Clear();
+}
+
+void VirtualControllerTab::DeviceListChanged()
+{
+    InitZoneList();
+}
