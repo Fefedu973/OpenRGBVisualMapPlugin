@@ -127,12 +127,6 @@ enum ZoneShape {
     CUSTOM = 2
 };
 
-inline static const QStringList ZONE_SHAPES = {
-    "Horizontal line",
-    "Vertical line",
-    "Custom"
-};
-
 struct ControllerZoneSettings
 {
     ZoneShape shape;

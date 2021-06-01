@@ -8,6 +8,13 @@ ItemOptions::ItemOptions(QWidget *parent) :
     ui(new Ui::ItemOptions)
 {
     ui->setupUi(this);
+
+    QStringList ZONE_SHAPES = {
+        "Horizontal line",
+        "Vertical line",
+        "Custom"
+    };
+
     ui->shape_comboBox->addItems(ZONE_SHAPES);
 }
 

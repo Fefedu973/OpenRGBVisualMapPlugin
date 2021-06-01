@@ -9,7 +9,7 @@ class VirtualController: public RGBController
 {
 
 public:
-    inline const static std::string VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
+    static std::string VIRTUAL_CONTROLLER_SERIAL;
 
     VirtualController();
     ~VirtualController();

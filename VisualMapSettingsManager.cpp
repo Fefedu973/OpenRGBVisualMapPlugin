@@ -2,14 +2,17 @@
 #include "OpenRGBVisualMapPlugin.h"
 
 #include <fstream>
-#include <filesystem>
+#include "filesystem.h"
+
+const std::string VisualMapSettingsManager::settings_folder = "plugins/settings/";
+const std::string VisualMapSettingsManager::saves_folder = "plugins/settings/virtual-controllers/";
 
 std::vector<std::string> VisualMapSettingsManager::GetFileNames()
 {
     std::string path = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
     std::vector<std::string> filenames;
 
-    for (std::filesystem::directory_entry entry : std::filesystem::directory_iterator(path))
+    for (filesystem::directory_entry entry : filesystem::directory_iterator(path))
     {
         filenames.push_back(entry.path().filename().u8string());
     }
@@ -68,9 +71,9 @@ bool VisualMapSettingsManager::CreateSettingsDirectory()
 {
     std::string settings_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + settings_folder;
 
-    if(!std::filesystem::exists(settings_directory))
+    if(!filesystem::exists(settings_directory))
     {
-        if(!std::filesystem::create_directory(settings_directory))
+        if(!filesystem::create_directory(settings_directory))
         {
             return false;
         }
@@ -78,10 +81,10 @@ bool VisualMapSettingsManager::CreateSettingsDirectory()
 
     std::string saves_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
 
-    if(std::filesystem::exists(saves_directory))
+    if(filesystem::exists(saves_directory))
     {
         return true;
     }
 
-    return std::filesystem::create_directory(saves_directory);
+    return filesystem::create_directory(saves_directory);
 }

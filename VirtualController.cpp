@@ -4,6 +4,8 @@
 #include "ZoneManager.h"
 #include <set>
 
+std::string VirtualController::VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
+
 VirtualController::VirtualController()
 {
     width = 1;

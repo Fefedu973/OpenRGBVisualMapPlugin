@@ -69,6 +69,7 @@ HEADERS +=                                                                      
     OpenRGB/RGBController/RGBController.h                                                       \
     OpenRGBVisualMapPlugin.h                                                                    \
     ZoneManager.h                                                                               \
+    filesystem.h                                                                                \
     VirtualController.h                                                                         \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
