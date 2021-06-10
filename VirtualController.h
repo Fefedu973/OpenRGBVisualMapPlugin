@@ -30,7 +30,7 @@ public:
 
     void SetCallBack(std::function<void(QImage)>);
 
-    void Register(bool);
+    void Register(bool, bool);
 
     bool HasZone(ControllerZone*);
     void Add(ControllerZone*);
@@ -45,6 +45,7 @@ private:
     int height;
 
     bool registered = false;
+    bool members_unregistered = false;
 
     void SetupVirtualZone();
 

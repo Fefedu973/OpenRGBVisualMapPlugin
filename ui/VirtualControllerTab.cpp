@@ -210,7 +210,7 @@ void VirtualControllerTab::OnItemOptionsChanged()
 
 void VirtualControllerTab::on_register_controller_stateChanged(int value)
 {
-    virtual_controller->Register(value);
+    virtual_controller->Register(value, settings->unregister_members);
 }
 
 void VirtualControllerTab::on_clearButton_clicked()

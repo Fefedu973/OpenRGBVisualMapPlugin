@@ -60,6 +60,12 @@ void GridOptions::on_auto_register_checkBox_stateChanged(int value)
     emit SettingsChanged();
 }
 
+void GridOptions::on_unregister_members_checkBox_stateChanged(int value)
+{
+    settings->unregister_members = value;
+    emit SettingsChanged();
+}
+
 void GridOptions::Update()
 {
     ui->bounds_checkBox->setChecked(settings->show_bounds);
@@ -67,6 +73,7 @@ void GridOptions::Update()
     ui->live_preview_checkBox->setChecked(settings->live_preview);
     ui->auto_load_checkBox->setChecked(settings->auto_load);
     ui->auto_register_checkBox->setChecked(settings->auto_register);
+    ui->unregister_members_checkBox->setChecked(settings->unregister_members);
     ui->w_spinBox->setValue(settings->w);
     ui->h_spinBox->setValue(settings->h);
 }

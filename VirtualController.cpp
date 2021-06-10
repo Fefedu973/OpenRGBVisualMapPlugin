@@ -33,7 +33,7 @@ VirtualController::VirtualController()
 
 VirtualController::~VirtualController()
 {
-    Register(false);
+    Register(false, false);
 }
 
 void VirtualController::SetupVirtualZone()
@@ -106,7 +106,7 @@ void VirtualController::SetCallBack(std::function<void(QImage)> callback)
     this->callback = callback;
 }
 
-void VirtualController::Register(bool state)
+void VirtualController::Register(bool state, bool unregister_members)
 {
     if(state)
     {
@@ -114,6 +114,24 @@ void VirtualController::Register(bool state)
         {
             ForceDirectMode();
             OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(this);
+
+            if(unregister_members)
+            {
+                std::set<RGBController*> controllers;
+
+                for(ControllerZone* ctrl_zone: added_zones)
+                {
+                    controllers.insert(ctrl_zone->controller);
+                }
+
+                for(RGBController* controller : controllers)
+                {
+                    OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(controller);
+                }
+
+                members_unregistered = true;
+            }
+
             registered = true;
         }
     }
@@ -123,6 +141,23 @@ void VirtualController::Register(bool state)
         {
             OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(this);
             registered = false;
+
+            if(members_unregistered)
+            {
+                std::set<RGBController*> controllers;
+
+                for(ControllerZone* ctrl_zone: added_zones)
+                {
+                    controllers.insert(ctrl_zone->controller);
+                }
+
+                for(RGBController* controller : controllers)
+                {
+                    OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(controller);
+                }
+
+                members_unregistered = false;
+            }
         }
     }
 }

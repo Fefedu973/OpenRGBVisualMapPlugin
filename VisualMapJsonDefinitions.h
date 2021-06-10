@@ -120,6 +120,7 @@ void to_json(json& j, const GridSettings* settings) {
     {"grid_size", settings->grid_size},
     {"auto_load", settings->auto_load},
     {"auto_register", settings->auto_register},
+    {"unregister_members", settings->unregister_members},
 };
 }
 
@@ -139,6 +140,11 @@ void from_json(const json& j, GridSettings* s) {
     if(j.contains("auto_register"))
     {
         j.at("auto_register").get_to(s->auto_register);
+    }
+
+    if(j.contains("unregister_members"))
+    {
+        j.at("unregister_members").get_to(s->unregister_members);
     }
 }
 
