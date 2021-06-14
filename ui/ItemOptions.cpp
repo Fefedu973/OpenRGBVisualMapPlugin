@@ -98,12 +98,6 @@ void ItemOptions::on_shape_comboBox_currentIndexChanged(int i)
             }
         }
 
-        if(!ctrl_zone->isCustomShape() && ctrl_zone->settings.custom_shape)
-        {            
-            ctrl_zone->settings.custom_shape = nullptr;
-        }
-
-
         emit ItemOptionsChanged();
     }
 }

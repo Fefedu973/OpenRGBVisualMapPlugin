@@ -138,7 +138,6 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
     for(LedPosition* led_position: shape->led_positions)
     {
         LedItem* led_item = new LedItem(led_position, settings);
-
         led_items.push_back(led_item);
 
         scene->addItem(led_item);
@@ -180,6 +179,33 @@ void EditorGrid::Clear()
 {
     scene->clear();
     led_items.clear();
+}
+
+void EditorGrid::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+    case Qt::Key_Left:  MoveSelection(-1,  0); break;
+    case Qt::Key_Right: MoveSelection( 1,  0); break;
+    case Qt::Key_Up:   MoveSelection( 0, -1); break;
+    case Qt::Key_Down:  MoveSelection( 0,  1); break;
+
+    default: QGraphicsView::keyPressEvent(event); break;
+    }
+}
+
+void EditorGrid::MoveSelection(int delta_x, int delta_y)
+{
+    for(LedItem* led_item: led_items)
+    {
+        if(led_item->isSelected())
+        {
+            led_item->setX(led_item->x() + delta_x);
+            led_item->setY(led_item->y() + delta_y);
+            led_item->Restrict();
+        }
+    }
+
+    UpdateItems();
 }
 
 std::vector<LedPosition*> EditorGrid::GetSelection()

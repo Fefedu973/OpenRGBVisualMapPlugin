@@ -6,6 +6,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
+#include "GridSettings.h"
 
 #include "ControllerZone.h"
 
@@ -15,41 +16,32 @@ class ControllerZoneItem : public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem);
 
 public:
-
-    ControllerZoneItem(ControllerZone*);
-
+    ControllerZoneItem(ControllerZone*, GridSettings*);
     QRectF boundingRect() const;
-
-    void paint(QPainter * painter,
-               const QStyleOptionGraphicsItem * option,
-               QWidget * widget);
-
-    void SetSelected(bool);
-
-    void Restrict(int,int);
-
+    void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
+    void Restrict();
     ControllerZone* GetControllerZone();
+    QPoint point();
 
 signals:
-    void Selected();
-    void Moved();
+    void Released();
+    void RectSelectionRequest();
 
 private:
     ControllerZone* ctrl_zone;
-    bool selected = false;
+    GridSettings* settings;
+
     bool pressed = false;
-    bool moving = false;
     bool hover = false;
 
-    const QBrush selected_brush = QBrush(QColor("#c7956d"));
-    const QBrush moving_brush =   QBrush(QColor("#965d62"));
-    const QBrush default_brush =  QBrush(QColor("#f2d974"));
-    const QBrush hover_brush =    QBrush(QColor("#00ff00"));
+    const QBrush selected_brush  = QBrush(QColor("#c7956d"));
+    const QBrush focus_brush       =   QBrush(QColor("#965d62"));
+    const QBrush default_brush     =  QBrush(QColor("#f2d974"));
+    const QBrush hover_brush   =    QBrush(QColor("#00ff00"));
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);    
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 };

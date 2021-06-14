@@ -31,6 +31,7 @@ private:
 
     bool SearchAndAutoLoad();
     VirtualControllerTab* AddTab();
+
 };
 
 #endif // OPENRGBVISUALMAPTAB_H

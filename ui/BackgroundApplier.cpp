@@ -4,7 +4,6 @@
 
 #include "math.h"
 #include <QImage>
-#include <QBrush>
 #include <QPainter>
 #include <QGradient>
 #include <QLinearGradient>
@@ -38,6 +37,14 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     ui->images->setLayout(new QHBoxLayout());
     ui->images->layout()->setSizeConstraint(QLayout::SetFixedSize);
     ui->images_scrollArea->setWidgetResizable(true);
+
+    // presets
+    ui->presets_comboBox->blockSignals(true);
+    for(Preset presest:presets)
+    {
+        ui->presets_comboBox->addItem(QString::fromStdString(presest.name));
+    }
+    ui->presets_comboBox->blockSignals(false);
 }
 
 BackgroundApplier::~BackgroundApplier()
@@ -255,14 +262,28 @@ void BackgroundApplier::OpenFileDialog()
     });
 }
 
+void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
+{
+    Preset preset = presets[index];
+    image = QImage(w, h, QImage::Format_RGB32);
 
+    QBrush brush;
 
+    QGradientStops stops = preset.stops;
+    QGradient::Spread spread = QGradient::PadSpread;
 
+    switch(preset.type)
+    {
+    case QGradient::LinearGradient: brush = ApplyLinearGradient(stops, spread); break;
+    case QGradient::RadialGradient: brush = ApplyRadialGradient(stops, spread); break;
+    case QGradient::ConicalGradient: brush = ApplyConicalGradient(stops, spread); break;
+    default: return;
+    }
 
+    QRectF rect(0, 0, w, h);
 
+    QPainter painter(&image);
+    painter.fillRect(rect, brush);
 
-
-
-
-
-
+    emit BackgroundApplied(image);
+}

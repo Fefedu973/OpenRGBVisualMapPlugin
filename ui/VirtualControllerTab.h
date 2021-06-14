@@ -38,8 +38,11 @@ public:
 
 private slots:
     void OnZoneSelectionChanged();
+    void OnGridSelectionChanged();
+    void OnZoneDoubleClick(int, int);
     void OnItemOptionsChanged();
     void OnBackgroundApplied(QImage);
+    void OnSettingsChanged();
 
     void on_saveButton_clicked();
     void on_loadButton_clicked();
@@ -65,7 +68,8 @@ private:
     void InitZoneList();
     void UpdateVirtualControllerDetails();
 
-    void resizeEvent(QResizeEvent*);
+protected:
+    void resizeEvent(QResizeEvent*) override;
 
 };
 

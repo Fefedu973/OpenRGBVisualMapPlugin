@@ -18,7 +18,6 @@ public:
 
 signals:
     void CloseRequest();
-    void SelectRequest();
     void RenameRequest(QString);
 
 private slots:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>940</width>
-    <height>727</height>
+    <width>944</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,7 +50,7 @@
    <item>
     <layout class="QGridLayout" name="gridLayout" rowstretch="1000000,1">
      <item row="0" column="0">
-      <layout class="QHBoxLayout" name="mapLayout" stretch="1,100000,1">
+      <layout class="QHBoxLayout" name="mapLayout" stretch="0,1,0">
        <item>
         <layout class="QVBoxLayout" name="zonesLayout" stretch="0,100">
          <property name="sizeConstraint">
@@ -89,6 +89,12 @@
          </item>
          <item>
           <widget class="Grid" name="grid" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>400</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -126,7 +132,7 @@
          <item row="1" column="0">
           <widget class="GridOptions" name="gridOptions" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -134,7 +140,7 @@
            <property name="minimumSize">
             <size>
              <width>10</width>
-             <height>150</height>
+             <height>200</height>
             </size>
            </property>
           </widget>
@@ -142,7 +148,7 @@
          <item row="2" column="0">
           <widget class="ItemOptions" name="itemOptions" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>

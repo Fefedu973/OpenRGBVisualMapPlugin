@@ -26,6 +26,7 @@ protected:
     void wheelEvent(QWheelEvent*) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 signals:
     void SelectionChanged();
@@ -34,12 +35,13 @@ signals:
 private:
     GridSettings* settings = nullptr;
     Scene* scene = nullptr;
-    LedPosition* selected = nullptr;
     std::vector<LedItem*> led_items;    
     bool left_button_pressed = false;
     bool right_button_pressed = false;
 
     void Clear();
+    void MoveSelection(int, int);
+
 };
 
 #endif // EDITORGRID_H

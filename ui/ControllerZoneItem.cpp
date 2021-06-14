@@ -3,11 +3,13 @@
 #include <QString>
 #include <QCursor>
 
-ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone) :
-   ctrl_zone(ctrl_zone)
+ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone, GridSettings* settings) :
+   ctrl_zone(ctrl_zone),
+   settings(settings)
 {
-    setFlag(ItemIsMovable);
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
     setAcceptHoverEvents(true);
+    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
     setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
 
@@ -41,12 +43,8 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     setZValue(ctrl_zone->isCustomShape() ? -ctrl_zone->settings.custom_shape->h * ctrl_zone->settings.custom_shape->w :
                                            -ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
 
-    if(!moving)
-    {
-        setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
-    }
 
-    QBrush brush = pressed ? moving_brush: hover ? hover_brush : selected ? selected_brush :  default_brush;
+    QBrush brush =  isSelected() ? selected_brush : hasFocus() ? focus_brush:  hover ? hover_brush :  default_brush;
 
     painter->setBrush(brush);
     QPen pen(QColor(0, 0, 0, 0x80), 0.05);
@@ -95,57 +93,45 @@ void ControllerZoneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     pressed = true;
     setCursor(Qt::ClosedHandCursor);
 
-
-    emit Selected();
-
-    update();
-    QGraphicsItem::mousePressEvent(event);
+    if(event->modifiers() == Qt::ShiftModifier)
+    {
+        event->accept();
+    }
+    else
+    {
+        QGraphicsItem::mousePressEvent(event);
+    }
 }
 
 void ControllerZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     pressed = false;
-    moving = false;
     setCursor(Qt::OpenHandCursor);
 
-    emit Moved();
+    emit Released();
 
-    update();
-
-    QGraphicsItem::mouseReleaseEvent(event);    
+    if(event->modifiers() == Qt::ShiftModifier)
+    {
+        emit RectSelectionRequest();
+        event->accept();
+    }
+    else
+    {
+        QGraphicsItem::mouseReleaseEvent(event);
+    }
 }
 
-void ControllerZoneItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    moving = true;
-
-    ctrl_zone->settings.x = x();
-    ctrl_zone->settings.y = y();
-
-    emit Moved();
-
-    QGraphicsItem::mouseMoveEvent(event);
-}
-
-void ControllerZoneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
+void ControllerZoneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     hover = true;
-    QGraphicsItem::hoverEnterEvent(event);
+    QGraphicsItem::hoverEnterEvent( event );
 }
 
-void ControllerZoneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
+void ControllerZoneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     hover = false;
-    QGraphicsItem::hoverLeaveEvent(event);
+    QGraphicsItem::hoverLeaveEvent( event );
 }
 
-void ControllerZoneItem::ControllerZoneItem::SetSelected(bool value)
-{
-    selected = value;
-}
-
-
-void ControllerZoneItem::Restrict(int w, int h)
+void ControllerZoneItem::Restrict()
 {
     int new_x = 10 * x();
     int new_y = 10 * y();
@@ -162,8 +148,8 @@ void ControllerZoneItem::Restrict(int w, int h)
     }
 
     // restrict to bounds
-    new_x = std::min<int>(std::max<int>(0,new_x/10), w-1);
-    new_y = std::min<int>(std::max<int>(0,new_y/10), h-1);
+    new_x = std::min<int>(std::max<int>(0,new_x/10),  settings->w - 1);
+    new_y = std::min<int>(std::max<int>(0,new_y/10), settings->h - 1);
 
     setX(new_x);
     setY(new_y);
@@ -177,4 +163,10 @@ void ControllerZoneItem::Restrict(int w, int h)
 ControllerZone* ControllerZoneItem::GetControllerZone()
 {
     return ctrl_zone;
+}
+
+QPoint ControllerZoneItem::point()
+{
+    //return QPoint(ctrl_zone->settings.x, ctrl_zone->settings.y);
+    return QPoint(x(),y());
 }

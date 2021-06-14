@@ -8,6 +8,13 @@ namespace Ui {
 class BackgroundApplier;
 }
 
+struct Preset
+{
+    std::string name;
+    QGradient::Type type;
+    QGradientStops stops;
+    unsigned int angle;
+};
 
 class BackgroundApplier : public QWidget
 {
@@ -30,6 +37,7 @@ private slots:
     void on_rotate_valueChanged(int);
     void on_add_color_stop_button_clicked();
     void on_choose_image_button_clicked();
+    void on_presets_comboBox_currentIndexChanged(int);
 
 private:
     Ui::BackgroundApplier *ui;
@@ -62,7 +70,46 @@ private:
         QGradient::PadSpread,
         QGradient::RepeatSpread,
         QGradient::ReflectSpread
-    };   
+    };
+
+    const std::vector<Preset> presets = {
+        {
+            "Dark red",
+            QGradient::LinearGradient,
+            QGradientStops({
+                QGradientStop(0,Qt::black),
+                QGradientStop(1,Qt::red),
+            }),
+            0
+        },
+        {
+            "Dark blue",
+            QGradient::LinearGradient,
+            QGradientStops({
+                QGradientStop(0,Qt::black),
+                QGradientStop(1,Qt::blue),
+            }),
+            0
+        },
+        {
+            "Dark green",
+            QGradient::LinearGradient,
+            QGradientStops({
+                QGradientStop(0,Qt::black),
+                QGradientStop(1,Qt::green),
+            }),
+            0
+        },
+        {
+            "Dark yellow",
+            QGradient::LinearGradient,
+            QGradientStops({
+                QGradientStop(0,Qt::black),
+                QGradientStop(1,Qt::yellow),
+            }),
+            0
+        }
+    };
 
 };
 

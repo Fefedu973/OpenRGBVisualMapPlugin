@@ -6,13 +6,6 @@ TabHeader::TabHeader(QWidget *parent) :
     ui(new Ui::TabHeader)
 {
     ui->setupUi(this);
-
-    connect(ui->editor, &EditableLabel::Focussed, [=](bool has_focus){
-        if(has_focus)
-        {
-            emit SelectRequest();
-        }
-    });
 }
 
 void TabHeader::Rename(QString name)
@@ -34,4 +27,3 @@ TabHeader::~TabHeader()
 {
     delete ui;
 }
-
