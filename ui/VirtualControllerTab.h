@@ -67,6 +67,7 @@ private:
     void UpdateZoneButtons();
     void InitZoneList();
     void UpdateVirtualControllerDetails();
+    std::vector<ControllerZone*> retained_zones;
 
 protected:
     void resizeEvent(QResizeEvent*) override;

@@ -16,19 +16,9 @@ ZoneManager* ZoneManager::Get()
     return instance;
 }
 
-ZoneManager::ZoneManager()
+std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
 {
-    ResetControllerZones();
-}
-
-void ZoneManager::Clear()
-{
-    available_zones.clear();
-}
-
-void ZoneManager::ResetControllerZones(){
-
-    available_zones.clear();
+    std::vector<ControllerZone*> available_zones;
 
     std::vector<RGBController*> controllers = OpenRGBVisualMapPlugin::RMPointer->GetRGBControllers();
 
@@ -64,24 +54,17 @@ void ZoneManager::ResetControllerZones(){
             }
         }
     }
-}
 
-
-std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
-{
     return available_zones;
 }
 
-
-ControllerZone* ZoneManager::GetZone(int idx)
-{
-    return available_zones[idx];
-}
 
 void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 {
     // make sure we update the controller only once by using a set
     std::set<RGBController*> controllers;
+
+    std::vector<ControllerZone*> available_zones = GetAvailableZones();
 
     for(ControllerZone* ctrl_zone: available_zones)
     {

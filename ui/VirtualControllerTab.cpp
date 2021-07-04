@@ -97,7 +97,7 @@ void VirtualControllerTab::UpdateVirtualControllerDetails()
 
 void VirtualControllerTab::InitZoneList()
 {
-    std::vector<ControllerZone*> retained_zones = ZoneManager::Get()->GetAvailableZones();
+    retained_zones = ZoneManager::Get()->GetAvailableZones();
 
     // Hide headers
     ui->zoneList->horizontalHeader()->hide();
@@ -175,7 +175,7 @@ void VirtualControllerTab::OnZoneSelectionChanged()
     for(int i = 0; i < selected_indexes.size(); i++)
     {
         int index = selected_indexes.at(i).row();
-        selection.push_back(ZoneManager::Get()->GetZone(index));
+        selection.push_back(retained_zones[index]);
     }
 
     if(selection.size() == 1)
@@ -195,18 +195,16 @@ void VirtualControllerTab::OnZoneSelectionChanged()
 void VirtualControllerTab::OnGridSelectionChanged()
 {
     std::vector<ControllerZoneItem*> selected_items = ui->grid->GetSelection();
-    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
 
     ui->zoneList->selectionModel()->blockSignals(true);
 
     ui->zoneList->clearSelection();
 
-
-    for(unsigned int i = 0; i < ctrl_zones.size(); i++)
+    for(unsigned int i = 0; i < retained_zones.size(); i++)
     {
         for(ControllerZoneItem* item: selected_items)
         {
-            if(item->GetControllerZone() == ctrl_zones[i])
+            if(item->GetControllerZone() == retained_zones[i])
             {
                 ui->zoneList->selectRow(i);
                 break;
@@ -231,9 +229,9 @@ void VirtualControllerTab::OnGridSelectionChanged()
     ui->zoneList->update();
 }
 
-void VirtualControllerTab::OnZoneDoubleClick(int r, int)
+void VirtualControllerTab::OnZoneDoubleClick(int row, int)
 {
-    ControllerZone* ctrl_zone = ZoneManager::Get()->GetZone(r);
+    ControllerZone* ctrl_zone = retained_zones[row];
 
     std::string old_name = ctrl_zone->controller->zones[ctrl_zone->zone_idx].name;
 
@@ -244,7 +242,7 @@ void VirtualControllerTab::OnZoneDoubleClick(int r, int)
     if(!new_name.isEmpty())
     {
         ctrl_zone->custom_zone_name = new_name.toStdString();
-        ui->zoneList->item(r,0)->setText(new_name);
+        ui->zoneList->item(row, 0)->setText(new_name);
     }
 }
 
@@ -326,8 +324,6 @@ void VirtualControllerTab::LoadFile(std::string filename)
 {
     json j = VisualMapSettingsManager::LoadSettings(filename);
 
-    std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
-
     virtual_controller->Clear();
 
     auto ctrl_zones = j["ctrl_zones"];
@@ -340,9 +336,9 @@ void VirtualControllerTab::LoadFile(std::string filename)
         auto controller = entry["controller"];
         auto settings = entry["settings"];
 
-        for(unsigned int i= 0; i < available_zones.size(); i++)
+        for(unsigned int i= 0; i < retained_zones.size(); i++)
         {
-            ControllerZone* ctrl_zone = available_zones[i];
+            ControllerZone* ctrl_zone = retained_zones[i];
 
             if(
                     ctrl_zone->controller->name     == controller["name"]     &&
@@ -361,7 +357,7 @@ void VirtualControllerTab::LoadFile(std::string filename)
 
                     ctrl_zone->settings = settings;
 
-                    virtual_controller->Add(available_zones[i]);
+                    virtual_controller->Add(retained_zones[i]);
 
                     ui->zoneList->item(i,0)->setText(QString::fromUtf8(ctrl_zone->display_name().c_str()));
 
@@ -407,15 +403,13 @@ void VirtualControllerTab::LoadFile(std::string filename)
 
 void VirtualControllerTab::UpdateZoneButtons()
 {
-    std::vector<ControllerZone*> available_zones = ZoneManager::Get()->GetAvailableZones();
-
-    for(unsigned int i = 0; i < available_zones.size(); i++)
+    for(unsigned int i = 0; i < retained_zones.size(); i++)
     {
         QList<QPushButton *> buttons = ui->zoneList->cellWidget(i, 1)->findChildren<QPushButton *>();
 
         if(buttons.size() == 1)
         {
-            DecorateButton(buttons[0], virtual_controller->HasZone(available_zones[i]) ? remove_icon : add_icon);
+            DecorateButton(buttons[0], virtual_controller->HasZone(retained_zones[i]) ? remove_icon : add_icon);
         }
 
     }
