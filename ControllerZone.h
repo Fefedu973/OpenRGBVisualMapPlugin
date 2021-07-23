@@ -154,8 +154,22 @@ struct ControllerZone
 
     ControllerZoneSettings settings;
 
-    bool operator==(ControllerZone const & rhs) const {
-        return this->controller == rhs.controller && this->zone_idx == rhs.zone_idx;
+    bool compare_controller(RGBController* other) const {
+        return
+                this->controller->name == other->name &&
+                this->controller->vendor == other->vendor &&
+                this->controller->description == other->description &&
+                this->controller->version == other->version &&
+                this->controller->serial == other->serial &&
+                this->controller->location == other->location ;
+    }
+
+    bool compare(ControllerZone* rhs) const {
+        return this->compare_controller(rhs->controller) && this->zone_idx == rhs->zone_idx;
+    }
+
+    bool operator==(ControllerZone* rhs) const {
+        return this->compare(rhs);
     }
 
     unsigned int led_count() const {

@@ -68,7 +68,7 @@ void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 
     for(ControllerZone* ctrl_zone: available_zones)
     {
-        SetControllerZoneColor(ctrl_zone, ctrl_zone == ctrl_zone_to_identify ? Qt::green : Qt::black);
+        SetControllerZoneColor(ctrl_zone, ctrl_zone->compare(ctrl_zone_to_identify) ? Qt::green : Qt::black);
         controllers.insert(ctrl_zone->controller);
     }
 
