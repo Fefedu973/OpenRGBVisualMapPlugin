@@ -44,6 +44,18 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     connect(ui->zoneList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnZoneDoubleClick(int, int)));
     connect(ui->gridOptions, SIGNAL(SettingsChanged()), this, SLOT(OnSettingsChanged()));
 
+    connect(ui->itemOptions, &ItemOptions::ShapeEditRequest, [=](ControllerZone* ctrl_zone){
+        if(ctrl_zone)
+        {
+            int result = WidgetEditor::Show(ctrl_zone, retained_zones);
+
+            if(result)
+            {
+                OnItemOptionsChanged();
+            }
+        }
+    });
+
     connect(ui->grid, &Grid::Changed, [=](){
         ui->itemOptions->Update();
     });

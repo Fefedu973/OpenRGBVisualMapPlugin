@@ -14,7 +14,7 @@ class WidgetEditor : public QWidget
     Q_OBJECT
 
 public:
-    static int Show(ControllerZone*);
+    static int Show(ControllerZone*, std::vector<ControllerZone*>);
 
 signals:
     void Cancel();
@@ -52,6 +52,7 @@ private:
 
     Ui::WidgetEditor *ui;
     ControllerZone* ctrl_zone;
+    std::vector<ControllerZone*> other_zones;
     GridSettings* settings;
 
     std::vector<CustomShape*> states;

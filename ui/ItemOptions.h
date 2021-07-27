@@ -21,6 +21,7 @@ public:
 
 signals:
     void ItemOptionsChanged() const;
+    void ShapeEditRequest(ControllerZone*);
 
 private:
     Ui::ItemOptions *ui;

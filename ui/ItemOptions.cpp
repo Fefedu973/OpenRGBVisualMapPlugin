@@ -121,15 +121,7 @@ void ItemOptions::on_identifyButton_clicked()
 
 void ItemOptions::on_edit_shape_button_clicked()
 {
-    if(ctrl_zone)
-    {
-        int result = WidgetEditor::Show(ctrl_zone);
-
-        if(result)
-        {
-            emit ItemOptionsChanged();
-        }
-    }
+    emit ShapeEditRequest(ctrl_zone);
 }
 
 void ItemOptions::UpdateWidgetsVisibility()

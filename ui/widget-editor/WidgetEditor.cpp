@@ -13,9 +13,10 @@
 #include <QTransform>
 #include <QRect>
 
-int WidgetEditor::Show(ControllerZone* ctrl_zone)
+int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> other_zones)
 {
     WidgetEditor* editor = new WidgetEditor(nullptr, ctrl_zone);
+    editor->other_zones = other_zones;
 
     QDialog* dialog = new QDialog();
 
@@ -230,8 +231,6 @@ void WidgetEditor::on_reset_button_clicked()
 
 void WidgetEditor::on_copy_shape_button_clicked()
 {
-    std::vector<ControllerZone*> ctrl_zones = ZoneManager::Get()->GetAvailableZones();
-
     QStringList items;
 
     std::map<QString, ControllerZone*> ctrl_zones_choices;
@@ -239,7 +238,7 @@ void WidgetEditor::on_copy_shape_button_clicked()
     // generate choice list
     int i = 0;
 
-    for(ControllerZone* ctrl_zone_it : ctrl_zones)
+    for(ControllerZone* ctrl_zone_it : other_zones)
     {
         // ignore current ctrl_zone
         if(ctrl_zone == ctrl_zone_it)
