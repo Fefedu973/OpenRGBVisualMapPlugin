@@ -642,8 +642,6 @@ void WidgetEditor::AutoResize()
        shift_y = std::min<int>(shift_y, led_position->y());
     }
 
-    printf("Shift %d %d\n",shift_x,shift_y);
-
     for(LedPosition* led_position : temp_shape->led_positions)
     {
         led_position->shift(-shift_x, -shift_y);

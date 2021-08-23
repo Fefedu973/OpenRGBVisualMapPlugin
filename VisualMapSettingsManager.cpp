@@ -24,7 +24,7 @@ void VisualMapSettingsManager::SaveSettings(std::string filename, json settings)
 {
     if(!CreateSettingsDirectory())
     {
-        printf("Cannot create settings directory.\n");
+        printf("[OpenRGBVisualMapPlugin] Cannot create settings directory.\n");
         return;
     }
 
@@ -35,11 +35,11 @@ void VisualMapSettingsManager::SaveSettings(std::string filename, json settings)
         try{
             SFile << settings.dump(4);
             SFile.close();
-            printf("Virtual controller file successfully written.\n");
+            printf("[OpenRGBVisualMapPlugin] Virtual controller file successfully written.\n");
         }
         catch(const std::exception& e)
         {
-            printf("Cannot write virtual controller file.\n %s\n", e.what());
+            printf("[OpenRGBVisualMapPlugin] Cannot write virtual controller file.\n %s\n", e.what());
         }
         SFile.close();
     }
@@ -60,7 +60,7 @@ json VisualMapSettingsManager::LoadSettings(std::string filename)
         }
         catch(const std::exception& e)
         {
-             printf("Cannot read virtual controller file.\n %s\n", e.what());
+             printf("[OpenRGBVisualMapPlugin] Cannot read virtual controller file.\n %s\n", e.what());
         }
     }
 

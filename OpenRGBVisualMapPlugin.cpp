@@ -38,13 +38,13 @@ QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
 
 void OpenRGBVisualMapPlugin::DetectionStart(void* o)
 {
-    printf("DetectionStart\n");
+    printf("[OpenRGBVisualMapPlugin] DetectionStart\n");
 
     QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "Clear", Qt::QueuedConnection);
 }
 void OpenRGBVisualMapPlugin::DetectionEnd(void* o)
 {
-    printf("DetectionEnd\n");
+    printf("[OpenRGBVisualMapPlugin] DetectionEnd\n");
 
     QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "DeviceListChanged", Qt::QueuedConnection);
 }

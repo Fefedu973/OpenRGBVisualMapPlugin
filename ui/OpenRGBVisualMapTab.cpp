@@ -134,7 +134,7 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 
             if(auto_load)
             {
-                printf("Auto load: loading file %s\n", filename.c_str());
+                printf("[OpenRGBVisualMapPlugin] Auto load: loading file %s\n", filename.c_str());
                 VirtualControllerTab* tab = AddTab();
                 tab->LoadFile(filename);
                 has_loaded = true;
@@ -142,7 +142,7 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
         }
         catch(const std::exception& e)
         {
-            printf("Not able to load file %s: \n%s\n", filename.c_str(), e.what());
+            printf("[OpenRGBVisualMapPlugin] Not able to load file %s: \n%s\n", filename.c_str(), e.what());
         }
     }
 

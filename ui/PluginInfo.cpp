@@ -16,8 +16,6 @@ PluginInfo::PluginInfo(QWidget *parent) :
     ui->git_commit_id->setText(GIT_COMMIT_ID);
     ui->git_commit_date->setText(GIT_COMMIT_DATE);
     ui->git_branch->setText(GIT_BRANCH);
-    //QDesktopServices::openUrl()
-
 }
 
 PluginInfo::~PluginInfo()
@@ -29,8 +27,6 @@ void PluginInfo::on_open_plugin_folder_clicked()
 {
     std::string config_dir = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + "plugins";
     QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
-
-    printf("Opening %s\n", url.path().toStdString().c_str());
 
     QDesktopServices::openUrl(url);
 }

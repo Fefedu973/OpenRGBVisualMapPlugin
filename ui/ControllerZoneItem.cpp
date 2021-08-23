@@ -84,7 +84,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     }
     else
     {
-        printf("Unsupported shape\n");
+        printf("[OpenRGBVisualMapPlugin] Unsupported shape\n");
     }
 }
 
