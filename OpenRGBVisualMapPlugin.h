@@ -23,9 +23,20 @@ class OpenRGBVisualMapPlugin : public QObject, public OpenRGBPluginInterface
 public:
     ~OpenRGBVisualMapPlugin() {};
 
-    OpenRGBPluginInfo       PInfo;
-    OpenRGBPluginInfo       Initialize(bool, ResourceManager*)   override;
-    QWidget*                CreateGUI(QWidget *Parent)           override;
+    /*-------------------------------------------------------------------------------------------------*\
+    | Plugin Information                                                                                |
+    \*-------------------------------------------------------------------------------------------------*/
+    virtual OpenRGBPluginInfo   GetPluginInfo()                                                     override;
+    virtual unsigned int        GetPluginAPIVersion()                                               override;
+
+    /*-------------------------------------------------------------------------------------------------*\
+    | Plugin Functionality                                                                              |
+    \*-------------------------------------------------------------------------------------------------*/
+    virtual void                Load(bool dark_theme, ResourceManager* resource_manager_ptr)        override;
+    virtual QWidget*            GetWidget()                                                         override;
+    virtual QMenu*              GetTrayMenu()                                                       override;
+    virtual void                Unload()                                                            override;
+
     static bool             DarkTheme;
     static ResourceManager* RMPointer;
 

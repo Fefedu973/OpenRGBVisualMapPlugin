@@ -437,6 +437,11 @@ void VirtualControllerTab::OnBackgroundApplied(QImage image)
     virtual_controller->ApplyImage(image);
 }
 
+void VirtualControllerTab::Unregister()
+{
+    virtual_controller->Register(false, false);
+}
+
 void VirtualControllerTab::Clear()
 {
     ui->zoneList->clear();

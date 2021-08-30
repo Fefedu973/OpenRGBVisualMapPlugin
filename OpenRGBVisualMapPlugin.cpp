@@ -6,26 +6,41 @@
 bool OpenRGBVisualMapPlugin::DarkTheme = false;
 ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
 
-OpenRGBPluginInfo OpenRGBVisualMapPlugin::Initialize(bool Dt, ResourceManager *RM)
+OpenRGBPluginInfo OpenRGBVisualMapPlugin::GetPluginInfo()
 {
-    PInfo.PluginName         = "VisualMap";
-    PInfo.PluginDescription  = "Spatial configurator";
-    PInfo.PluginLocation     = "TopTabBar";
-    PInfo.HasCustom          = true;
-    PInfo.PluginLabel        = new QLabel("VisualMap");
+    OpenRGBPluginInfo info;
 
-    RMPointer                = RM;
-    DarkTheme                = Dt;
+    info.Name           = "OpenRGB Visual Map Plugin";
+    info.Description    = "Group and organize your devices on a spatial map";
+    info.Version        = VERSION_STRING;
+    info.Commit         = GIT_COMMIT_ID;
+    info.URL            = "https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin";
 
-    return PInfo;
+    info.Label          = "Visual Map";
+    info.Location       = OPENRGB_PLUGIN_LOCATION_TOP;
+
+    info.Icon.load(":/OpenRGBVisualMapPlugin.png");
+
+    return(info);
 }
 
-QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
+unsigned int OpenRGBVisualMapPlugin::GetPluginAPIVersion()
+{
+    return(OPENRGB_PLUGIN_API_VERSION);
+}
+
+void OpenRGBVisualMapPlugin::Load(bool Dt, ResourceManager *RM)
+{
+    DarkTheme = Dt;
+    RMPointer = RM;
+}
+
+QWidget* OpenRGBVisualMapPlugin::GetWidget()
 {
     VisualMapSettingsManager::CreateSettingsDirectory();
     OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();
 
-    ui = new OpenRGBVisualMapTab(parent);
+    ui = new OpenRGBVisualMapTab(nullptr);
 
     ui->setStyle(new TooltipProxy(ui->style()));
     ui->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -34,6 +49,17 @@ QWidget* OpenRGBVisualMapPlugin::CreateGUI(QWidget* parent)
     RMPointer->RegisterDetectionEndCallback(DetectionEnd, ui);
 
     return ui;
+}
+
+QMenu* OpenRGBVisualMapPlugin::GetTrayMenu()
+{
+    return(nullptr);
+}
+
+void OpenRGBVisualMapPlugin::Unload()
+{    
+    ui->UnregisterAll();
+    ui->Clear();
 }
 
 void OpenRGBVisualMapPlugin::DetectionStart(void* o)

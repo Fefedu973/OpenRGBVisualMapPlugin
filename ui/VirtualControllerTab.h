@@ -34,6 +34,7 @@ public:
 
     void LoadFile(std::string);
     void Clear();
+    void Unregister();
     void DeviceListChanged();
 
 private slots:
