@@ -37,6 +37,8 @@ void OpenRGBVisualMapPlugin::Load(bool Dt, ResourceManager *RM)
 
 QWidget* OpenRGBVisualMapPlugin::GetWidget()
 {
+    printf("[OpenRGBVisualMapPlugin] version %s (%s), build date %s\n", VERSION_STRING, GIT_COMMIT_ID, GIT_COMMIT_DATE);
+
     VisualMapSettingsManager::CreateSettingsDirectory();
     OpenRGBVisualMapPlugin::RMPointer->WaitForDeviceDetection();
 

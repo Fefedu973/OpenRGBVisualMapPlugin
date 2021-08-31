@@ -115,6 +115,8 @@ void VirtualController::Register(bool state, bool unregister_members)
             ForceDirectMode();
             OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(this);
 
+            printf("[OpenRGBVisualMapPlugin] Virtual map \"%s\" registered\n", name.c_str());
+
             if(unregister_members)
             {
                 std::set<RGBController*> controllers;
