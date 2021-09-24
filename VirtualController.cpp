@@ -59,7 +59,7 @@ void VirtualController::SetupVirtualZone()
     zones[0].name = "Virtual zone";
     zones[0].leds_count = size;
     zones[0].leds_min = size;
-    zones[0].leds_max = size;    
+    zones[0].leds_max = size;
     zones[0].matrix_map->width = width;
     zones[0].matrix_map->height = height;
     zones[0].matrix_map->map = map;
@@ -70,8 +70,6 @@ void VirtualController::SetupVirtualZone()
     zones[0].leds = &leds[0];
 
     modes[0].name = "Direct";
-    modes[0].colors.resize(size);
-    modes[0].colors = colors;
     modes[0].value = 0;
     modes[0].flags = MODE_FLAG_HAS_PER_LED_COLOR;
     modes[0].color_mode = MODE_COLORS_PER_LED;
