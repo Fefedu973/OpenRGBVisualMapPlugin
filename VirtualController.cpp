@@ -71,19 +71,23 @@ void VirtualController::SetupVirtualZone()
 
     modes[0].name = "Direct";
     modes[0].value = 0;
-    modes[0].flags = MODE_FLAG_HAS_PER_LED_COLOR;
+    modes[0].flags = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
+    modes[0].brightness = 100;
+    modes[0].brightness_max = 100;
+    modes[0].brightness_min = 0;
     modes[0].color_mode = MODE_COLORS_PER_LED;
 }
 
 void VirtualController::DeviceUpdateLEDs() {
     QImage image(width, height, QImage::Format_ARGB32);
 
+    float brightness = modes[0].brightness / 100.f;
     for(int h = 0; h<height; h++)
     {
         for(int w = 0; w < width; w++)
         {
             int rgb = colors[(h*width) + w];
-            QColor color = QColor(RGBGetRValue(rgb), RGBGetGValue(rgb), RGBGetBValue(rgb));
+            QColor color = QColor(RGBGetRValue(rgb) * brightness, RGBGetGValue(rgb)* brightness, RGBGetBValue(rgb)* brightness);
             image.setPixelColor(w, h, color);
         }
     }
