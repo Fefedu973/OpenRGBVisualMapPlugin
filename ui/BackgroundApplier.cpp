@@ -44,7 +44,10 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     {
         ui->presets_comboBox->addItem(QString::fromStdString(presest.name));
     }
+
     ui->presets_comboBox->blockSignals(false);
+
+    ui->tabs->setVisible(false);
 }
 
 BackgroundApplier::~BackgroundApplier()
@@ -69,6 +72,17 @@ void BackgroundApplier::on_gradient_type_currentIndexChanged(int)
 }
 
 void BackgroundApplier::on_spread_comboBox_currentIndexChanged(int)
+{
+    ApplyCustom();
+}
+
+
+void BackgroundApplier::on_x_offset_valueChanged(int)
+{
+    ApplyCustom();
+}
+
+void BackgroundApplier::on_y_offset_valueChanged(int)
 {
     ApplyCustom();
 }
@@ -158,7 +172,7 @@ QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::S
 {
     float radius = sqrt(h*h + w*w) / 2;
 
-    QRadialGradient grad(w/2, h/2, radius);
+    QRadialGradient grad(w * ui->x_offset->value() / 100.f ,h * ui->y_offset->value() / 100.f, radius);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -170,7 +184,7 @@ QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::
 {
     int angle = ui->rotate->value();
 
-    QConicalGradient grad(w/2,h/2, angle);
+    QConicalGradient grad(w * ui->x_offset->value() / 100.f ,h * ui->y_offset->value() / 100.f, angle);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -227,6 +241,9 @@ QPointF BackgroundApplier::EdgeOfView(int deg) {
         edgePoint.setY(edgePoint.y() + yFactor * (h /  2.0f));
     }
 
+    edgePoint.setX(edgePoint.x()*ui->x_offset->value() / 100.f);
+    edgePoint.setY(edgePoint.y()*ui->y_offset->value() / 100.f);
+
     return edgePoint;
 };
 
@@ -260,6 +277,11 @@ void BackgroundApplier::OpenFileDialog()
     connect(button, &QPushButton::clicked, [=](){
         emit BackgroundApplied(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
     });
+}
+
+void BackgroundApplier::on_show_background_applier_clicked()
+{
+    ui->tabs->setVisible(ui->show_background_applier->isChecked());
 }
 
 void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)

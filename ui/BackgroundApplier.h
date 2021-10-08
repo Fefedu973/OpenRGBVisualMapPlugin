@@ -35,9 +35,12 @@ private slots:
     void on_gradient_type_currentIndexChanged(int);
     void on_spread_comboBox_currentIndexChanged(int);
     void on_rotate_valueChanged(int);
+    void on_x_offset_valueChanged(int);
+    void on_y_offset_valueChanged(int);
     void on_add_color_stop_button_clicked();
     void on_choose_image_button_clicked();
     void on_presets_comboBox_currentIndexChanged(int);
+    void on_show_background_applier_clicked();
 
 private:
     Ui::BackgroundApplier *ui;
