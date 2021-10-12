@@ -165,6 +165,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="zigzag_button">
+           <property name="text">
+            <string>ZigZag</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="grow_button">
            <property name="text">
             <string>Grow</string>

@@ -616,6 +616,43 @@ void WidgetEditor::on_square_button_clicked()
     SaveState();
 }
 
+void WidgetEditor::on_zigzag_button_clicked()
+{
+    std::vector<LedPosition*> selection = ui->grid->GetSelection();
+    std::vector<LedPosition*> led_positions = selection.empty() ? temp_shape->led_positions : selection;
+
+   int size = QInputDialog::getInt(this, tr("ZigZag size"), tr("Enter a value"), QLineEdit::Normal, 2) - 1;
+
+   if (size > 0)
+   {
+        QPoint start_position = led_positions.front()->point;
+
+        int start_x = start_position.x();
+        int start_y = start_position.y();
+
+        int cnt = -1;
+        bool dir = 1;
+
+        for(unsigned int i = 0; i < led_positions.size(); i++)
+        {
+            if((cnt++) % size == size-1)
+            {
+                dir = !dir;
+            }
+
+            led_positions[i]->setX(start_x++);
+            led_positions[i]->setY(dir? start_y++ : start_y--);
+        }
+
+        AutoResize();
+
+        ui->grid->UpdateItems();
+
+        SaveState();
+   }
+
+}
+
 void WidgetEditor::on_undo_button_clicked()
 {
     Undo();
