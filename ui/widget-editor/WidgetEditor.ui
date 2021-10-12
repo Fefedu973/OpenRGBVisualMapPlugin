@@ -172,6 +172,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="sawtooth_button">
+           <property name="text">
+            <string>Sawtooth</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="grow_button">
            <property name="text">
             <string>Grow</string>

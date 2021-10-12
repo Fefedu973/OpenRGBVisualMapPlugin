@@ -39,6 +39,7 @@ private slots:
     void on_circle_button_clicked();
     void on_square_button_clicked();
     void on_zigzag_button_clicked();
+    void on_sawtooth_button_clicked();
     void on_undo_button_clicked();
     void on_auto_resize_button_clicked();
 

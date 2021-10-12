@@ -284,7 +284,7 @@ void WidgetEditor::on_copy_shape_button_clicked()
     inp->setWindowTitle("Choose shape");
     inp->move(button_pos.x(), button_pos.y());
 
-    if(inp->exec()){        
+    if(inp->exec()){
 
         QString selected = inp->textValue();
 
@@ -331,7 +331,7 @@ void WidgetEditor::on_h_spinBox_valueChanged(int value)
 
     SaveState();
 
-    ui->grid->ApplySettings(settings);    
+    ui->grid->ApplySettings(settings);
 }
 
 void WidgetEditor::on_auto_identify_stateChanged(int state)
@@ -349,7 +349,7 @@ void WidgetEditor::on_rotate_button_clicked()
 
     if(led_positions.empty())
     {
-       return;
+        return;
     }
 
     QPoint start_position = led_positions.front()->point;
@@ -382,7 +382,7 @@ void WidgetEditor::on_v_flip_button_clicked()
 
     if(led_positions.empty())
     {
-       return;
+        return;
     }
 
     QPoint start_position = led_positions.front()->point;
@@ -410,7 +410,7 @@ void WidgetEditor::on_h_flip_button_clicked()
 
     if(led_positions.empty())
     {
-       return;
+        return;
     }
 
     QPoint start_position = led_positions.front()->point;
@@ -436,7 +436,7 @@ void WidgetEditor::on_h_line_button_clicked()
 
     if(led_positions.empty())
     {
-       return;
+        return;
     }
 
     QPoint start_position = led_positions.front()->point;
@@ -445,8 +445,8 @@ void WidgetEditor::on_h_line_button_clicked()
 
     for(LedPosition* led_position : led_positions)
     {
-       led_position->setX(start_position.x() + (i++));
-       led_position->setY(start_position.y());
+        led_position->setX(start_position.x() + (i++));
+        led_position->setY(start_position.y());
     }
 
     UpdateWidgetsValues();
@@ -465,7 +465,7 @@ void WidgetEditor::on_v_line_button_clicked()
 
     if(led_positions.empty())
     {
-       return;
+        return;
     }
 
     QPoint start_position = led_positions.front()->point;
@@ -474,8 +474,8 @@ void WidgetEditor::on_v_line_button_clicked()
 
     for(LedPosition* led_position : led_positions)
     {
-       led_position->setX(start_position.x());
-       led_position->setY(start_position.y() + (i++));
+        led_position->setX(start_position.x());
+        led_position->setY(start_position.y() + (i++));
     }
 
     UpdateWidgetsValues();
@@ -621,10 +621,48 @@ void WidgetEditor::on_zigzag_button_clicked()
     std::vector<LedPosition*> selection = ui->grid->GetSelection();
     std::vector<LedPosition*> led_positions = selection.empty() ? temp_shape->led_positions : selection;
 
-   int size = QInputDialog::getInt(this, tr("ZigZag size"), tr("Enter a value"), QLineEdit::Normal, 2) - 1;
+    unsigned int size = QInputDialog::getInt(this, tr("ZigZag size"), tr("Enter a value"), QLineEdit::Normal, 2);
 
-   if (size > 0)
-   {
+    if (size >= 2)
+    {
+        QPoint start_position = led_positions.front()->point;
+
+        int start_x = start_position.x();
+        int start_y = start_position.y();
+
+        int col = 0;
+        bool down = 1;
+
+        for(unsigned int i = 0; i < led_positions.size(); i++)
+        {
+            if((i-1) % size == size-1)
+            {
+                down = !down;
+                col++;
+            }
+
+            led_positions[i]->setX(start_x + col);
+            led_positions[i]->setY(down? start_y-- : ++start_y);
+        }
+
+        AutoResize();
+
+        ui->grid->UpdateItems();
+
+        SaveState();
+    }
+
+}
+
+void WidgetEditor::on_sawtooth_button_clicked()
+{
+    std::vector<LedPosition*> selection = ui->grid->GetSelection();
+    std::vector<LedPosition*> led_positions = selection.empty() ? temp_shape->led_positions : selection;
+
+    int size = QInputDialog::getInt(this, tr("Diagonal size"), tr("Enter a value"), QLineEdit::Normal, 2) - 1;
+
+    if (size > 0)
+    {
         QPoint start_position = led_positions.front()->point;
 
         int start_x = start_position.x();
@@ -649,7 +687,7 @@ void WidgetEditor::on_zigzag_button_clicked()
         ui->grid->UpdateItems();
 
         SaveState();
-   }
+    }
 
 }
 
@@ -675,8 +713,8 @@ void WidgetEditor::AutoResize()
 
     for(LedPosition* led_position : temp_shape->led_positions)
     {
-       shift_x = std::min<int>(shift_x, led_position->x());
-       shift_y = std::min<int>(shift_y, led_position->y());
+        shift_x = std::min<int>(shift_x, led_position->x());
+        shift_y = std::min<int>(shift_y, led_position->y());
     }
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -690,8 +728,8 @@ void WidgetEditor::AutoResize()
 
     for(LedPosition* led_position : temp_shape->led_positions)
     {
-       w = std::max<int>(w, led_position->x() + 1 );
-       h = std::max<int>(h, led_position->y() + 1 );
+        w = std::max<int>(w, led_position->x() + 1 );
+        h = std::max<int>(h, led_position->y() + 1 );
     }
 
     temp_shape->w = w;
