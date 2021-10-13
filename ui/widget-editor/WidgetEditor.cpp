@@ -375,8 +375,6 @@ void WidgetEditor::on_rotate_button_clicked()
 
 void WidgetEditor::on_v_flip_button_clicked()
 {
-    QTransform t = QTransform().scale(1,-1);
-
     std::vector<LedPosition*> selection = ui->grid->GetSelection();
     std::vector<LedPosition*> led_positions = selection.empty() ? temp_shape->led_positions : selection;
 
@@ -385,13 +383,12 @@ void WidgetEditor::on_v_flip_button_clicked()
         return;
     }
 
-    QPoint start_position = led_positions.front()->point;
+    float cy = GetCenter(led_positions).y();
 
     for(LedPosition* led_position : led_positions)
     {
-        QPoint new_pos = t.map(led_position->point);
-        led_position->setX(new_pos.x());
-        led_position->setY(new_pos.y() + start_position.y() - 1);
+        float distance = cy - led_position->point.y();
+        led_position->setY(cy + distance);
     }
 
     AutoResize();
@@ -403,8 +400,6 @@ void WidgetEditor::on_v_flip_button_clicked()
 
 void WidgetEditor::on_h_flip_button_clicked()
 {
-    QTransform t = QTransform().scale(-1, 1);
-
     std::vector<LedPosition*> selection = ui->grid->GetSelection();
     std::vector<LedPosition*> led_positions = selection.empty() ? temp_shape->led_positions : selection;
 
@@ -413,13 +408,12 @@ void WidgetEditor::on_h_flip_button_clicked()
         return;
     }
 
-    QPoint start_position = led_positions.front()->point;
+    float cx = GetCenter(led_positions).x();
 
     for(LedPosition* led_position : led_positions)
     {
-        QPoint new_pos = t.map(led_position->point);
-        led_position->setX(new_pos.x() +  start_position.x() - 1 );
-        led_position->setY(new_pos.y());
+        float distance = cx - led_position->point.x();
+        led_position->setX(cx + distance);
     }
 
     AutoResize();
@@ -743,20 +737,24 @@ void WidgetEditor::AutoResize()
     UpdateWidgetsValues();
 }
 
-QPoint WidgetEditor::GetCenter(std::vector<LedPosition*> led_positions)
+QPointF WidgetEditor::GetCenter(std::vector<LedPosition*> led_positions)
 {
-    QRect bounds(0,0,1,1);
+    int x_min = INT_MAX;
+    int y_min = INT_MAX;
+
+    int x_max = INT_MIN;
+    int y_max = INT_MIN;
 
     for(LedPosition* led_position: led_positions)
     {
-        bounds.setX(std::min<unsigned int>(bounds.x(), led_position->x()));
-        bounds.setWidth(std::max<unsigned int>(bounds.width(), led_position->x() + 1));
+        x_min = std::min<int>(x_min, led_position->x());
+        y_min = std::min<int>(y_min, led_position->y());
 
-        bounds.setY(std::min<unsigned int>(bounds.y(), led_position->y()));
-        bounds.setHeight(std::max<unsigned int>(bounds.height(), led_position->y() + 1));
+        x_max = std::max<int>(x_max, led_position->x());
+        y_max = std::max<int>(y_max, led_position->y());
     }
 
-    return bounds.center();
+    return QRectF(QPoint(x_min,y_min), QPoint(x_max,y_max)).center();
 }
 
 

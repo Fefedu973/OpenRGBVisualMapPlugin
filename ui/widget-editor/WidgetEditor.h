@@ -63,7 +63,7 @@ private:
     void IdentifySelected();
     void InitShape();
     void AutoResize();
-    QPoint GetCenter(std::vector<LedPosition*>);
+    QPointF GetCenter(std::vector<LedPosition*>);
 
     bool StateChanged();
     void SaveState();
