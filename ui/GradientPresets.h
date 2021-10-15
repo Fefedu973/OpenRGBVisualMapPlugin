@@ -101,7 +101,34 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
         100,
         100
     },
-    // linear-gradient(90deg, #00DBDE 0%, #FC00FF 100%);
+    {
+        "Green to pink",
+        QGradient::LinearGradient,
+        QGradientStops({
+            QGradientStop(0,   "#FA8BFF"),
+            QGradientStop(0.52,   "#2BD2FF"),
+            QGradientStop(1,   "#2BFF88"),
+        }),
+        315,
+        100,
+        100
+    },
+    {
+        "Burning Spring",
+        QGradient::LinearGradient,
+        QGradientStops({
+            QGradientStop(0,   "#4fb576"),
+            QGradientStop(0.3,   "#44c489"),
+            QGradientStop(0.46,   "#28a9ae"),
+            QGradientStop(0.59,   "#28a2b7"),
+            QGradientStop(0.71,   "#4c7788"),
+            QGradientStop(0.86,   "#6c4f63"),
+            QGradientStop(1,   "#432c39"),
+        }),
+        90,
+        100,
+        100
+    },
 
 };
 
