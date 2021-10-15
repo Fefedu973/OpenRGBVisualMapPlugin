@@ -78,6 +78,7 @@ HEADERS +=                                                                      
     ui/ColorStop.h                                                                              \
     ui/ControllerZoneItem.h                                                                     \
     ui/EditableLabel.h                                                                          \
+    ui/GradientPresets.h                                                                        \
     ui/GridSettings.h                                                                           \
     ui/PluginInfo.h                                                                             \
     ui/Scene.h                                                                                  \

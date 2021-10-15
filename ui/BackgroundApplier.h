@@ -1,6 +1,7 @@
 #ifndef BACKGROUNDAPPLIER_H
 #define BACKGROUNDAPPLIER_H
 
+#include "GradientPresets.h"
 #include "ColorStop.h"
 #include <QWidget>
 
@@ -8,13 +9,6 @@ namespace Ui {
 class BackgroundApplier;
 }
 
-struct Preset
-{
-    std::string name;
-    QGradient::Type type;
-    QGradientStops stops;
-    unsigned int angle;
-};
 
 class BackgroundApplier : public QWidget
 {
@@ -55,11 +49,11 @@ private:
     void OpenFileDialog();
     void AddColorStop(ColorStop*);
 
-    QBrush ApplyLinearGradient(QGradientStops, QGradient::Spread);
-    QBrush ApplyRadialGradient(QGradientStops, QGradient::Spread);
-    QBrush ApplyConicalGradient(QGradientStops, QGradient::Spread);
+    QBrush ApplyLinearGradient(QGradientStops, QGradient::Spread, int, int, int);
+    QBrush ApplyRadialGradient(QGradientStops, QGradient::Spread, int, int);
+    QBrush ApplyConicalGradient(QGradientStops, QGradient::Spread, int, int, int);
 
-    QPointF EdgeOfView(int);
+    QPointF EdgeOfView(int, int, int);
 
     const QStringList custom_names = {
         "Linear", "Radial", "Conical"
@@ -75,44 +69,6 @@ private:
         QGradient::ReflectSpread
     };
 
-    const std::vector<Preset> presets = {
-        {
-            "Dark red",
-            QGradient::LinearGradient,
-            QGradientStops({
-                QGradientStop(0,Qt::black),
-                QGradientStop(1,Qt::red),
-            }),
-            0
-        },
-        {
-            "Dark blue",
-            QGradient::LinearGradient,
-            QGradientStops({
-                QGradientStop(0,Qt::black),
-                QGradientStop(1,Qt::blue),
-            }),
-            0
-        },
-        {
-            "Dark green",
-            QGradient::LinearGradient,
-            QGradientStops({
-                QGradientStop(0,Qt::black),
-                QGradientStop(1,Qt::green),
-            }),
-            0
-        },
-        {
-            "Dark yellow",
-            QGradient::LinearGradient,
-            QGradientStops({
-                QGradientStop(0,Qt::black),
-                QGradientStop(1,Qt::yellow),
-            }),
-            0
-        }
-    };
 
 };
 

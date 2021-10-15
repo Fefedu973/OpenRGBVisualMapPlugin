@@ -40,7 +40,7 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
 
     // presets
     ui->presets_comboBox->blockSignals(true);
-    for(Preset presest:presets)
+    for(GradientPreset presest:GRADIENT_PRESETS)
     {
         ui->presets_comboBox->addItem(QString::fromStdString(presest.name));
     }
@@ -137,11 +137,15 @@ void BackgroundApplier::ApplyCustom()
 
     QGradient::Spread spread = spreads[ui->spread_comboBox->currentIndex()];
 
+    int angle = ui->rotate->value();
+    int x_offset = ui->x_offset->value();
+    int y_offset = ui->y_offset->value();
+
     switch(ui->gradient_type->currentIndex())
     {
-    case 0: brush = ApplyLinearGradient(stops, spread); break;
-    case 1: brush = ApplyRadialGradient(stops, spread); break;
-    case 2: brush = ApplyConicalGradient(stops, spread); break;
+    case 0: brush = ApplyLinearGradient(stops, spread, angle, x_offset, y_offset); break;
+    case 1: brush = ApplyRadialGradient(stops, spread, x_offset, y_offset); break;
+    case 2: brush = ApplyConicalGradient(stops, spread, angle, x_offset, y_offset); break;
     default: return;
     }
 
@@ -153,12 +157,10 @@ void BackgroundApplier::ApplyCustom()
     emit BackgroundApplied(image);
 }
 
-QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::Spread spread)
+QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::Spread spread, int angle, int x_offset, int y_offset)
 {
-    int angle = ui->rotate->value();
-
-    QPointF end_point = EdgeOfView(angle);
-    QPointF start_point = EdgeOfView((angle + 180)%360);
+    QPointF end_point = EdgeOfView(angle, x_offset, y_offset);
+    QPointF start_point = EdgeOfView((angle + 180)%360, x_offset, y_offset);
 
     QLinearGradient grad(start_point , end_point);
 
@@ -168,11 +170,11 @@ QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::S
     return QBrush(grad);
 }
 
-QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::Spread spread)
+QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::Spread spread, int x_offset, int y_offset)
 {
     float radius = sqrt(h*h + w*w) / 2;
 
-    QRadialGradient grad(w * ui->x_offset->value() / 100.f ,h * ui->y_offset->value() / 100.f, radius);
+    QRadialGradient grad(w * x_offset / 100.f ,h * y_offset / 100.f, radius);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -180,11 +182,9 @@ QBrush BackgroundApplier::ApplyRadialGradient(QGradientStops stops, QGradient::S
     return QBrush(grad);
 }
 
-QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::Spread spread)
+QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::Spread spread, int angle, int x_offset, int y_offset)
 {
-    int angle = ui->rotate->value();
-
-    QConicalGradient grad(w * ui->x_offset->value() / 100.f ,h * ui->y_offset->value() / 100.f, angle);
+    QConicalGradient grad(w * x_offset / 100.f ,h * y_offset / 100.f, angle);
 
     grad.setSpread(spread);
     grad.setStops(stops);
@@ -192,7 +192,7 @@ QBrush BackgroundApplier::ApplyConicalGradient(QGradientStops stops, QGradient::
     return QBrush(grad);
 }
 
-QPointF BackgroundApplier::EdgeOfView(int deg) {
+QPointF BackgroundApplier::EdgeOfView(int deg, int x_offset, int y_offset) {
 
     float PI = 3.14159265359;
     float twoPI = PI*2;
@@ -241,8 +241,8 @@ QPointF BackgroundApplier::EdgeOfView(int deg) {
         edgePoint.setY(edgePoint.y() + yFactor * (h /  2.0f));
     }
 
-    edgePoint.setX(edgePoint.x()*ui->x_offset->value() / 100.f);
-    edgePoint.setY(edgePoint.y()*ui->y_offset->value() / 100.f);
+    edgePoint.setX(edgePoint.x() * x_offset / 100.f);
+    edgePoint.setY(edgePoint.y( )* y_offset / 100.f);
 
     return edgePoint;
 };
@@ -286,7 +286,7 @@ void BackgroundApplier::on_show_background_applier_clicked()
 
 void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
 {
-    Preset preset = presets[index];
+    GradientPreset preset = GRADIENT_PRESETS[index];
     image = QImage(w, h, QImage::Format_RGB32);
 
     QBrush brush;
@@ -294,11 +294,15 @@ void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
     QGradientStops stops = preset.stops;
     QGradient::Spread spread = QGradient::PadSpread;
 
+    int angle = preset.angle;
+    int x_offset = preset.x_offset;
+    int y_offset = preset.y_offset;
+
     switch(preset.type)
     {
-    case QGradient::LinearGradient: brush = ApplyLinearGradient(stops, spread); break;
-    case QGradient::RadialGradient: brush = ApplyRadialGradient(stops, spread); break;
-    case QGradient::ConicalGradient: brush = ApplyConicalGradient(stops, spread); break;
+    case QGradient::LinearGradient: brush = ApplyLinearGradient(stops, spread, angle, x_offset, y_offset); break;
+    case QGradient::RadialGradient: brush = ApplyRadialGradient(stops, spread, x_offset, y_offset); break;
+    case QGradient::ConicalGradient: brush = ApplyConicalGradient(stops, spread, angle, x_offset, y_offset); break;
     default: return;
     }
 
