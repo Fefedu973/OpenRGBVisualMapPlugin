@@ -36,6 +36,10 @@ private slots:
     void on_presets_comboBox_currentIndexChanged(int);
     void on_show_background_applier_clicked();
 
+    void on_brightness_valueChanged(int);
+    void on_save_gradient_clicked();
+    void on_load_gradient_clicked();
+
 private:
     Ui::BackgroundApplier *ui;
     int w;

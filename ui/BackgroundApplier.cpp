@@ -132,7 +132,10 @@ void BackgroundApplier::ApplyCustom()
 
     for(ColorStop* color_stop: color_stops)
     {
-        stops << color_stop->GetGradientStop();
+        QGradientStop stop = color_stop->GetGradientStop();
+        stop.second.setHsv(stop.second.hue(), stop.second.saturation(), ui->brightness->value());
+
+        stops << stop;
     }
 
     QGradient::Spread spread = spreads[ui->spread_comboBox->currentIndex()];
@@ -337,3 +340,23 @@ void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
 
     ApplyCustom();
 }
+
+void BackgroundApplier::on_brightness_valueChanged(int)
+{
+    ApplyCustom();
+}
+
+void BackgroundApplier::on_save_gradient_clicked()
+{
+
+}
+
+void BackgroundApplier::on_load_gradient_clicked()
+{
+
+}
+
+
+
+
+
