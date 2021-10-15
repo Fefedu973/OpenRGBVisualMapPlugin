@@ -11,6 +11,7 @@ struct GradientPreset
 {
     std::string name;
     QGradient::Type type;
+    QGradient::Spread spread;
     QGradientStops stops;
     unsigned int angle;
     unsigned int x_offset;
@@ -19,8 +20,21 @@ struct GradientPreset
 
 const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
+        "Empty preset",
+        QGradient::LinearGradient,
+        QGradient::PadSpread,
+        QGradientStops({
+            QGradientStop(0,Qt::black),
+            QGradientStop(1,Qt::black)
+        }),
+        0,
+        100,
+        100
+    },
+    {
         "Dark red",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,Qt::black),
             QGradientStop(1,Qt::red),
@@ -32,6 +46,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Dark blue",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,Qt::black),
             QGradientStop(1,Qt::blue),
@@ -43,6 +58,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Dark green",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,Qt::black),
             QGradientStop(1,Qt::green),
@@ -54,6 +70,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Dark yellow",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,Qt::black),
             QGradientStop(1,Qt::yellow),
@@ -65,6 +82,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Halloween pumpkin",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,   "#090B06"),
             QGradientStop(0.2, "#1B3711"),
@@ -80,6 +98,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Fabled sunset",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,   "#231557"),
             QGradientStop(0.29, "#44107A"),
@@ -93,6 +112,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Pink blue",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,   "#00DBDE"),
             QGradientStop(1,   "#FC00FF"),
@@ -104,6 +124,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Green to pink",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,   "#FA8BFF"),
             QGradientStop(0.52,   "#2BD2FF"),
@@ -116,6 +137,7 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
     {
         "Burning Spring",
         QGradient::LinearGradient,
+        QGradient::PadSpread,
         QGradientStops({
             QGradientStop(0,   "#4fb576"),
             QGradientStop(0.3,   "#44c489"),

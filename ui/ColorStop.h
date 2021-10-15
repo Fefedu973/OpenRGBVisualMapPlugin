@@ -16,13 +16,14 @@ public:
     ~ColorStop();
 
     QGradientStop GetGradientStop();
+    void SetGradientStop(const QGradientStop&);
 
 private slots:
     void on_stop_valueChanged(int);
     void on_remove_button_clicked();
 
 signals:
-  void GradientStopChanged(QGradientStop);
+  void GradientStopChanged();
   void RemoveRequest();
 
 private:

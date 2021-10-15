@@ -2,6 +2,7 @@
 #define COLORPICKER_H
 
 #include <QWidget>
+#include <QColor>
 
 namespace Ui {
 class ColorPicker;
@@ -14,6 +15,8 @@ class ColorPicker : public QWidget
 public:
     explicit ColorPicker(QWidget *parent = nullptr);
     ~ColorPicker();
+
+    void SetColor(QColor&);
 
 private slots:
     void on_button_clicked();

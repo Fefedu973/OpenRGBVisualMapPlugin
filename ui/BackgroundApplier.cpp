@@ -40,6 +40,7 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
 
     // presets
     ui->presets_comboBox->blockSignals(true);
+
     for(GradientPreset presest:GRADIENT_PRESETS)
     {
         ui->presets_comboBox->addItem(QString::fromStdString(presest.name));
@@ -117,9 +118,8 @@ void BackgroundApplier::AddColorStop(ColorStop* color_stop)
     connect(color_stop, &ColorStop::RemoveRequest, [=](){
         ui->color_stops->layout()->removeWidget(color_stop);
         color_stops.erase(std::find(color_stops.begin(), color_stops.end(), color_stop));
+        ApplyCustom();
     });
-
-    ApplyCustom();
 }
 
 void BackgroundApplier::ApplyCustom()
@@ -287,29 +287,53 @@ void BackgroundApplier::on_show_background_applier_clicked()
 void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
 {
     GradientPreset preset = GRADIENT_PRESETS[index];
-    image = QImage(w, h, QImage::Format_RGB32);
 
-    QBrush brush;
+    ui->rotate->blockSignals(true);
+    ui->x_offset->blockSignals(true);
+    ui->y_offset->blockSignals(true);
+    ui->spread_comboBox->blockSignals(true);
+    ui->gradient_type->blockSignals(true);
 
-    QGradientStops stops = preset.stops;
-    QGradient::Spread spread = QGradient::PadSpread;
+    ui->rotate->setValue(preset.angle);
+    ui->x_offset->setValue(preset.x_offset);
+    ui->y_offset->setValue(preset.y_offset);
 
-    int angle = preset.angle;
-    int x_offset = preset.x_offset;
-    int y_offset = preset.y_offset;
+    auto it_spread = std::find(spreads.begin(), spreads.end(), preset.spread);
 
-    switch(preset.type)
+    if (it_spread != spreads.end())
     {
-    case QGradient::LinearGradient: brush = ApplyLinearGradient(stops, spread, angle, x_offset, y_offset); break;
-    case QGradient::RadialGradient: brush = ApplyRadialGradient(stops, spread, x_offset, y_offset); break;
-    case QGradient::ConicalGradient: brush = ApplyConicalGradient(stops, spread, angle, x_offset, y_offset); break;
-    default: return;
+        auto idx = std::distance(spreads.begin(), it_spread);
+        ui->spread_comboBox->setCurrentIndex(idx);
     }
 
-    QRectF rect(0, 0, w, h);
+    auto it_type = std::find(types.begin(), types.end(), preset.type);
 
-    QPainter painter(&image);
-    painter.fillRect(rect, brush);
+    if (it_type != types.end())
+    {
+        auto idx = std::distance(types.begin(), it_type);
+        ui->gradient_type->setCurrentIndex(idx);
+    }
 
-    emit BackgroundApplied(image);
+    QLayoutItem *child;
+
+    while ((child = ui->color_stops->layout()->takeAt(0)) != 0) {
+        delete child->widget();
+    }
+
+    color_stops.clear();
+
+    for(QGradientStop stop: preset.stops)
+    {
+        ColorStop* color_stop = new ColorStop();
+        color_stop->SetGradientStop(stop);
+        AddColorStop(color_stop);
+    }
+
+    ui->rotate->blockSignals(false);
+    ui->x_offset->blockSignals(false);
+    ui->y_offset->blockSignals(false);
+    ui->spread_comboBox->blockSignals(false);
+    ui->gradient_type->blockSignals(false);
+
+    ApplyCustom();
 }

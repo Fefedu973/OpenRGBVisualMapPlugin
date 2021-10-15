@@ -21,6 +21,11 @@ ColorPicker::~ColorPicker()
     delete ui;
 }
 
+void ColorPicker::SetColor(QColor& color)
+{
+    ui->button->setStyleSheet("QPushButton {background-color: "+ color.name() + "; border: 1px solid black;}");
+}
+
 void ColorPicker::on_button_clicked()
 {    
     QPoint button_pos = ui->button->cursor().pos();
@@ -66,8 +71,7 @@ void ColorPicker::on_button_clicked()
     if (dialog->exec())
     {
         QColor color = color_wheel->color();
-        ui->button->setStyleSheet("QPushButton {background-color: "+ color.name() + "; border: 1px solid black;}");
-
+        SetColor(color);
         emit ColorSelected(color);
         delete dialog;
     }

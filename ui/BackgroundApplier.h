@@ -59,6 +59,12 @@ private:
         "Linear", "Radial", "Conical"
     };
 
+    const std::vector<QGradient::Type> types = {
+        QGradient::LinearGradient,
+        QGradient::RadialGradient,
+        QGradient::ConicalGradient
+    };
+
     const QStringList spread_names = {
         "Pad", "Repeat", "Reflect"
     };
