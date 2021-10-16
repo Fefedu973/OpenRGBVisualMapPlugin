@@ -5,6 +5,7 @@
 #include "ColorStop.h"
 #include <QWidget>
 
+
 namespace Ui {
 class BackgroundApplier;
 }

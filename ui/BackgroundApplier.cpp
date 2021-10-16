@@ -1,8 +1,10 @@
 #include "BackgroundApplier.h"
 #include "ColorStop.h"
 #include "ui_BackgroundApplier.h"
-
+#include "json.hpp"
 #include "math.h"
+#include "VisualMapSettingsManager.h"
+
 #include <QImage>
 #include <QPainter>
 #include <QGradient>
@@ -11,6 +13,9 @@
 #include <QConicalGradient>
 #include <QGradientStops>
 #include <QFileDialog>
+#include <QInputDialog>
+
+using json = nlohmann::json;
 
 BackgroundApplier::BackgroundApplier(QWidget *parent) :
     QWidget(parent),
@@ -348,10 +353,98 @@ void BackgroundApplier::on_brightness_valueChanged(int)
 
 void BackgroundApplier::on_save_gradient_clicked()
 {
+    QString filename = QInputDialog::getText(
+                nullptr, "Save gradient to file...", "Choose a filename",
+                QLineEdit::Normal, QString("my-gradient")).trimmed();
 
+    json j;
+
+    j["type"] = ui->gradient_type->currentText().toStdString();
+    j["spread"] = ui->spread_comboBox->currentText().toStdString();
+    j["x_offset"] = ui->x_offset->value();
+    j["y_offset"] = ui->y_offset->value();
+    j["rotate"] = ui->rotate->value();
+
+    std::vector<json> colors_array;
+
+    for(ColorStop* color_stop: color_stops)
+    {
+        json c;
+        QGradientStop stop = color_stop->GetGradientStop();
+        c["position"] = stop.first;
+        c["color"] = stop.second.name().toStdString();
+        colors_array.push_back(c);
+    }
+
+    j["colors"] = colors_array;
+
+    VisualMapSettingsManager::SaveGradient(filename.toStdString(), j);
 }
 
 void BackgroundApplier::on_load_gradient_clicked()
 {
+    std::vector<std::string> filenames = VisualMapSettingsManager::GetGradientsNames();
 
+    QStringList file_list;
+
+    for(std::string filename : filenames)
+    {
+        file_list << QString::fromUtf8(filename.c_str());
+    }
+
+    if(file_list.empty())
+    {
+        return;
+    }
+
+    QInputDialog *inp = new QInputDialog(this);
+
+    inp->setOptions(QInputDialog::UseListViewForComboBoxItems);
+    inp->setComboBoxItems(file_list);
+    inp->setWindowTitle("Load gradient from file...");
+    inp->setLabelText("Choose a gradient file from this list:");
+
+    if(!inp->exec()){
+        return;
+    }
+
+    QString filename = inp->textValue();
+
+    json j = VisualMapSettingsManager::LoadGradient(filename.toStdString());
+
+
+    ui->rotate->blockSignals(true);
+    ui->x_offset->blockSignals(true);
+    ui->y_offset->blockSignals(true);
+    ui->spread_comboBox->blockSignals(true);
+    ui->gradient_type->blockSignals(true);
+
+    ui->gradient_type->setCurrentText(QString::fromStdString(j["type"]));
+    ui->spread_comboBox->setCurrentText(QString::fromStdString(j["spread"]));
+    ui->x_offset->setValue(j["x_offset"]);
+    ui->y_offset->setValue(j["y_offset"]);
+    ui->rotate->setValue(j["rotate"]);
+
+    QLayoutItem *child;
+
+    while ((child = ui->color_stops->layout()->takeAt(0)) != 0) {
+        delete child->widget();
+    }
+
+    color_stops.clear();
+
+    for(json c: j["colors"])
+    {
+        ColorStop* color_stop = new ColorStop();
+        color_stop->SetGradientStop(QGradientStop(c["position"], QColor(QString::fromStdString(c["color"]))));
+        AddColorStop(color_stop);
+    }
+
+    ui->rotate->blockSignals(false);
+    ui->x_offset->blockSignals(false);
+    ui->y_offset->blockSignals(false);
+    ui->spread_comboBox->blockSignals(false);
+    ui->gradient_type->blockSignals(false);
+
+    ApplyCustom();
 }
