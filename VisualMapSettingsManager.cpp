@@ -4,87 +4,186 @@
 #include <fstream>
 #include "filesystem.h"
 
-const std::string VisualMapSettingsManager::settings_folder = "plugins/settings/";
-const std::string VisualMapSettingsManager::saves_folder = "plugins/settings/virtual-controllers/";
-
-std::vector<std::string> VisualMapSettingsManager::GetFileNames()
-{
-    std::string path = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
-    std::vector<std::string> filenames;
-
-    for (filesystem::directory_entry entry : filesystem::directory_iterator(path))
-    {
-        filenames.push_back(entry.path().filename().u8string());
-    }
-
-    return filenames;
-}
-
-void VisualMapSettingsManager::SaveSettings(std::string filename, json settings)
+bool VisualMapSettingsManager::SaveMap(std::string filename, json j)
 {
     if(!CreateSettingsDirectory())
     {
-        printf("[OpenRGBVisualMapPlugin] Cannot create settings directory.\n");
-        return;
+        return false;
     }
 
-    std::ofstream SFile((OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder + filename), std::ios::out | std::ios::binary);
-
-    if(SFile)
+    if(!CreateMapsDirectory())
     {
-        try{
-            SFile << settings.dump(4);
-            SFile.close();
-            printf("[OpenRGBVisualMapPlugin] Virtual controller file successfully written.\n");
-        }
-        catch(const std::exception& e)
-        {
-            printf("[OpenRGBVisualMapPlugin] Cannot write virtual controller file.\n %s\n", e.what());
-        }
-        SFile.close();
+        return false;
     }
+
+    return write_file(MapsFolder() + folder_separator() + filename, j);
 }
 
-json VisualMapSettingsManager::LoadSettings(std::string filename)
+json VisualMapSettingsManager::LoadMap(std::string filename)
 {
-    json Settings;
+    json j;
 
-    std::ifstream SFile(OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder + filename, std::ios::in | std::ios::binary);
-
-    if(SFile)
+    if(!CreateSettingsDirectory())
     {
-        try
-        {
-            SFile >> Settings;
-            SFile.close();
-        }
-        catch(const std::exception& e)
-        {
-             printf("[OpenRGBVisualMapPlugin] Cannot read virtual controller file.\n %s\n", e.what());
-        }
+        return j;
     }
 
-    return Settings;
+    if(!CreateMapsDirectory())
+    {
+        return j;
+    }
+
+    return load_json_file(MapsFolder() + folder_separator() + filename);
+}
+
+std::vector<std::string> VisualMapSettingsManager::GetMapNames()
+{
+    return list_files(MapsFolder());
+}
+
+bool VisualMapSettingsManager::SaveGradient(std::string filename, json j)
+{
+    if(!CreateSettingsDirectory())
+    {
+        return false;
+    }
+
+    if(!CreateGradientsDirectory())
+    {
+        return false;
+    }
+
+    return write_file(GradientsFolder() + folder_separator() + filename, j);
+}
+
+json VisualMapSettingsManager::LoadGradient(std::string filename)
+{
+    json j;
+
+    if(!CreateSettingsDirectory())
+    {
+        return j;
+    }
+
+    if(!CreateMapsDirectory())
+    {
+        return j;
+    }
+
+    return load_json_file(GradientsFolder() + folder_separator() + filename);
+}
+
+std::vector<std::string> VisualMapSettingsManager::GetGradientsNames()
+{
+    return list_files(GradientsFolder());
 }
 
 bool VisualMapSettingsManager::CreateSettingsDirectory()
 {
-    std::string settings_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + settings_folder;
+    return create_dir(SettingsFolder());
+}
 
-    if(!filesystem::exists(settings_directory))
+bool VisualMapSettingsManager::CreateMapsDirectory()
+{
+    return create_dir(MapsFolder());
+}
+
+bool VisualMapSettingsManager::CreateGradientsDirectory()
+{
+    return create_dir(GradientsFolder());
+}
+
+std::string VisualMapSettingsManager::SettingsFolder()
+{
+    return OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + "plugins" + folder_separator() + "settings";
+}
+
+std::string VisualMapSettingsManager::MapsFolder()
+{
+    return SettingsFolder() + folder_separator() + "virtual-controllers";
+}
+
+std::string VisualMapSettingsManager::GradientsFolder()
+{
+    return SettingsFolder() + folder_separator() + "gradients";
+}
+
+std::string VisualMapSettingsManager::folder_separator()
+{
+#if defined(WIN32) || defined(_WIN32)
+    return "\\";
+#else
+    return "/";
+#endif
+}
+
+bool VisualMapSettingsManager::write_file(std::string file_name, json j)
+{
+    std::ofstream file(file_name, std::ios::out | std::ios::binary);
+
+    if(file)
     {
-        if(!filesystem::create_directory(settings_directory))
+        try
         {
+            file << j.dump(4);
+            file.close();
+        }
+        catch(const std::exception& e)
+        {
+            printf("[OpenRGBEffectsPlugin] Cannot write file: %s\n", e.what());
             return false;
         }
-    }    
+    }
 
-    std::string saves_directory = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + saves_folder;
+    return true;
+}
 
-    if(filesystem::exists(saves_directory))
+json VisualMapSettingsManager::load_json_file(std::string file_name)
+{
+    json j;
+
+    std::ifstream file(file_name);
+
+    if(file)
+    {
+        try
+        {
+            file >> j;
+            file.close();
+        }
+        catch(const std::exception& e)
+        {
+             printf("[OpenRGBEffectsPlugin] Cannot read file: %s\n", e.what());
+        }
+    }
+
+    return j;
+}
+
+std::vector<std::string> VisualMapSettingsManager::list_files(std::string path)
+{
+    std::vector<std::string> filenames;
+
+    if(filesystem::exists(path))
+    {
+        for (const auto & entry : filesystem::directory_iterator(path))
+        {
+            filenames.push_back(entry.path().filename().u8string());
+        }
+    }
+
+    // alphabetical sort
+    std::sort(filenames.begin(), filenames.end());
+
+    return filenames;
+}
+
+bool VisualMapSettingsManager::create_dir(std::string directory)
+{
+    if(filesystem::exists(directory))
     {
         return true;
     }
 
-    return filesystem::create_directory(saves_directory);
+    return filesystem::create_directories(directory);
 }

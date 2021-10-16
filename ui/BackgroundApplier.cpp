@@ -355,8 +355,3 @@ void BackgroundApplier::on_load_gradient_clicked()
 {
 
 }
-
-
-
-
-

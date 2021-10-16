@@ -299,7 +299,7 @@ void VirtualControllerTab::on_saveButton_clicked()
         j["ctrl_zones"] = virtual_controller->GetZones();
         j["grid_settings"] = settings;
 
-        VisualMapSettingsManager::SaveSettings(filename.toStdString(), j);
+        VisualMapSettingsManager::SaveMap(filename.toStdString(), j);
     }
 }
 
@@ -307,7 +307,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 {
     QStringList file_list;
 
-    std::vector<std::string> filenames = VisualMapSettingsManager::GetFileNames();
+    std::vector<std::string> filenames = VisualMapSettingsManager::GetMapNames();
 
     for(std::string filename : filenames)
     {
@@ -334,7 +334,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 
 void VirtualControllerTab::LoadFile(std::string filename)
 {
-    json j = VisualMapSettingsManager::LoadSettings(filename);
+    json j = VisualMapSettingsManager::LoadMap(filename);
 
     virtual_controller->Clear();
 

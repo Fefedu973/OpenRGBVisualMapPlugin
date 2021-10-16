@@ -131,12 +131,13 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 {
     bool has_loaded = false;
 
-    std::vector<std::string> filenames = VisualMapSettingsManager::GetFileNames();
+    std::vector<std::string> filenames = VisualMapSettingsManager::GetMapNames();
+
     for(std::string filename : filenames)
     {
         try
         {
-            json j = VisualMapSettingsManager::LoadSettings(filename);
+            json j = VisualMapSettingsManager::LoadMap(filename);
 
             bool auto_load = j["grid_settings"]["auto_load"];
 
