@@ -11,7 +11,7 @@ ColorStop::ColorStop(QWidget *parent) :
 
     //default values
     stop.first = 0;
-    stop.second = Qt::white;
+    stop.second = QColor("#000000");
 
     // remove button style
     ui->remove_button->setStyleSheet("image:url(:close.png);");

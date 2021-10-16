@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>756</width>
-    <height>240</height>
+    <height>264</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -83,7 +83,7 @@
               <x>0</x>
               <y>0</y>
               <width>560</width>
-              <height>78</height>
+              <height>90</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -211,13 +211,13 @@
          <item row="8" column="2">
           <widget class="QSlider" name="brightness">
            <property name="maximum">
-            <number>255</number>
+            <number>100</number>
            </property>
            <property name="singleStep">
             <number>1</number>
            </property>
            <property name="value">
-            <number>255</number>
+            <number>100</number>
            </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -271,7 +271,7 @@
               <x>0</x>
               <y>0</y>
               <width>732</width>
-              <height>112</height>
+              <height>136</height>
              </rect>
             </property>
             <property name="sizePolicy">

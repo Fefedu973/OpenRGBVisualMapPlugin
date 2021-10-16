@@ -105,7 +105,16 @@ void BackgroundApplier::on_choose_image_button_clicked()
 
 void BackgroundApplier::on_add_color_stop_button_clicked()
 {
-    AddColorStop(new ColorStop());
+    ColorStop* color_stop = new ColorStop(this);
+
+    QGradientStop stop;
+
+    stop.first = 1.f;
+    stop.second = QColor::fromHsv(rand()%360 ,255,255);
+
+    color_stop->SetGradientStop(stop);
+
+    AddColorStop(color_stop);
     ApplyCustom();
 }
 
@@ -131,6 +140,13 @@ void BackgroundApplier::ApplyCustom()
 {
     image = QImage(w, h, QImage::Format_RGB32);
 
+    if(color_stops.empty())
+    {
+        image.fill(Qt::black);
+        emit BackgroundApplied(image);
+        return;
+    }
+
     QBrush brush;
 
     QGradientStops stops;
@@ -138,7 +154,8 @@ void BackgroundApplier::ApplyCustom()
     for(ColorStop* color_stop: color_stops)
     {
         QGradientStop stop = color_stop->GetGradientStop();
-        stop.second.setHsv(stop.second.hue(), stop.second.saturation(), ui->brightness->value());
+        float brightness = ui->brightness->value() / 100.f;
+        stop.second.setRgb(stop.second.red() * brightness, stop.second.green() * brightness, stop.second.blue() * brightness);
 
         stops << stop;
     }
@@ -160,6 +177,7 @@ void BackgroundApplier::ApplyCustom()
     QRectF rect(0, 0, w, h);
 
     QPainter painter(&image);
+
     painter.fillRect(rect, brush);
 
     emit BackgroundApplied(image);
@@ -332,7 +350,7 @@ void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
 
     for(QGradientStop stop: preset.stops)
     {
-        ColorStop* color_stop = new ColorStop();
+        ColorStop* color_stop = new ColorStop(this);
         color_stop->SetGradientStop(stop);
         AddColorStop(color_stop);
     }
@@ -435,7 +453,7 @@ void BackgroundApplier::on_load_gradient_clicked()
 
     for(json c: j["colors"])
     {
-        ColorStop* color_stop = new ColorStop();
+        ColorStop* color_stop = new ColorStop(this);
         color_stop->SetGradientStop(QGradientStop(c["position"], QColor(QString::fromStdString(c["color"]))));
         AddColorStop(color_stop);
     }

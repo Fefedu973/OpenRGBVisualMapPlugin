@@ -13,7 +13,7 @@ ColorPicker::ColorPicker(QWidget *parent) :
     ui(new Ui::ColorPicker)
 {
     ui->setupUi(this);
-    ui->button->setStyleSheet("QPushButton {background-color: #ffffff; border: 1px solid black;}");
+    ui->button->setStyleSheet("QPushButton {background-color: #000000; border: 1px solid black;}");
 }
 
 ColorPicker::~ColorPicker()
