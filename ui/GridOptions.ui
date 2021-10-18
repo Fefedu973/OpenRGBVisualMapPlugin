@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
-    <height>300</height>
+    <width>520</width>
+    <height>407</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,70 +21,15 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
    <item row="0" column="0">
-    <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,1,1,1,0,0,0,0">
-     <item row="8" column="0">
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QLabel" name="height">
-         <property name="text">
-          <string>Height</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="h_spinBox">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>1024</number>
-         </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Grid options</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="width">
-         <property name="text">
-          <string>Width</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="w_spinBox">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>1024</number>
-         </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="0">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0">
+     <item row="2" column="0" colspan="2">
       <widget class="QCheckBox" name="auto_register_checkBox">
        <property name="text">
         <string>Auto register</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
+     <item row="9" column="0" colspan="2">
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -97,38 +42,85 @@
        </property>
       </spacer>
      </item>
-     <item row="5" column="0">
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Grid options</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QSpinBox" name="w_spinBox">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>1024</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="height">
+       <property name="text">
+        <string>Height</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
       <widget class="QCheckBox" name="bounds_checkBox">
        <property name="text">
         <string>Show bounds</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QCheckBox" name="auto_load_checkBox">
-       <property name="text">
-        <string>Auto load</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
+     <item row="4" column="0" colspan="2">
       <widget class="QCheckBox" name="grid_checkBox">
        <property name="text">
         <string>Show grid</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="8" column="1">
+      <widget class="QSpinBox" name="h_spinBox">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>1024</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QCheckBox" name="auto_load_checkBox">
+       <property name="text">
+        <string>Auto load</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QCheckBox" name="unregister_members_checkBox">
+       <property name="text">
+        <string>Unregister member controllers</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0" colspan="2">
       <widget class="QCheckBox" name="live_preview_checkBox">
        <property name="text">
         <string>Live preview</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QCheckBox" name="unregister_members_checkBox">
+     <item row="7" column="0">
+      <widget class="QLabel" name="width">
        <property name="text">
-        <string>Unregister member controllers</string>
+        <string>Width</string>
        </property>
       </widget>
      </item>

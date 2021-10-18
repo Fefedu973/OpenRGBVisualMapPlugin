@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>944</width>
-    <height>477</height>
+    <width>1779</width>
+    <height>648</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,20 +50,20 @@
    <item>
     <layout class="QGridLayout" name="gridLayout" rowstretch="1000000,1">
      <item row="0" column="0">
-      <layout class="QHBoxLayout" name="mapLayout" stretch="0,1,0">
-       <item>
-        <layout class="QVBoxLayout" name="zonesLayout" stretch="0,100">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_4">
          <property name="sizeConstraint">
           <enum>QLayout::SetMinimumSize</enum>
          </property>
-         <item>
+         <item row="0" column="0">
           <widget class="QCheckBox" name="register_controller">
            <property name="text">
             <string>Register controller</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="1" column="0">
           <widget class="QTableWidget" name="zoneList">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -78,16 +78,16 @@
          </item>
         </layout>
        </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
-         <item>
+       <item row="0" column="1">
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
           <widget class="QLabel" name="virtual_controller_details_label">
            <property name="text">
             <string>Infos</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="1" column="0">
           <widget class="Grid" name="grid" native="true">
            <property name="minimumSize">
             <size>
@@ -102,7 +102,7 @@
          </item>
         </layout>
        </item>
-       <item>
+       <item row="0" column="2">
         <layout class="QGridLayout" name="optionsLayout" rowstretch="0,0,0,100">
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_3">
@@ -132,23 +132,7 @@
          <item row="1" column="0">
           <widget class="GridOptions" name="gridOptions" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>10</width>
-             <height>200</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="ItemOptions" name="itemOptions" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -156,7 +140,23 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>250</height>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="ItemOptions" name="itemOptions" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </widget>
