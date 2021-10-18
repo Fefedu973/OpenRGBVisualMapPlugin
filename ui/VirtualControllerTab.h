@@ -42,6 +42,7 @@ private slots:
     void OnGridSelectionChanged();
     void OnZoneDoubleClick(int, int);
     void OnItemOptionsChanged();
+    void OnAutoResizeRequest();
     void OnBackgroundApplied(QImage);
     void OnSettingsChanged();
 

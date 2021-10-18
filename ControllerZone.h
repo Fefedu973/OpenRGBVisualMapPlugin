@@ -186,6 +186,28 @@ struct ControllerZone
     bool isCustomShape()  {
         return this->settings.shape == CUSTOM;
     }
+
+    int width () const
+    {
+        switch (this->settings.shape) {
+            case CUSTOM: return this->settings.custom_shape->w;
+            case HORIZONTAL_LINE: return this->led_count() * this->settings.led_spacing - (this->settings.led_spacing - 1);
+            case VERTICAL_LINE: return 1;
+        }
+
+        return 0;
+    }
+
+    int height () const
+    {
+        switch (this->settings.shape) {
+            case CUSTOM: return this->settings.custom_shape->h;
+            case HORIZONTAL_LINE: return 1;
+            case VERTICAL_LINE: return  this->led_count() * this->settings.led_spacing - (this->settings.led_spacing - 1);
+        }
+
+        return 0;
+    }
 };
 
 #endif // CONTROLLERZONE_H

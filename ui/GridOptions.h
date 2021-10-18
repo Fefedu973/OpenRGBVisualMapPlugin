@@ -22,6 +22,7 @@ public:
 
 signals:
     void SettingsChanged();
+    void AutoResizeRequest();
 
 private slots:
     void on_w_spinBox_valueChanged(int);
@@ -31,6 +32,7 @@ private slots:
     void on_live_preview_checkBox_stateChanged(int);
     void on_auto_load_checkBox_stateChanged(int);
     void on_auto_register_checkBox_stateChanged(int);
+    void on_auto_resize_clicked();
 
     void on_unregister_members_checkBox_stateChanged(int arg1);
 

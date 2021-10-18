@@ -37,6 +37,7 @@ public:
     void Remove(ControllerZone*);
     void Clear();
     std::vector<ControllerZone*> GetZones();
+    bool IsEmpty();
     void ApplyImage(QImage);
     unsigned int GetTotalLeds();
 

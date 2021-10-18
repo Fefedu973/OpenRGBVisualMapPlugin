@@ -66,6 +66,11 @@ void GridOptions::on_unregister_members_checkBox_stateChanged(int value)
     emit SettingsChanged();
 }
 
+void GridOptions::on_auto_resize_clicked()
+{
+    emit AutoResizeRequest();
+}
+
 void GridOptions::Update()
 {
     ui->bounds_checkBox->setChecked(settings->show_bounds);

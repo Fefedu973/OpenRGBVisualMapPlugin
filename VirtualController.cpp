@@ -217,6 +217,11 @@ std::vector<ControllerZone*> VirtualController::GetZones()
     return added_zones;
 }
 
+bool VirtualController::IsEmpty()
+{
+    return added_zones.empty();
+}
+
 unsigned int VirtualController::GetTotalLeds()
 {
     unsigned int result = 0;

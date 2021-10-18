@@ -43,6 +43,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     connect(ui->grid, SIGNAL(SelectionChanged()), this, SLOT(OnGridSelectionChanged()));
     connect(ui->zoneList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnZoneDoubleClick(int, int)));
     connect(ui->gridOptions, SIGNAL(SettingsChanged()), this, SLOT(OnSettingsChanged()));
+    connect(ui->gridOptions, SIGNAL(AutoResizeRequest()), this, SLOT(OnAutoResizeRequest()));
 
     connect(ui->itemOptions, &ItemOptions::ShapeEditRequest, [=](ControllerZone* ctrl_zone){
         if(ctrl_zone)
@@ -78,6 +79,45 @@ void VirtualControllerTab::OnSettingsChanged()
     ui->grid->ApplySettings(settings);
     ui->backgroundApplier->SetSize(settings->w, settings->h);
     virtual_controller->UpdateSize(settings->w, settings->h);
+}
+
+void VirtualControllerTab::OnAutoResizeRequest()
+{
+    if(virtual_controller->IsEmpty())
+    {
+        return;
+    }
+
+    // calculate bounds
+    int min_x = INT_MAX;
+    int min_y = INT_MAX;
+    int max_x = INT_MIN;
+    int max_y = INT_MIN;
+
+    for (ControllerZone* controller_zone: virtual_controller->GetZones())
+    {
+        min_x = std::min<int>(min_x, controller_zone->settings.x);
+        min_y = std::min<int>(min_y, controller_zone->settings.y);
+
+        max_x = std::max<int>(max_x, controller_zone->settings.x + controller_zone->width());
+        max_y = std::max<int>(max_y, controller_zone->settings.y + controller_zone->height());
+    }
+
+    // shift
+    for (ControllerZone* controller_zone: virtual_controller->GetZones())
+    {
+        controller_zone->settings.x -= min_x;
+        controller_zone->settings.y -= min_y;
+    }
+
+    // resize map
+    settings->w = max_x - min_x;
+    settings->h = max_y - min_y;
+
+    // udpate GUI
+    ui->grid->ApplySettings(settings);
+    ui->grid->UpdateItems();
+    ui->gridOptions->SetSettings(settings);
 }
 
 void VirtualControllerTab::RenameController(std::string value)
