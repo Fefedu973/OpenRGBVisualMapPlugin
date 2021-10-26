@@ -24,35 +24,28 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
 
     for (unsigned int i = 0; i < controllers.size(); i++)
     {
-        for (unsigned int mode_idx = 0; mode_idx < controllers[i]->modes.size(); mode_idx++)
+        if(controllers[i]->serial == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
         {
-            if(controllers[i]->serial == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
-            {
-                continue;
-            }
-
-            if (controllers[i]->modes[mode_idx].name == "Direct")
-            {
-                for(unsigned int zone_idx = 0; zone_idx < controllers[i]->zones.size(); zone_idx++)
-                {
-                    ControllerZone* ctrl_zone = new ControllerZone();
-
-                    ctrl_zone->controller = controllers[i];
-                    ctrl_zone->zone_idx = zone_idx;
-                    ctrl_zone->settings = ControllerZoneSettings::defaults();
-                    ctrl_zone->custom_zone_name = "";
-
-                    if(ctrl_zone->controller->zones[ctrl_zone->zone_idx].type == ZONE_TYPE_MATRIX)
-                    {
-                        InitMatrixCustomShape(ctrl_zone);
-                    }
-
-                    available_zones.push_back(ctrl_zone);
-                }
-
-                break;
-            }
+            continue;
         }
+
+        for(unsigned int zone_idx = 0; zone_idx < controllers[i]->zones.size(); zone_idx++)
+        {
+            ControllerZone* ctrl_zone = new ControllerZone();
+
+            ctrl_zone->controller = controllers[i];
+            ctrl_zone->zone_idx = zone_idx;
+            ctrl_zone->settings = ControllerZoneSettings::defaults();
+            ctrl_zone->custom_zone_name = "";
+
+            if(ctrl_zone->controller->zones[ctrl_zone->zone_idx].type == ZONE_TYPE_MATRIX)
+            {
+                InitMatrixCustomShape(ctrl_zone);
+            }
+
+            available_zones.push_back(ctrl_zone);
+        }
+
     }
 
     return available_zones;
@@ -135,35 +128,35 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage image)
     int start_idx = z.start_idx;
 
     switch (ctrl_zone->settings.shape) {
-        case HORIZONTAL_LINE:
-            for(int i = 0; i < leds_count; i++)
-            {
-                int idx = settings.reverse ? leds_count - 1 - i : i;
-                QColor color = image.pixelColor(idx * settings.led_spacing + settings.x, settings.y);
-                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-            break;
+    case HORIZONTAL_LINE:
+        for(int i = 0; i < leds_count; i++)
+        {
+            int idx = settings.reverse ? leds_count - 1 - i : i;
+            QColor color = image.pixelColor(idx * settings.led_spacing + settings.x, settings.y);
+            controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+        }
+        break;
 
-        case VERTICAL_LINE:
-            for(int i = 0; i < leds_count; i++)
-            {
-                int idx = settings.reverse ? leds_count - 1 - i : i;
+    case VERTICAL_LINE:
+        for(int i = 0; i < leds_count; i++)
+        {
+            int idx = settings.reverse ? leds_count - 1 - i : i;
 
-                QColor color = image.pixelColor(settings.x, idx * settings.led_spacing + settings.y);
-                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-            break;
+            QColor color = image.pixelColor(settings.x, idx * settings.led_spacing + settings.y);
+            controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+        }
+        break;
 
-        case CUSTOM:
-            std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
+    case CUSTOM:
+        std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
 
-            for(unsigned int i = 0; i < led_positions.size(); i++)
-            {                
-                QColor color = image.pixelColor(settings.x + led_positions[i]->x(), settings.y + led_positions[i]->y());
-                controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
+        for(unsigned int i = 0; i < led_positions.size(); i++)
+        {
+            QColor color = image.pixelColor(settings.x + led_positions[i]->x(), settings.y + led_positions[i]->y());
+            controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
+        }
 
-            break;
+        break;
     }
 }
 
@@ -195,4 +188,4 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
             }
         }
     }
- }
+}
