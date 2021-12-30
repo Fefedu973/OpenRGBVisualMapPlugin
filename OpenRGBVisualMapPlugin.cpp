@@ -62,6 +62,9 @@ void OpenRGBVisualMapPlugin::Unload()
 {    
     ui->UnregisterAll();
     ui->Clear();
+
+    RMPointer->UnregisterDetectionStartCallback(DetectionStart, ui);
+    RMPointer->UnregisterDetectionEndCallback(DetectionEnd, ui);
 }
 
 void OpenRGBVisualMapPlugin::DetectionStart(void* o)
