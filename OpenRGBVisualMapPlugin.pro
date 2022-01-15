@@ -49,11 +49,9 @@ INCLUDEPATH +=                                                                  
     OpenRGB/net_port                                                                            \
     OpenRGB/RGBController                                                                       \
     OpenRGB/dependencies/json                                                                   \
+    OpenRGB/qt                                                                                  \
     ui/                                                                                         \
     ui/widget-editor/                                                                           \
-    Dependencies/                                                                               \
-    Dependencies/HSV                                                                            \
-    Dependencies/ColorWheel                                                                     \
 
 HEADERS +=                                                                                      \
     OpenRGB/NetworkClient.h                                                                     \
@@ -93,8 +91,7 @@ HEADERS +=                                                                      
     ui/Grid.h                                                                                   \
     ui/GridOptions.h                                                                            \
     ui/ItemOptions.h                                                                            \
-    Dependencies/HSV/hsv.h                                                                      \
-    Dependencies/ColorWheel/ColorWheel.h                                                        \
+    OpenRGB/qt/hsv.h                                                                            \
 
 SOURCES +=                                                                                      \
     OpenRGB/RGBController/RGBController.cpp                                                     \
@@ -118,8 +115,7 @@ SOURCES +=                                                                      
     ui/widget-editor/EditorGrid.cpp                                                             \
     ui/widget-editor/LedItem.cpp                                                                \
     ui/widget-editor/WidgetEditor.cpp                                                           \
-    Dependencies/HSV/hsv.cpp                                                                    \
-    Dependencies/ColorWheel/ColorWheel.cpp                                                      \
+    OpenRGB/qt/hsv.cpp                                                                          \
 
 FORMS +=                                                                                        \
     ui/BackgroundApplier.ui                                                                     \

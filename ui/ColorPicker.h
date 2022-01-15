@@ -16,7 +16,7 @@ public:
     explicit ColorPicker(QWidget *parent = nullptr);
     ~ColorPicker();
 
-    void SetColor(QColor&);
+    void SetColor(const QColor &);
 
 private slots:
     void on_button_clicked();
@@ -26,6 +26,7 @@ signals:
 
 private:
     Ui::ColorPicker *ui;
+    QColor current_color;
 };
 
 #endif // COLORPICKER_H
