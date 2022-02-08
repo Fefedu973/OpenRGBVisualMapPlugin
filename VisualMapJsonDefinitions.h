@@ -148,4 +148,39 @@ void from_json(const json& j, GridSettings* s) {
     }
 }
 
+class DummyController: public RGBController
+{
+public:
+    DummyController(){};
+    ~DummyController(){};
+    void DeviceUpdateLEDs()    override {};
+    void SetupZones()          override {};
+    void SetupColors()         override {};
+    void ResizeZone(int, int)  override {};
+    void SetCustomMode()       override {};
+    void DeviceUpdateMode()    override {};
+    void UpdateZoneLEDs(int)   override {};
+    void UpdateSingleLED(int)  override {};
+};
+
+void from_json(const json& j, ControllerZone* z) {
+
+    z->controller = new DummyController();
+
+    if(!j.is_null())
+    {
+        j["controller"].at("name").get_to(z->controller->name);
+        j["controller"].at("vendor").get_to(z->controller->vendor);
+        j["controller"].at("description").get_to(z->controller->description);
+        j["controller"].at("version").get_to(z->controller->version);
+        j["controller"].at("serial").get_to(z->controller->serial);
+        j["controller"].at("location").get_to(z->controller->location);
+
+        j.at("zone_idx").get_to(z->zone_idx);
+        j.at("custom_zone_name").get_to(z->custom_zone_name);
+        j.at("settings").get_to(z->settings);
+    }
+}
+
+
 #endif // VISUALMAPJSONDEFINITIONS_H

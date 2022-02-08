@@ -15,7 +15,9 @@
 #include "GridOptions.h"
 #include "ItemOptions.h"
 #include "BackgroundApplier.h"
+#include "json.hpp"
 
+using json = nlohmann::json;
 
 namespace Ui {
 class VirtualControllerTab;
@@ -33,9 +35,11 @@ public:
     std::string GetControllerName();
 
     void LoadFile(std::string);
+    void LoadJson(json);
     void Clear();
     void Unregister();
-    void DeviceListChanged();
+    void Recreate();
+    void BackupZones();
 
 private slots:
     void OnZoneSelectionChanged();
@@ -70,6 +74,10 @@ private:
     void InitZoneList();
     void UpdateVirtualControllerDetails();
     std::vector<ControllerZone*> retained_zones;
+
+    json saved_zones;
+
+    void ReassignZones();
 
 protected:
     void resizeEvent(QResizeEvent*) override;

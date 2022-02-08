@@ -20,7 +20,8 @@ public:
 
 public slots:
     void Clear();
-    void DeviceListChanged();
+    void Backup();
+    void Recreate();
 
 private slots:
     void AddTabSlot();

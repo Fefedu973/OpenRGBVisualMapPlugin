@@ -64,20 +64,40 @@ void OpenRGBVisualMapTab::UnregisterAll()
     }
 }
 
-void OpenRGBVisualMapTab::Clear()
+void OpenRGBVisualMapTab::Backup()
 {
+    printf("[OpenRGBVisualMapPlugin] Backup\n");
+
+    for(VirtualControllerTab* controller_tab: controller_tabs)
+    {
+        controller_tab->BackupZones();
+    }
+
+    printf("[OpenRGBVisualMapPlugin] Backup done\n");
+}
+
+void OpenRGBVisualMapTab::Clear()
+{    
+    printf("[OpenRGBVisualMapPlugin] Clear\n");
+
     for(VirtualControllerTab* controller_tab: controller_tabs)
     {
         controller_tab->Clear();
     }
+
+    printf("[OpenRGBVisualMapPlugin] Clear done\n");
 }
 
-void OpenRGBVisualMapTab::DeviceListChanged()
+void OpenRGBVisualMapTab::Recreate()
 {
+    printf("[OpenRGBVisualMapPlugin] Recreate\n");
+
     for(VirtualControllerTab* controller_tab: controller_tabs)
     {
-        controller_tab->DeviceListChanged();
+        controller_tab->Recreate();
     }
+
+    printf("[OpenRGBVisualMapPlugin] Recreate done\n");
 }
 
 VirtualControllerTab* OpenRGBVisualMapTab::AddTab()

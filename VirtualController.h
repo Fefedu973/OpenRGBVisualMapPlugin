@@ -4,6 +4,7 @@
 #include "RGBController.h"
 #include "ControllerZone.h"
 #include <QImage>
+#include <functional>
 
 class VirtualController: public RGBController
 {

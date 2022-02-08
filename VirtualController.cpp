@@ -166,7 +166,8 @@ void VirtualController::Register(bool state, bool unregister_members)
     }
 }
 
-void VirtualController::ForceDirectMode(){
+void VirtualController::ForceDirectMode()
+{
     std::set<RGBController*> controllers;
 
     for(ControllerZone* ctrl_zone: added_zones)

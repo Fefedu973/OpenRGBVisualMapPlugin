@@ -71,11 +71,15 @@ void OpenRGBVisualMapPlugin::DetectionStart(void* o)
 {
     printf("[OpenRGBVisualMapPlugin] DetectionStart\n");
 
+    // immediate backup, don't run this in a thread
+    ((OpenRGBVisualMapTab *)o)->UnregisterAll();
+    ((OpenRGBVisualMapTab *)o)->Backup();
+    // clear the GUI on the GUI thread
     QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "Clear", Qt::QueuedConnection);
 }
 void OpenRGBVisualMapPlugin::DetectionEnd(void* o)
 {
     printf("[OpenRGBVisualMapPlugin] DetectionEnd\n");
 
-    QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "DeviceListChanged", Qt::QueuedConnection);
+    QMetaObject::invokeMethod((OpenRGBVisualMapTab *)o, "Recreate",  Qt::QueuedConnection);
 }

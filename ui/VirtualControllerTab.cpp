@@ -31,6 +31,8 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 
     virtual_controller->UpdateSize(settings->w, settings->h);
 
+    retained_zones = ZoneManager::Get()->GetAvailableZones();
+
     InitZoneList();
 
     ui->itemOptions->hide();
@@ -149,8 +151,6 @@ void VirtualControllerTab::UpdateVirtualControllerDetails()
 
 void VirtualControllerTab::InitZoneList()
 {
-    retained_zones = ZoneManager::Get()->GetAvailableZones();
-
     // Hide headers
     ui->zoneList->horizontalHeader()->hide();
     ui->zoneList->verticalHeader()->hide();
@@ -376,6 +376,13 @@ void VirtualControllerTab::LoadFile(std::string filename)
 {
     json j = VisualMapSettingsManager::LoadMap(filename);
 
+    RenameController(filename);
+
+    LoadJson(j);
+}
+
+void VirtualControllerTab::LoadJson(json j)
+{
     virtual_controller->Clear();
 
     auto ctrl_zones = j["ctrl_zones"];
@@ -432,8 +439,6 @@ void VirtualControllerTab::LoadFile(std::string filename)
         msgBox.exec();
     }
 
-    RenameController(filename);
-
     UpdateZoneButtons();
 
     j.at("grid_settings").get_to(settings);
@@ -482,14 +487,35 @@ void VirtualControllerTab::Unregister()
     virtual_controller->Register(false, false);
 }
 
+void VirtualControllerTab::Recreate()
+{
+    retained_zones = ZoneManager::Get()->GetAvailableZones();
+
+    InitZoneList();
+
+    ReassignZones();
+
+    if(ui->register_controller->isChecked())
+    {
+        virtual_controller->Register(true, settings->unregister_members);
+    }
+}
+
+void VirtualControllerTab::ReassignZones()
+{
+    LoadJson(saved_zones);
+}
+
+void VirtualControllerTab::BackupZones()
+{
+    saved_zones["ctrl_zones"] = virtual_controller->GetZones();
+    saved_zones["grid_settings"] = settings;
+}
+
 void VirtualControllerTab::Clear()
 {
     ui->zoneList->clear();
     ui->grid->Clear();
-    virtual_controller->Clear();
-}
-
-void VirtualControllerTab::DeviceListChanged()
-{
-    InitZoneList();
+    retained_zones.clear();
+    selected_ctrl_zone = nullptr;
 }

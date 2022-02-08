@@ -130,7 +130,7 @@ bool VisualMapSettingsManager::write_file(std::string file_name, json j)
         }
         catch(const std::exception& e)
         {
-            printf("[OpenRGBEffectsPlugin] Cannot write file: %s\n", e.what());
+            printf("[OpenRGBVisualMapPlugin] Cannot write file: %s\n", e.what());
             return false;
         }
     }
@@ -153,7 +153,7 @@ json VisualMapSettingsManager::load_json_file(std::string file_name)
         }
         catch(const std::exception& e)
         {
-             printf("[OpenRGBEffectsPlugin] Cannot read file: %s\n", e.what());
+             printf("[OpenRGBVisualMapPlugin] Cannot read file: %s\n", e.what());
         }
     }
 
