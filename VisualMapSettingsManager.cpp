@@ -1,8 +1,9 @@
 #include "VisualMapSettingsManager.h"
 #include "OpenRGBVisualMapPlugin.h"
-
+#include <QFile>
+#include <QString>
+#include <QDir>
 #include <fstream>
-#include "filesystem.h"
 
 bool VisualMapSettingsManager::SaveMap(std::string filename, json j)
 {
@@ -164,11 +165,13 @@ std::vector<std::string> VisualMapSettingsManager::list_files(std::string path)
 {
     std::vector<std::string> filenames;
 
-    if(filesystem::exists(path))
+    QDir dir(QString::fromStdString(path));
+
+    if(dir.exists())
     {
-        for (const auto & entry : filesystem::directory_iterator(path))
+        for (const QString & entry : dir.entryList(QDir::Files))
         {
-            filenames.push_back(entry.path().filename().u8string());
+            filenames.push_back(entry.toStdString());
         }
     }
 
@@ -180,10 +183,12 @@ std::vector<std::string> VisualMapSettingsManager::list_files(std::string path)
 
 bool VisualMapSettingsManager::create_dir(std::string directory)
 {
-    if(filesystem::exists(directory))
+    QDir dir(QString::fromStdString(directory));
+
+    if(dir.exists())
     {
         return true;
     }
 
-    return filesystem::create_directories(directory);
+    return QDir().mkpath(dir.path());
 }

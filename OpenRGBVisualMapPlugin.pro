@@ -66,8 +66,7 @@ HEADERS +=                                                                      
     OpenRGB/net_port/net_port.h                                                                 \
     OpenRGB/RGBController/RGBController.h                                                       \
     OpenRGBVisualMapPlugin.h                                                                    \
-    ZoneManager.h                                                                               \
-    filesystem.h                                                                                \
+    ZoneManager.h                                                                              \
     VirtualController.h                                                                         \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
@@ -168,7 +167,6 @@ win32:DEFINES +=                                                        \
 # Linux-specific Configuration                                          #
 #-----------------------------------------------------------------------#
 unix:!macx {
- LIBS += -lstdc++fs
 }
 
 #-----------------------------------------------------------------------#
