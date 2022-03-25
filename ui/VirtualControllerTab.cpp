@@ -399,13 +399,14 @@ void VirtualControllerTab::LoadJson(json j)
         {
             ControllerZone* ctrl_zone = retained_zones[i];
 
+             // Don't compare location for HID devices, because it constantly changes
+            bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
             if(
-                    ctrl_zone->controller->name     == controller["name"]     &&
-                    ctrl_zone->controller->location == controller["location"] &&
-                    ctrl_zone->controller->serial   == controller["serial"]   &&
-                    ctrl_zone->controller->vendor   == controller["vendor"]   &&
-                    ctrl_zone->zone_idx == entry["zone_idx"]
-                    )
+                ctrl_zone->controller->name == controller["name"] &&
+                ctrl_zone->controller->vendor == controller["vendor"] &&
+                ctrl_zone->controller->serial == controller["serial"] &&
+                (ctrl_zone->controller->location == controller["location"] || hid_location) &&
+                ctrl_zone->zone_idx == entry["zone_idx"])
             {
                 try
                 {
