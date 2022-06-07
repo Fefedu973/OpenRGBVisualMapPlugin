@@ -132,8 +132,16 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage image)
         for(int i = 0; i < leds_count; i++)
         {
             int idx = settings.reverse ? leds_count - 1 - i : i;
-            QColor color = image.pixelColor(idx * settings.led_spacing + settings.x, settings.y);
-            controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+
+            unsigned int x = idx * settings.led_spacing + settings.x;
+            unsigned int y = settings.y;
+
+            if(image.valid(x,y))
+            {
+                QColor color = image.pixelColor(x, y);
+                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+
         }
         break;
 
@@ -142,8 +150,14 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage image)
         {
             int idx = settings.reverse ? leds_count - 1 - i : i;
 
-            QColor color = image.pixelColor(settings.x, idx * settings.led_spacing + settings.y);
-            controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            unsigned int x = settings.x;
+            unsigned int y = idx * settings.led_spacing + settings.y;
+
+            if(image.valid(x,y))
+            {
+                QColor color = image.pixelColor(x, y);
+                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
         }
         break;
 
@@ -152,8 +166,14 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage image)
 
         for(unsigned int i = 0; i < led_positions.size(); i++)
         {
-            QColor color = image.pixelColor(settings.x + led_positions[i]->x(), settings.y + led_positions[i]->y());
-            controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
+            unsigned int x = settings.x + led_positions[i]->x();
+            unsigned int y = settings.y + led_positions[i]->y();
+
+            if(image.valid(x,y))
+            {
+                QColor color = image.pixelColor(x, y);
+                controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
         }
 
         break;
@@ -162,8 +182,6 @@ void ZoneManager::ApplyImage(ControllerZone* ctrl_zone, QImage image)
 
 void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
 {
-    unsigned int NA = 0xFFFFFFFF;
-
     matrix_map_type* matrix_map = ctrl_zone->controller->zones[ctrl_zone->zone_idx].matrix_map;
 
     ctrl_zone->settings.shape = CUSTOM;

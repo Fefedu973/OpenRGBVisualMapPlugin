@@ -28,14 +28,14 @@ QRectF ControllerZoneItem::boundingRect() const
     switch(ctrl_zone->settings.shape)
     {
     case HORIZONTAL_LINE :
-        return QRectF(0, 0, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 1);
+        return QRectF(-0.1, -0.1, 0.1 + ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 1.1);
     case VERTICAL_LINE :
-        return QRectF(0, 0, 1, ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
+        return QRectF(-0.1, -0.1, 1.1, 0.1 + ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
     case CUSTOM:
-        return QRectF(0, 0, ctrl_zone->settings.custom_shape->w, ctrl_zone->settings.custom_shape->h);
+        return QRectF(-0.1, -0.1, 0.1 + ctrl_zone->settings.custom_shape->w, 0.1 + ctrl_zone->settings.custom_shape->h);
     }
 
-    return QRectF(0, 0, 1, 1);
+    return QRectF(-0.1, -0.1, 1.1, 1.1);
 }
 
 void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -47,7 +47,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     QBrush brush =  isSelected() ? selected_brush : hasFocus() ? focus_brush:  hover ? hover_brush :  default_brush;
 
     painter->setBrush(brush);
-    QPen pen(QColor(0, 0, 0, 0x80), 0.05);
+    QPen pen(QColor(0, 0, 0, 0x80), 0.2);
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setCompositionMode(QPainter::CompositionMode_Source);

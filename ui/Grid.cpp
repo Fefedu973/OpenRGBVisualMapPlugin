@@ -3,7 +3,7 @@
 #include "RGBController.h"
 #include "ControllerZoneItem.h"
 
-void Grid::Init(GridSettings* s)
+void Grid::Init()
 {
     setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

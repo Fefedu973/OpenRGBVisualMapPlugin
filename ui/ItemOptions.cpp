@@ -32,12 +32,24 @@ void ItemOptions::SetControllerZone(ControllerZone* ctrl_zone)
 void ItemOptions::Update()
 {
     if(ctrl_zone)
-    {
+    {        
+        ui->x_spinBox->blockSignals(true);
+        ui->y_spinBox->blockSignals(true);
+        ui->led_spacing_spinBox->blockSignals(true);
+        ui->shape_comboBox->blockSignals(true);
+        ui->reverse_checkBox->blockSignals(true);
+
         ui->x_spinBox->setValue(ctrl_zone->settings.x);
         ui->y_spinBox->setValue(ctrl_zone->settings.y);
         ui->led_spacing_spinBox->setValue(ctrl_zone->settings.led_spacing);
         ui->shape_comboBox->setCurrentIndex(ctrl_zone->settings.shape);
         ui->reverse_checkBox->setChecked(ctrl_zone->settings.reverse);
+
+        ui->x_spinBox->blockSignals(false);
+        ui->y_spinBox->blockSignals(false);
+        ui->led_spacing_spinBox->blockSignals(false);
+        ui->shape_comboBox->blockSignals(false);
+        ui->reverse_checkBox->blockSignals(false);
 
         UpdateWidgetsVisibility();
     }

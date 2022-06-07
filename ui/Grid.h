@@ -19,7 +19,7 @@ class Grid : public QGraphicsView
 public:
     explicit Grid(QWidget *parent) : QGraphicsView(parent){}
 
-    void Init(GridSettings*);
+    void Init();
 
     void ResetItems(std::vector<ControllerZone*>);
     void UpdateItems();

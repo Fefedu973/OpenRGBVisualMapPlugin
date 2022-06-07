@@ -16,16 +16,18 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 {
     ui->setupUi(this);
 
-    // default settings for main grid
-    settings = new GridSettings();
-    settings->w = 64;
-    settings->h = 64;
-    settings->show_bounds = true;
-    settings->show_grid = true;
-    settings->live_preview = true;
-    settings->grid_size = 1;
+    /*-------------------------------------------------*\
+    | Default settings for main grid                    |
+    \*-------------------------------------------------*/
+    settings                = new GridSettings();
+    settings->w             = 64;
+    settings->h             = 64;
+    settings->show_bounds   = true;
+    settings->show_grid     = true;
+    settings->live_preview  = true;
+    settings->grid_size     = 1;
 
-    ui->grid->Init(settings);
+    ui->grid->Init();
     ui->gridOptions->Init(settings);
     ui->grid->ApplySettings(settings);
 
@@ -60,6 +62,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     });
 
     connect(ui->grid, &Grid::Changed, [=](){
+        virtual_controller->UpdateVirtualZone();
         ui->itemOptions->Update();
     });
 
@@ -85,12 +88,17 @@ void VirtualControllerTab::OnSettingsChanged()
 
 void VirtualControllerTab::OnAutoResizeRequest()
 {
+    /*-------------------------------------------------*\
+    | Do nothing if the controller is empty             |
+    \*-------------------------------------------------*/
     if(virtual_controller->IsEmpty())
     {
         return;
     }
 
-    // calculate bounds
+    /*-------------------------------------------------*\
+    | Calculate bounds                                  |
+    \*-------------------------------------------------*/
     int min_x = INT_MAX;
     int min_y = INT_MAX;
     int max_x = INT_MIN;
@@ -105,18 +113,24 @@ void VirtualControllerTab::OnAutoResizeRequest()
         max_y = std::max<int>(max_y, controller_zone->settings.y + controller_zone->height());
     }
 
-    // shift
+    /*-------------------------------------------------*\
+    | Shift all controllers                             |
+    \*-------------------------------------------------*/
     for (ControllerZone* controller_zone: virtual_controller->GetZones())
     {
         controller_zone->settings.x -= min_x;
         controller_zone->settings.y -= min_y;
     }
 
-    // resize map
+    /*-------------------------------------------------*\
+    | Resize the map                                    |
+    \*-------------------------------------------------*/
     settings->w = max_x - min_x;
     settings->h = max_y - min_y;
 
-    // udpate GUI
+    /*-------------------------------------------------*\
+    | Update GUI elements                               |
+    \*-------------------------------------------------*/
     ui->grid->ApplySettings(settings);
     ui->grid->UpdateItems();
     ui->gridOptions->SetSettings(settings);
@@ -145,39 +159,54 @@ void VirtualControllerTab::resizeEvent(QResizeEvent*)
 
 void VirtualControllerTab::UpdateVirtualControllerDetails()
 {
+    virtual_controller->UpdateVirtualZone();
     ui->virtual_controller_details_label->setText(
                 QString::fromStdString("Total leds: " + std::to_string(virtual_controller->GetTotalLeds())));
 }
 
 void VirtualControllerTab::InitZoneList()
 {
-    // Hide headers
+    /*-------------------------------------------------*\
+    | Hide headers                                      |
+    \*-------------------------------------------------*/
     ui->zoneList->horizontalHeader()->hide();
     ui->zoneList->verticalHeader()->hide();
 
-    // Set size
+    /*-------------------------------------------------*\
+    | Set size                                          |
+    \*-------------------------------------------------*/
     ui->zoneList->setRowCount(retained_zones.size());
     ui->zoneList->setColumnCount(2);
     ui->zoneList->setColumnWidth(1, 20);
 
-    // Set selection options
+    /*-------------------------------------------------*\
+    | Set selection options                             |
+    \*-------------------------------------------------*/
     ui->zoneList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->zoneList->setFocusPolicy(Qt::NoFocus);
     ui->zoneList->setSelectionMode(QAbstractItemView::MultiSelection);
     ui->zoneList->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    // Set stretch modes
+    /*-------------------------------------------------*\
+    | Set stretch modes                                 |
+    \*-------------------------------------------------*/
     ui->zoneList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->zoneList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
     ui->zoneList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    // Fill the table
+    /*-------------------------------------------------*\
+    | Fill the table                                    |
+    \*-------------------------------------------------*/
     for(unsigned int i = 0; i < retained_zones.size(); i++)
     {
-        // Cell 1 : ControllerZone display name
+        /*-------------------------------------------------*\
+        | Cell 1 : ControllerZone display name              |
+        \*-------------------------------------------------*/
         ui->zoneList->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(retained_zones[i]->display_name())));
 
-        // Cell 2 : add/remove button
+        /*-------------------------------------------------*\
+        | Cell 2 : add/remove button                        |
+        \*-------------------------------------------------*/
         QWidget* widget = new QWidget();
         QPushButton* button = new QPushButton();
         DecorateButton(button, add_icon);
@@ -208,7 +237,6 @@ void VirtualControllerTab::InitZoneList()
 
                 DecorateButton(button, add_icon);
             }
-
 
             UpdateVirtualControllerDetails();
 
@@ -300,6 +328,7 @@ void VirtualControllerTab::OnZoneDoubleClick(int row, int)
 
 void VirtualControllerTab::OnItemOptionsChanged()
 {
+    virtual_controller->UpdateVirtualZone();
     ui->grid->UpdateItems();
 }
 
@@ -336,8 +365,8 @@ void VirtualControllerTab::on_saveButton_clicked()
 
         json j;
 
-        j["ctrl_zones"] = virtual_controller->GetZones();
-        j["grid_settings"] = settings;
+        j["ctrl_zones"]     = virtual_controller->GetZones();
+        j["grid_settings"]  = settings;
 
         VisualMapSettingsManager::SaveMap(filename.toStdString(), j);
     }
@@ -349,7 +378,7 @@ void VirtualControllerTab::on_loadButton_clicked()
 
     std::vector<std::string> filenames = VisualMapSettingsManager::GetMapNames();
 
-    for(std::string filename : filenames)
+    for(const std::string& filename : filenames)
     {
         file_list << QString::fromUtf8(filename.c_str());
     }
@@ -399,7 +428,10 @@ void VirtualControllerTab::LoadJson(json j)
         {
             ControllerZone* ctrl_zone = retained_zones[i];
 
-             // Don't compare location for HID devices, because it constantly changes
+            /*-------------------------------------------------*\
+            | Don't compare location for HID devices,           |
+            | because it constantly changes                     |
+            \*-------------------------------------------------*/
             bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
             if(
                 ctrl_zone->controller->name == controller["name"] &&
@@ -452,7 +484,9 @@ void VirtualControllerTab::LoadJson(json j)
 
     if(settings->auto_register)
     {
-        // will auto trigger registering
+        /*-------------------------------------------------*\
+        | This will auto trigger registering                |
+        \*-------------------------------------------------*/
         ui->register_controller->setChecked(true);
     }
 
