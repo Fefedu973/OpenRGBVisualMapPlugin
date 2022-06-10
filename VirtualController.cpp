@@ -187,8 +187,12 @@ void VirtualController::UpdateVirtualZone()
     zones[0].leds_max               = map_leds_count;
     zones[0].matrix_map->width      = width;
     zones[0].matrix_map->height     = height;
-    zones[0].colors                 = &colors[0];
-    zones[0].leds                   = &leds[0];
+
+    if(colors.size() > 0 && leds.size() > 0)
+    {
+        zones[0].colors                 = &colors[0];
+        zones[0].leds                   = &leds[0];
+    }
 
     /*-------------------------------------------------*\
     | Clean up old map and set the new one              |
