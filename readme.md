@@ -20,3 +20,9 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 * Download and extract the correct files depending on your system
 * Launch OpenRGB
 * From the Settings -> Plugins menu, click the "Install plugin" button
+
+## How do I use it?
+
+Here is a link to find the documentation you need.
+
+[HardwareSync Help](https://gitlab.com/OpenRGBDevelopers/OpenRGB-Wiki/-/blob/stable/Plugins/VisualMap/VisualMap.md)
