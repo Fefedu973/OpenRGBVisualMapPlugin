@@ -165,14 +165,14 @@ void VirtualController::UpdateVirtualZone()
 
                 colors[i] = ToRGBColor(0,0,0);
 
-                leds[i].name = std::accumulate(
-                    std::next(real_leds[xy].begin()),
-                    real_leds[xy].end(),
-                    real_leds[xy][0],
-                    [](std::string a, std::string b) {
-                        return a + ", " + b;
-                    }
-                );
+                if(real_leds[xy].size() > 1)
+                {
+                    leds[i].name = "Multiple LEDs (" + std::to_string(real_leds[xy].size()) + ") \n coucou \n blabla";
+                }
+                else
+                {
+                    leds[i].name = real_leds[xy][0];
+                }
 
                 i++;
             }
