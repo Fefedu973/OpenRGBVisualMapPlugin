@@ -7,6 +7,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QSignalMapper>
+#include <QDesktopServices>
 
 #include "ui_VirtualControllerTab.h"
 #include "VirtualController.h"
@@ -53,6 +54,7 @@ private slots:
     void on_saveButton_clicked();
     void on_loadButton_clicked();
     void on_clearButton_clicked();
+    void on_folderButton_clicked();
     void on_register_controller_stateChanged(int);
 
 signals:

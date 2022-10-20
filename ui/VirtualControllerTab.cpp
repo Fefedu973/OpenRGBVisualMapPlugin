@@ -401,6 +401,16 @@ void VirtualControllerTab::on_loadButton_clicked()
     LoadFile(filename.toStdString());
 }
 
+void VirtualControllerTab::on_folderButton_clicked()
+{
+    std::string config_dir = VisualMapSettingsManager::MapsFolder();
+    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
+
+    printf("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
+
+    QDesktopServices::openUrl(url);
+}
+
 void VirtualControllerTab::LoadFile(std::string filename)
 {
     json j = VisualMapSettingsManager::LoadMap(filename);

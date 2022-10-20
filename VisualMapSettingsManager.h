@@ -18,13 +18,13 @@ public:
     static std::vector<std::string> GetGradientsNames();
 
     static bool CreateSettingsDirectory();
+    static std::string MapsFolder();
 
 private:
     static bool CreateMapsDirectory();
     static bool CreateGradientsDirectory();
 
     static std::string SettingsFolder();
-    static std::string MapsFolder();
     static std::string GradientsFolder();
     static std::string folder_separator();
     static bool create_dir(std::string);
