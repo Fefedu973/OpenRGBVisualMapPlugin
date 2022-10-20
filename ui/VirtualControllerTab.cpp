@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QTableWidgetItem>
 #include <set>
+#include <QMenu>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -71,6 +72,26 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     });
 
     UpdateVirtualControllerDetails();
+
+    QMenu* main_menu = new QMenu(this);
+    ui->main_menu->setMenu(main_menu);
+
+    QAction* save_vmap = new QAction("Save", this);
+    connect(save_vmap, &QAction::triggered, this, &VirtualControllerTab::SaveVmapAction);
+    main_menu->addAction(save_vmap);
+
+    QAction* load_vmap = new QAction("Load", this);
+    connect(load_vmap, &QAction::triggered, this, &VirtualControllerTab::LoadVmapAction);
+    main_menu->addAction(load_vmap);
+
+    QAction* clear = new QAction("Clear", this);
+    connect(clear, &QAction::triggered, this, &VirtualControllerTab::ClearVmapAction);
+    main_menu->addAction(clear);
+
+
+    QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
+    connect(open_vmap_folder, &QAction::triggered, this, &VirtualControllerTab::OpenVmapsFolder);
+    main_menu->addAction(open_vmap_folder);
 }
 
 VirtualControllerTab::~VirtualControllerTab()
@@ -337,7 +358,7 @@ void VirtualControllerTab::on_register_controller_stateChanged(int value)
     virtual_controller->Register(value, settings->unregister_members);
 }
 
-void VirtualControllerTab::on_clearButton_clicked()
+void VirtualControllerTab::ClearVmapAction()
 {   
     for(ControllerZone* ctrl_zone: virtual_controller->GetZones())
     {
@@ -353,7 +374,7 @@ void VirtualControllerTab::on_clearButton_clicked()
     ui->itemOptions->Update();
 }
 
-void VirtualControllerTab::on_saveButton_clicked()
+void VirtualControllerTab::SaveVmapAction()
 {
     QString filename = QInputDialog::getText(
                 nullptr, "Save virtual controller", "Choose a filename",
@@ -372,7 +393,7 @@ void VirtualControllerTab::on_saveButton_clicked()
     }
 }
 
-void VirtualControllerTab::on_loadButton_clicked()
+void VirtualControllerTab::LoadVmapAction()
 {
     QStringList file_list;
 
@@ -401,7 +422,7 @@ void VirtualControllerTab::on_loadButton_clicked()
     LoadFile(filename.toStdString());
 }
 
-void VirtualControllerTab::on_folderButton_clicked()
+void VirtualControllerTab::OpenVmapsFolder()
 {
     std::string config_dir = VisualMapSettingsManager::MapsFolder();
     QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
@@ -471,7 +492,7 @@ void VirtualControllerTab::LoadJson(json j)
         }
     }
 
-    QPoint button_pos = ui->loadButton->cursor().pos();
+    QPoint button_pos = ui->main_menu->cursor().pos();
 
     if(has_failures)
     {

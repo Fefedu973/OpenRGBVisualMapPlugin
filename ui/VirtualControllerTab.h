@@ -51,10 +51,10 @@ private slots:
     void OnBackgroundApplied(QImage);
     void OnSettingsChanged();
 
-    void on_saveButton_clicked();
-    void on_loadButton_clicked();
-    void on_clearButton_clicked();
-    void on_folderButton_clicked();
+    void SaveVmapAction();
+    void LoadVmapAction();
+    void ClearVmapAction();
+    void OpenVmapsFolder();
     void on_register_controller_stateChanged(int);
 
 signals:
