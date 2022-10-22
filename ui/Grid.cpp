@@ -10,8 +10,6 @@ void Grid::Init()
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setInteractive(true);
-    setFrameShadow(QFrame::Raised);
-    setFrameStyle(QFrame::NoFrame);
 }
 
 void Grid::ApplySettings(GridSettings* s)

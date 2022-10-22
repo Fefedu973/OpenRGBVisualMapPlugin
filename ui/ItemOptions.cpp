@@ -10,8 +10,8 @@ ItemOptions::ItemOptions(QWidget *parent) :
     ui->setupUi(this);
 
     QStringList ZONE_SHAPES = {
-        "Horizontal line",
-        "Vertical line",
+        "Horizontal",
+        "Vertical",
         "Custom"
     };
 

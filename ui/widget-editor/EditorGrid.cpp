@@ -9,8 +9,6 @@ EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setInteractive(true);
-    setFrameShadow(QFrame::Raised);
-    setFrameStyle(QFrame::NoFrame);
 }
 
 void EditorGrid::ApplySettings(GridSettings* s)
