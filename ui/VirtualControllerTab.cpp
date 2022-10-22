@@ -534,6 +534,7 @@ void VirtualControllerTab::LoadJson(json j)
         | This will auto trigger registering                |
         \*-------------------------------------------------*/
         register_controller->setChecked(true);
+        RegisterAction();
     }
 
     UpdateVirtualControllerDetails();
