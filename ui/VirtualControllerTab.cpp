@@ -40,6 +40,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 
     ui->itemFrame->hide();
     ui->backgroundApplier->SetSize(settings->w, settings->h);
+    ui->backgroundFrame->hide();
 
     connect(this, SIGNAL(ApplyBackground(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
     connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
@@ -80,6 +81,11 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     register_controller->setCheckable(true);
     connect(register_controller, &QAction::triggered, this, &VirtualControllerTab::RegisterAction);
     main_menu->addAction(register_controller);
+
+    add_background = new QAction("Add background", this);
+    add_background->setCheckable(true);
+    connect(add_background, &QAction::triggered, this, &VirtualControllerTab::AddBackgroundAction);
+    main_menu->addAction(add_background);
 
     QAction* save_vmap = new QAction("Save", this);
     connect(save_vmap, &QAction::triggered, this, &VirtualControllerTab::SaveVmapAction);
@@ -360,6 +366,11 @@ void VirtualControllerTab::OnItemOptionsChanged()
 void VirtualControllerTab::RegisterAction()
 {
     virtual_controller->Register(register_controller->isChecked(), settings->unregister_members);
+}
+
+void VirtualControllerTab::AddBackgroundAction()
+{
+    ui->backgroundFrame->setVisible(add_background->isChecked());
 }
 
 void VirtualControllerTab::ClearVmapAction()

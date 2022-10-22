@@ -52,8 +52,6 @@ BackgroundApplier::BackgroundApplier(QWidget *parent) :
     }
 
     ui->presets_comboBox->blockSignals(false);
-
-    ui->tabs->setVisible(false);
 }
 
 BackgroundApplier::~BackgroundApplier()
@@ -303,11 +301,6 @@ void BackgroundApplier::OpenFileDialog()
     connect(button, &QPushButton::clicked, [=](){
         emit BackgroundApplied(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
     });
-}
-
-void BackgroundApplier::on_show_background_applier_clicked()
-{
-    ui->tabs->setVisible(ui->show_background_applier->isChecked());
 }
 
 void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)

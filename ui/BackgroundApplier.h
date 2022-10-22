@@ -35,7 +35,6 @@ private slots:
     void on_add_color_stop_button_clicked();
     void on_choose_image_button_clicked();
     void on_presets_comboBox_currentIndexChanged(int);
-    void on_show_background_applier_clicked();
 
     void on_brightness_valueChanged(int);
     void on_save_gradient_clicked();

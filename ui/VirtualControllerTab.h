@@ -55,8 +55,8 @@ private slots:
     void LoadVmapAction();
     void ClearVmapAction();
     void OpenVmapsFolder();
-    void on_register_controller_stateChanged(int);
     void RegisterAction();
+    void AddBackgroundAction();
 
 signals:
     void ApplyBackground(QImage);
@@ -73,6 +73,7 @@ private:
     QIcon remove_icon = QIcon(":/remove.png");
 
     QAction* register_controller;
+    QAction* add_background;
 
     void DecorateButton(QPushButton*, QIcon);
     void UpdateZoneButtons();
