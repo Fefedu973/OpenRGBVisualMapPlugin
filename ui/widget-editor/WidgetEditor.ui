@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>692</width>
-    <height>736</height>
+    <width>732</width>
+    <height>593</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -25,252 +25,228 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
+  <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+   <item row="0" column="0" rowspan="3">
+    <widget class="EditorGrid" name="grid">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="10000,1">
-       <item>
-        <widget class="EditorGrid" name="grid">
-         <property name="minimumSize">
-          <size>
-           <width>500</width>
-           <height>400</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="menuLayout">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetMinimumSize</enum>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QLabel" name="width">
-             <property name="text">
-              <string>Width</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="w_spinBox">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>1024</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QLabel" name="height">
-             <property name="text">
-              <string>Height</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="h_spinBox">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>1024</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="leds_count">
-             <property name="text">
-              <string>LEDS</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="led_count">
-             <property name="maximum">
-              <number>1024</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QPushButton" name="undo_button">
-           <property name="text">
-            <string>Undo</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="rotate_button">
-           <property name="text">
-            <string>Rotate</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="h_flip_button">
-           <property name="text">
-            <string>H-Flip</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="v_flip_button">
-           <property name="text">
-            <string>V-Flip</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="h_line_button">
-           <property name="text">
-            <string>H-Line</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="v_line_button">
-           <property name="text">
-            <string>V-Line</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="square_button">
-           <property name="text">
-            <string>Square</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="circle_button">
-           <property name="text">
-            <string>Circle</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="zigzag_button">
-           <property name="text">
-            <string>ZigZag</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="sawtooth_button">
-           <property name="text">
-            <string>Sawtooth</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="grow_button">
-           <property name="text">
-            <string>Grow</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="shrink_button">
-           <property name="text">
-            <string>Shrink</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="auto_resize_button">
-           <property name="text">
-            <string>Auto resize</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="copy_shape_button">
-           <property name="text">
-            <string>Copy shape</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QPushButton" name="identify_button">
-             <property name="text">
-              <string>Identify</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QCheckBox" name="auto_identify">
-             <property name="text">
-              <string>Auto identify</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QPushButton" name="reset_button">
-         <property name="text">
-          <string>Reset</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="cancel_button">
-         <property name="text">
-          <string>Cancel</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="save_button">
-         <property name="text">
-          <string>Save</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
+     <property name="minimumSize">
+      <size>
+       <width>500</width>
+       <height>100</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="1">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1">
+      <item row="13" column="1">
+       <widget class="QPushButton" name="shrink_button">
+        <property name="text">
+         <string>Shrink</string>
+        </property>
+       </widget>
+      </item>
+      <item row="26" column="0">
+       <widget class="QPushButton" name="reset_button">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="w_spinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1024</number>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="0" colspan="2">
+       <widget class="QPushButton" name="sawtooth_button">
+        <property name="text">
+         <string>Sawtooth</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="height">
+        <property name="text">
+         <string>Height</string>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="0" colspan="2">
+       <widget class="QPushButton" name="auto_resize_button">
+        <property name="text">
+         <string>Auto resize</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="leds_count">
+        <property name="text">
+         <string>LEDS</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="2">
+       <widget class="QPushButton" name="circle_button">
+        <property name="text">
+         <string>Circle</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" colspan="2">
+       <widget class="QPushButton" name="square_button">
+        <property name="text">
+         <string>Square</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="led_count">
+        <property name="maximum">
+         <number>1024</number>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QPushButton" name="h_line_button">
+        <property name="text">
+         <string>H-Line</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QPushButton" name="undo_button">
+        <property name="text">
+         <string>Undo</string>
+        </property>
+       </widget>
+      </item>
+      <item row="17" column="0" colspan="2">
+       <widget class="QPushButton" name="identify_button">
+        <property name="text">
+         <string>Identify</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="v_flip_button">
+        <property name="text">
+         <string>V-Flip</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="width">
+        <property name="text">
+         <string>Width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0" colspan="2">
+       <widget class="QPushButton" name="zigzag_button">
+        <property name="text">
+         <string>ZigZag</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="h_spinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1024</number>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QPushButton" name="v_line_button">
+        <property name="text">
+         <string>V-Line</string>
+        </property>
+       </widget>
+      </item>
+      <item row="26" column="1">
+       <widget class="QPushButton" name="cancel_button">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="25" column="0" colspan="2">
+       <widget class="QPushButton" name="copy_shape_button">
+        <property name="text">
+         <string>Copy shape</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="0">
+       <widget class="QPushButton" name="grow_button">
+        <property name="text">
+         <string>Grow</string>
+        </property>
+       </widget>
+      </item>
+      <item row="27" column="0" colspan="2">
+       <widget class="QPushButton" name="save_button">
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QPushButton" name="rotate_button">
+        <property name="text">
+         <string>Rotate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QPushButton" name="h_flip_button">
+        <property name="text">
+         <string>H-Flip</string>
+        </property>
+       </widget>
+      </item>
+      <item row="16" column="0" colspan="2">
+       <widget class="QCheckBox" name="auto_identify">
+        <property name="text">
+         <string>Auto identify</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

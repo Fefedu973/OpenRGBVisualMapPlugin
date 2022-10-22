@@ -34,7 +34,7 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> o
     std::string title = "Widget editor: " + ctrl_zone->display_name();
 
     dialog->setWindowTitle(QString::fromUtf8(title.c_str()));
-    dialog->setMinimumSize(814,489);
+    //dialog->setMinimumSize(814,489);
     dialog->setModal(true);
 
     QVBoxLayout* dialog_layout = new QVBoxLayout(dialog);
@@ -42,7 +42,7 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> o
     dialog_layout->addWidget(editor);
     dialog->setLayout(dialog_layout);
 
-    editor->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    editor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     connect(editor, &WidgetEditor::Save, [=](){
         dialog->accept();
