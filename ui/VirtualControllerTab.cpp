@@ -38,7 +38,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 
     InitZoneList();
 
-    ui->itemOptions->hide();
+    ui->itemFrame->hide();
     ui->backgroundApplier->SetSize(settings->w, settings->h);
 
     connect(this, SIGNAL(ApplyBackground(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
@@ -257,7 +257,7 @@ void VirtualControllerTab::InitZoneList()
                 {
                     ui->grid->ClearSelection();
                     ui->zoneList->clearSelection();
-                    ui->itemOptions->hide();
+                    ui->itemFrame->hide();
                 }
 
                 DecorateButton(button, add_icon);
@@ -286,12 +286,12 @@ void VirtualControllerTab::OnZoneSelectionChanged()
     if(selection.size() == 1)
     {
         ui->itemOptions->SetControllerZone(selection.front());
-        ui->itemOptions->show();
+        ui->itemFrame->show();
     }
     else
     {
         ui->itemOptions->SetControllerZone(nullptr);
-        ui->itemOptions->hide();
+        ui->itemFrame->hide();
     }
 
     ui->grid->SetSelection(selection);
@@ -320,12 +320,12 @@ void VirtualControllerTab::OnGridSelectionChanged()
     if(selected_items.size() == 1)
     {
         ui->itemOptions->SetControllerZone(selected_items[0]->GetControllerZone());
-        ui->itemOptions->show();
+        ui->itemFrame->show();
     }
     else
     {
         ui->itemOptions->SetControllerZone(nullptr);
-        ui->itemOptions->hide();
+        ui->itemFrame->hide();
     }
 
 
@@ -414,8 +414,8 @@ void VirtualControllerTab::LoadVmapAction()
     inp->setComboBoxItems(file_list);
     inp->setWindowTitle("Choose file");
 
-    QPoint position = ui->optionsLayout->contentsRect().topLeft();
-    inp->move(position.x(), position.y());
+//    QPoint position = ui->optionsLayout->contentsRect().topLeft();
+//    inp->move(position.x(), position.y());
 
     if(!inp->exec()){
         return;
