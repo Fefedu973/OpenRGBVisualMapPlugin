@@ -1,7 +1,6 @@
 #ifndef BACKGROUNDAPPLIER_H
 #define BACKGROUNDAPPLIER_H
 
-#include "GradientPresets.h"
 #include "ColorStop.h"
 #include <QWidget>
 

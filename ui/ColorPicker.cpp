@@ -1,5 +1,4 @@
 #include "ColorPicker.h"
-#include "OpenRGBVisualMapPlugin.h"
 #include "ui_ColorPicker.h"
 
 #include <QString>

@@ -1,7 +1,6 @@
 #ifndef VISUALMAPSETTINGSMANAGER_H
 #define VISUALMAPSETTINGSMANAGER_H
 
-#include "RGBController.h"
 #include "json.hpp"
 
 using json = nlohmann::json;

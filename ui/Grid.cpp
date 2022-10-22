@@ -1,6 +1,5 @@
 #include "Grid.h"
 #include "math.h"
-#include "RGBController.h"
 #include "ControllerZoneItem.h"
 
 void Grid::Init()

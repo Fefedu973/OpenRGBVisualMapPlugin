@@ -4,6 +4,7 @@
 #include "json.hpp"
 #include "math.h"
 #include "VisualMapSettingsManager.h"
+#include "GradientPresets.h"
 
 #include <QImage>
 #include <QPainter>

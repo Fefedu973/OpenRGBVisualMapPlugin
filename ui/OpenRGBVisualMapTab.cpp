@@ -3,7 +3,6 @@
 #include "VisualMapSettingsManager.h"
 #include "PluginInfo.h"
 #include "TabHeader.h"
-#include "OpenRGBVisualMapPlugin.h"
 
 #include <QString>
 #include <QToolButton>

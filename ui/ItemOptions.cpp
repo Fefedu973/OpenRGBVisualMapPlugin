@@ -1,5 +1,4 @@
 #include "ItemOptions.h"
-#include "WidgetEditor.h"
 #include "ui_ItemOptions.h"
 #include "ZoneManager.h"
 

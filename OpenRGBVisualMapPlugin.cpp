@@ -1,7 +1,6 @@
 #include "OpenRGBVisualMapPlugin.h"
 #include "TooltipProxy.h"
 #include "VisualMapSettingsManager.h"
-#include "ZoneManager.h"
 
 bool OpenRGBVisualMapPlugin::DarkTheme = false;
 ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
