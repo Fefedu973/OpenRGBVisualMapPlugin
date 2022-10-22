@@ -2,13 +2,13 @@
 #include "VisualMapSettingsManager.h"
 #include "ZoneManager.h"
 #include "WidgetEditor.h"
-#include "hsv.h"
 #include "VisualMapJsonDefinitions.h"
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTableWidgetItem>
 #include <set>
 #include <QMenu>
+#include <QWidgetAction>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -76,6 +76,11 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QMenu* main_menu = new QMenu(this);
     ui->main_menu->setMenu(main_menu);
 
+    register_controller = new QAction("Register controller", this);
+    register_controller->setCheckable(true);
+    connect(register_controller, &QAction::triggered, this, &VirtualControllerTab::RegisterAction);
+    main_menu->addAction(register_controller);
+
     QAction* save_vmap = new QAction("Save", this);
     connect(save_vmap, &QAction::triggered, this, &VirtualControllerTab::SaveVmapAction);
     main_menu->addAction(save_vmap);
@@ -88,10 +93,9 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     connect(clear, &QAction::triggered, this, &VirtualControllerTab::ClearVmapAction);
     main_menu->addAction(clear);
 
-
     QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
     connect(open_vmap_folder, &QAction::triggered, this, &VirtualControllerTab::OpenVmapsFolder);
-    main_menu->addAction(open_vmap_folder);
+    main_menu->addAction(open_vmap_folder);   
 }
 
 VirtualControllerTab::~VirtualControllerTab()
@@ -353,9 +357,9 @@ void VirtualControllerTab::OnItemOptionsChanged()
     ui->grid->UpdateItems();
 }
 
-void VirtualControllerTab::on_register_controller_stateChanged(int value)
+void VirtualControllerTab::RegisterAction()
 {
-    virtual_controller->Register(value, settings->unregister_members);
+    virtual_controller->Register(register_controller->isChecked(), settings->unregister_members);
 }
 
 void VirtualControllerTab::ClearVmapAction()
@@ -518,7 +522,7 @@ void VirtualControllerTab::LoadJson(json j)
         /*-------------------------------------------------*\
         | This will auto trigger registering                |
         \*-------------------------------------------------*/
-        ui->register_controller->setChecked(true);
+        register_controller->setChecked(true);
     }
 
     UpdateVirtualControllerDetails();
@@ -561,7 +565,7 @@ void VirtualControllerTab::Recreate()
 
     ReassignZones();
 
-    if(ui->register_controller->isChecked())
+    if(register_controller->isChecked())
     {
         virtual_controller->Register(true, settings->unregister_members);
     }
