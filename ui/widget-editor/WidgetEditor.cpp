@@ -20,17 +20,6 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> o
 
     QDialog* dialog = new QDialog();
 
-    if (OpenRGBVisualMapPlugin::DarkTheme)
-    {
-        QPalette pal;
-        pal.setColor(QPalette::WindowText, Qt::white);
-        dialog->setPalette(pal);
-        QFile dark_theme(":/windows_dark.qss");
-        dark_theme.open(QFile::ReadOnly);
-        dialog->setStyleSheet(dark_theme.readAll());
-        dark_theme.close();
-    }
-
     std::string title = "Widget editor: " + ctrl_zone->display_name();
 
     dialog->setWindowTitle(QString::fromUtf8(title.c_str()));
