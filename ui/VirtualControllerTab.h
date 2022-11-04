@@ -11,11 +11,6 @@
 
 #include "ui_VirtualControllerTab.h"
 #include "VirtualController.h"
-#include "RGBController.h"
-#include "Grid.h"
-#include "GridOptions.h"
-#include "ItemOptions.h"
-#include "BackgroundApplier.h"
 #include "json.hpp"
 
 using json = nlohmann::json;
@@ -43,14 +38,22 @@ public:
     void BackupZones();
 
 private slots:
-    void OnZoneSelectionChanged();
-    void OnGridSelectionChanged();
-    void OnZoneDoubleClick(int, int);
-    void OnItemOptionsChanged();
-    void OnAutoResizeRequest();
-    void OnBackgroundApplied(QImage);
-    void OnSettingsChanged();
+    // ui element signals
+    void on_backgroundApplier_BackgroundApplied(QImage);
+    void on_gridOptions_SettingsChanged();
+    void on_gridOptions_AutoResizeRequest();
 
+    void on_itemOptions_ShapeEditRequest(ControllerZone*);
+    void on_itemOptions_ItemOptionsChanged();
+
+    void on_grid_Changed();
+    void on_grid_SelectionChanged(std::vector<ControllerZone*>);
+
+    void on_device_list_DeviceAdded(ControllerZone*);
+    void on_device_list_DeviceRemoved(ControllerZone*);
+    void on_device_list_SelectionChanged(std::vector<ControllerZone*>);
+
+    // Main menu actions
     void SaveVmapAction();
     void LoadVmapAction();
     void ClearVmapAction();
@@ -58,32 +61,30 @@ private slots:
     void RegisterAction();
     void AddBackgroundAction();
 
+    // Needs to be changed
+    void OnBackgroundApplied(QImage);
+
 signals:
     void ApplyBackground(QImage);
     void ControllerRenamed(std::string);
 
-private:
+private:    
+    void CreateMainMenu();
+    void InitZoneList();
+    void UpdateVirtualControllerDetails();
+    void ReassignZones();
+    void UpdateItemOptions(std::vector<ControllerZone*>);
+
     Ui::VirtualControllerTab*   ui;
     VirtualController* virtual_controller;
     GridSettings* settings;
-
     ControllerZone* selected_ctrl_zone = nullptr;
-
     QIcon add_icon = QIcon(":/add.png");
     QIcon remove_icon = QIcon(":/remove.png");
-
     QAction* register_controller;
     QAction* add_background;
-
-    void DecorateButton(QPushButton*, QIcon);
-    void UpdateZoneButtons();
-    void InitZoneList();
-    void UpdateVirtualControllerDetails();
     std::vector<ControllerZone*> retained_zones;
-
     json saved_zones;
-
-    void ReassignZones();
 
 protected:
     void resizeEvent(QResizeEvent*) override;

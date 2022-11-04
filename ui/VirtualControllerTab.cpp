@@ -9,6 +9,7 @@
 #include <set>
 #include <QMenu>
 #include <QWidgetAction>
+#include <QVBoxLayout>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -42,38 +43,28 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     ui->backgroundApplier->SetSize(settings->w, settings->h);
     ui->backgroundFrame->hide();
 
+    // todo move this to .h
     connect(this, SIGNAL(ApplyBackground(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
-    connect(ui->itemOptions, SIGNAL(ItemOptionsChanged()), this, SLOT(OnItemOptionsChanged()));
-    connect(ui->backgroundApplier, SIGNAL(BackgroundApplied(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
-    connect(ui->zoneList->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(OnZoneSelectionChanged()));
-    connect(ui->grid, SIGNAL(SelectionChanged()), this, SLOT(OnGridSelectionChanged()));
-    connect(ui->zoneList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnZoneDoubleClick(int, int)));
-    connect(ui->gridOptions, SIGNAL(SettingsChanged()), this, SLOT(OnSettingsChanged()));
-    connect(ui->gridOptions, SIGNAL(AutoResizeRequest()), this, SLOT(OnAutoResizeRequest()));
 
-    connect(ui->itemOptions, &ItemOptions::ShapeEditRequest, [=](ControllerZone* ctrl_zone){
-        if(ctrl_zone)
-        {
-            int result = WidgetEditor::Show(ctrl_zone, retained_zones);
-
-            if(result)
-            {
-                OnItemOptionsChanged();
-            }
-        }
-    });
-
-    connect(ui->grid, &Grid::Changed, [=](){
-        virtual_controller->UpdateVirtualZone();
-        ui->itemOptions->Update();
-    });
-
+    // todo change this
     virtual_controller->SetCallBack([=](QImage image){
         emit ApplyBackground(image);
     });
 
     UpdateVirtualControllerDetails();
 
+    CreateMainMenu();
+}
+
+VirtualControllerTab::~VirtualControllerTab()
+{
+    delete virtual_controller;
+    delete ui;
+}
+
+void VirtualControllerTab::CreateMainMenu()
+{
+    // todo move this to own method
     QMenu* main_menu = new QMenu(this);
     ui->main_menu->setMenu(main_menu);
 
@@ -101,23 +92,254 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 
     QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
     connect(open_vmap_folder, &QAction::triggered, this, &VirtualControllerTab::OpenVmapsFolder);
-    main_menu->addAction(open_vmap_folder);   
+    main_menu->addAction(open_vmap_folder);
 }
 
-VirtualControllerTab::~VirtualControllerTab()
+void VirtualControllerTab::RenameController(std::string value)
 {
-    delete virtual_controller;
-    delete ui;
+    virtual_controller->name = value;
+    emit ControllerRenamed(value);
 }
 
-void VirtualControllerTab::OnSettingsChanged()
+std::string VirtualControllerTab::GetControllerName()
+{
+    return virtual_controller->name;
+}
+
+void VirtualControllerTab::resizeEvent(QResizeEvent*)
+{
+    ui->grid->update();
+}
+
+void VirtualControllerTab::UpdateVirtualControllerDetails()
+{
+    virtual_controller->UpdateVirtualZone();
+    ui->virtual_controller_details_label->setText(QString::fromStdString("Total leds: " + std::to_string(virtual_controller->GetTotalLeds())));
+}
+
+void VirtualControllerTab::InitZoneList()
+{
+    ui->device_list->Init(retained_zones);
+}
+
+void VirtualControllerTab::LoadFile(std::string filename)
+{
+    json j = VisualMapSettingsManager::LoadMap(filename);
+
+    RenameController(filename);
+
+    LoadJson(j);
+}
+
+void VirtualControllerTab::LoadJson(json j)
+{    
+    virtual_controller->Clear();
+
+    auto ctrl_zones = j["ctrl_zones"];
+
+    bool has_failures = false;
+
+    for (auto it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
+    {
+        auto entry = it.value();
+        auto controller = entry["controller"];
+        auto settings = entry["settings"];
+
+        for(unsigned int i= 0; i < retained_zones.size(); i++)
+        {
+            ControllerZone* ctrl_zone = retained_zones[i];
+
+            /*-------------------------------------------------*\
+            | Don't compare location for HID devices,           |
+            | because it constantly changes                     |
+            \*-------------------------------------------------*/
+            bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
+
+            if(
+                ctrl_zone->controller->name == controller["name"] &&
+                ctrl_zone->controller->vendor == controller["vendor"] &&
+                ctrl_zone->controller->serial == controller["serial"] &&
+                (ctrl_zone->controller->location == controller["location"] || hid_location) &&
+                ctrl_zone->zone_idx == entry["zone_idx"])
+            {
+                try
+                {
+                    if(entry.contains("custom_zone_name"))
+                    {
+                        ctrl_zone->custom_zone_name = entry["custom_zone_name"];
+                    }
+
+                    ctrl_zone->settings = settings;
+
+                    virtual_controller->Add(retained_zones[i]);
+
+                    ui->device_list->UpdateControllerState(retained_zones[i]);
+                }
+                catch(const std::exception& e)
+                {
+                    has_failures = true;
+                }
+            }
+        }
+    }
+
+    QPoint button_pos = ui->main_menu->cursor().pos();
+
+    if(has_failures)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Some of the components could not be loaded, the format is probably out of date.");
+        msgBox.setWindowTitle("Sorry");
+        msgBox.move(button_pos.x(), button_pos.y());
+        msgBox.exec();
+    }
+
+    j.at("grid_settings").get_to(settings);
+
+    ui->gridOptions->SetSettings(settings);
+
+    ui->grid->ResetItems(virtual_controller->GetZones());
+
+    virtual_controller->UpdateSize(settings->w, settings->h);
+
+    if(settings->auto_register)
+    {
+        /*-------------------------------------------------*\
+        | This will auto trigger registering                |
+        \*-------------------------------------------------*/
+        register_controller->setChecked(true);
+        RegisterAction();
+    }
+
+    UpdateVirtualControllerDetails();
+
+}
+
+void VirtualControllerTab::OnBackgroundApplied(QImage image)
+{
+    if(settings->live_preview)
+    {
+        ui->grid->UpdatePreview(image);
+    }
+
+    virtual_controller->ApplyImage(image);
+}
+
+void VirtualControllerTab::Unregister()
+{
+    virtual_controller->Register(false, false);
+}
+
+void VirtualControllerTab::Recreate()
+{
+    retained_zones = ZoneManager::Get()->GetAvailableZones();
+
+    InitZoneList();
+
+    ReassignZones();
+
+    if(register_controller->isChecked())
+    {
+        virtual_controller->Register(true, settings->unregister_members);
+    }
+}
+
+void VirtualControllerTab::ReassignZones()
+{
+    LoadJson(saved_zones);
+}
+
+void VirtualControllerTab::BackupZones()
+{
+    saved_zones["ctrl_zones"]       = virtual_controller->GetZones();
+    saved_zones["grid_settings"]    = settings;
+}
+
+void VirtualControllerTab::Clear()
+{
+    ui->device_list->Clear();
+    ui->grid->Clear();
+    retained_zones.clear();
+    selected_ctrl_zone = nullptr;
+}
+
+void VirtualControllerTab::UpdateItemOptions(std::vector<ControllerZone*> selected_controller_zones)
+{
+    if(selected_controller_zones.size() == 1)
+    {
+        ui->itemOptions->SetControllerZone(selected_controller_zones[0]);
+        ui->itemFrame->show();
+    }
+    else
+    {
+        ui->itemOptions->SetControllerZone(nullptr);
+        ui->itemFrame->hide();
+    }
+}
+
+/*-------------------------------------------------*\
+| ui element signals                                |
+\*-------------------------------------------------*/
+void VirtualControllerTab::on_device_list_DeviceAdded(ControllerZone* controller_zone)
+{
+    virtual_controller->Add(controller_zone);
+    UpdateVirtualControllerDetails();
+    ui->grid->ResetItems(virtual_controller->GetZones());
+}
+
+
+void VirtualControllerTab::on_device_list_DeviceRemoved(ControllerZone* controller_zone)
+{
+    virtual_controller->Remove(controller_zone);
+    UpdateVirtualControllerDetails();
+    ui->grid->ResetItems(virtual_controller->GetZones());
+}
+
+void VirtualControllerTab::on_device_list_SelectionChanged(std::vector<ControllerZone*> selected_controller_zones)
+{
+    ui->grid->SetSelection(selected_controller_zones);
+    UpdateItemOptions(selected_controller_zones);
+}
+
+void VirtualControllerTab::on_grid_SelectionChanged(std::vector<ControllerZone*> selected_controller_zones)
+{
+    ui->device_list->SetSelection(selected_controller_zones);
+    UpdateItemOptions(selected_controller_zones);
+}
+
+void VirtualControllerTab::on_itemOptions_ItemOptionsChanged()
+{
+    virtual_controller->UpdateVirtualZone();
+    ui->grid->UpdateItems();
+}
+
+void VirtualControllerTab::on_grid_Changed()
+{
+    virtual_controller->UpdateVirtualZone();
+    ui->itemOptions->Update();
+}
+
+void VirtualControllerTab::on_itemOptions_ShapeEditRequest(ControllerZone* controller_zone)
+{
+    if(controller_zone)
+    {
+        int result = WidgetEditor::Show(controller_zone, retained_zones);
+
+        if(result)
+        {
+            on_itemOptions_ItemOptionsChanged();
+        }
+    }
+}
+
+void VirtualControllerTab::on_gridOptions_SettingsChanged()
 {
     ui->grid->ApplySettings(settings);
     ui->backgroundApplier->SetSize(settings->w, settings->h);
     virtual_controller->UpdateSize(settings->w, settings->h);
 }
 
-void VirtualControllerTab::OnAutoResizeRequest()
+void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
 {
     /*-------------------------------------------------*\
     | Do nothing if the controller is empty             |
@@ -167,202 +389,14 @@ void VirtualControllerTab::OnAutoResizeRequest()
     ui->gridOptions->SetSettings(settings);
 }
 
-void VirtualControllerTab::RenameController(std::string value)
+void VirtualControllerTab::on_backgroundApplier_BackgroundApplied(QImage image)
 {
-    virtual_controller->name = value;
-    emit ControllerRenamed(value);
+    OnBackgroundApplied(image);
 }
 
-std::string VirtualControllerTab::GetControllerName()
-{
-    return virtual_controller->name;
-}
-
-void VirtualControllerTab::DecorateButton(QPushButton* button, QIcon icon)
-{
-    button->setIcon(icon);
-}
-
-void VirtualControllerTab::resizeEvent(QResizeEvent*)
-{
-    ui->grid->update();
-}
-
-void VirtualControllerTab::UpdateVirtualControllerDetails()
-{
-    virtual_controller->UpdateVirtualZone();
-    ui->virtual_controller_details_label->setText(
-                QString::fromStdString("Total leds: " + std::to_string(virtual_controller->GetTotalLeds())));
-}
-
-void VirtualControllerTab::InitZoneList()
-{
-    /*-------------------------------------------------*\
-    | Hide headers                                      |
-    \*-------------------------------------------------*/
-    ui->zoneList->horizontalHeader()->hide();
-    ui->zoneList->verticalHeader()->hide();
-
-    /*-------------------------------------------------*\
-    | Set size                                          |
-    \*-------------------------------------------------*/
-    ui->zoneList->setRowCount(retained_zones.size());
-    ui->zoneList->setColumnCount(2);
-    ui->zoneList->setColumnWidth(1, 20);
-
-    /*-------------------------------------------------*\
-    | Set selection options                             |
-    \*-------------------------------------------------*/
-    ui->zoneList->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->zoneList->setFocusPolicy(Qt::NoFocus);
-    ui->zoneList->setSelectionMode(QAbstractItemView::MultiSelection);
-    ui->zoneList->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    /*-------------------------------------------------*\
-    | Set stretch modes                                 |
-    \*-------------------------------------------------*/
-    ui->zoneList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->zoneList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
-    ui->zoneList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
-    /*-------------------------------------------------*\
-    | Fill the table                                    |
-    \*-------------------------------------------------*/
-    for(unsigned int i = 0; i < retained_zones.size(); i++)
-    {
-        /*-------------------------------------------------*\
-        | Cell 1 : ControllerZone display name              |
-        \*-------------------------------------------------*/
-        ui->zoneList->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(retained_zones[i]->display_name())));
-
-        /*-------------------------------------------------*\
-        | Cell 2 : add/remove button                        |
-        \*-------------------------------------------------*/
-        QWidget* widget = new QWidget();
-        QPushButton* button = new QPushButton();
-        DecorateButton(button, add_icon);
-        QHBoxLayout* layout = new QHBoxLayout(widget);
-        layout->addWidget(button);
-        layout->setAlignment(Qt::AlignCenter);
-        layout->setContentsMargins(0, 0, 0, 0);
-        widget->setLayout(layout);
-        ui->zoneList->setCellWidget(i, 1, widget);
-
-        connect(button, &QPushButton::clicked, [=]() {
-            if(!virtual_controller->HasZone(retained_zones[i]))
-            {
-                virtual_controller->Add(retained_zones[i]);
-                ui->zoneList->selectRow(i);
-                DecorateButton(button, remove_icon);
-            }
-            else
-            {
-                virtual_controller->Remove(retained_zones[i]);
-
-                if(selected_ctrl_zone == retained_zones[i])
-                {
-                    ui->grid->ClearSelection();
-                    ui->zoneList->clearSelection();
-                    ui->itemFrame->hide();
-                }
-
-                DecorateButton(button, add_icon);
-            }
-
-            UpdateVirtualControllerDetails();
-
-            ui->grid->ResetItems(virtual_controller->GetZones());
-        });
-    }
-
-}
-
-void VirtualControllerTab::OnZoneSelectionChanged()
-{
-    QModelIndexList selected_indexes = ui->zoneList->selectionModel()->selectedRows();
-
-    std::vector<ControllerZone*> selection;
-
-    for(int i = 0; i < selected_indexes.size(); i++)
-    {
-        int index = selected_indexes.at(i).row();
-        selection.push_back(retained_zones[index]);
-    }
-
-    if(selection.size() == 1)
-    {
-        ui->itemOptions->SetControllerZone(selection.front());
-        ui->itemFrame->show();
-    }
-    else
-    {
-        ui->itemOptions->SetControllerZone(nullptr);
-        ui->itemFrame->hide();
-    }
-
-    ui->grid->SetSelection(selection);
-}
-
-void VirtualControllerTab::OnGridSelectionChanged()
-{
-    std::vector<ControllerZoneItem*> selected_items = ui->grid->GetSelection();
-
-    ui->zoneList->selectionModel()->blockSignals(true);
-
-    ui->zoneList->clearSelection();
-
-    for(unsigned int i = 0; i < retained_zones.size(); i++)
-    {
-        for(ControllerZoneItem* item: selected_items)
-        {
-            if(item->GetControllerZone() == retained_zones[i])
-            {
-                ui->zoneList->selectRow(i);
-                break;
-            }
-        }
-    }
-
-    if(selected_items.size() == 1)
-    {
-        ui->itemOptions->SetControllerZone(selected_items[0]->GetControllerZone());
-        ui->itemFrame->show();
-    }
-    else
-    {
-        ui->itemOptions->SetControllerZone(nullptr);
-        ui->itemFrame->hide();
-    }
-
-
-    ui->zoneList->selectionModel()->blockSignals(false);
-
-    ui->zoneList->update();
-}
-
-void VirtualControllerTab::OnZoneDoubleClick(int row, int)
-{
-    ControllerZone* ctrl_zone = retained_zones[row];
-
-    std::string old_name = ctrl_zone->controller->zones[ctrl_zone->zone_idx].name;
-
-    QString new_name = QInputDialog::getText(
-                nullptr, "Rename zone", "Set the new name",
-                QLineEdit::Normal, QString::fromUtf8(old_name.c_str())).trimmed();
-
-    if(!new_name.isEmpty())
-    {
-        ctrl_zone->custom_zone_name = new_name.toStdString();
-        ui->zoneList->item(row, 0)->setText(new_name);
-    }
-}
-
-void VirtualControllerTab::OnItemOptionsChanged()
-{
-    virtual_controller->UpdateVirtualZone();
-    ui->grid->UpdateItems();
-}
-
+/*-------------------------------------------------*\
+| Main menu actions                                 |
+\*-------------------------------------------------*/
 void VirtualControllerTab::RegisterAction()
 {
     virtual_controller->Register(register_controller->isChecked(), settings->unregister_members);
@@ -374,7 +408,7 @@ void VirtualControllerTab::AddBackgroundAction()
 }
 
 void VirtualControllerTab::ClearVmapAction()
-{   
+{
     for(ControllerZone* ctrl_zone: virtual_controller->GetZones())
     {
         ctrl_zone->settings = ControllerZoneSettings::defaults();
@@ -383,8 +417,6 @@ void VirtualControllerTab::ClearVmapAction()
     virtual_controller->Clear();
 
     ui->grid->ResetItems(virtual_controller->GetZones());
-
-    UpdateZoneButtons();
 
     ui->itemOptions->Update();
 }
@@ -425,10 +457,8 @@ void VirtualControllerTab::LoadVmapAction()
     inp->setComboBoxItems(file_list);
     inp->setWindowTitle("Choose file");
 
-//    QPoint position = ui->optionsLayout->contentsRect().topLeft();
-//    inp->move(position.x(), position.y());
-
-    if(!inp->exec()){
+    if(!inp->exec())
+    {
         return;
     }
 
@@ -445,159 +475,4 @@ void VirtualControllerTab::OpenVmapsFolder()
     printf("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
 
     QDesktopServices::openUrl(url);
-}
-
-void VirtualControllerTab::LoadFile(std::string filename)
-{
-    json j = VisualMapSettingsManager::LoadMap(filename);
-
-    RenameController(filename);
-
-    LoadJson(j);
-}
-
-void VirtualControllerTab::LoadJson(json j)
-{
-    virtual_controller->Clear();
-
-    auto ctrl_zones = j["ctrl_zones"];
-
-    bool has_failures = false;
-
-    for (auto it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
-    {
-        auto entry = it.value();
-        auto controller = entry["controller"];
-        auto settings = entry["settings"];
-
-        for(unsigned int i= 0; i < retained_zones.size(); i++)
-        {
-            ControllerZone* ctrl_zone = retained_zones[i];
-
-            /*-------------------------------------------------*\
-            | Don't compare location for HID devices,           |
-            | because it constantly changes                     |
-            \*-------------------------------------------------*/
-            bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
-            if(
-                ctrl_zone->controller->name == controller["name"] &&
-                ctrl_zone->controller->vendor == controller["vendor"] &&
-                ctrl_zone->controller->serial == controller["serial"] &&
-                (ctrl_zone->controller->location == controller["location"] || hid_location) &&
-                ctrl_zone->zone_idx == entry["zone_idx"])
-            {
-                try
-                {
-                    if(entry.contains("custom_zone_name"))
-                    {
-                        ctrl_zone->custom_zone_name = entry["custom_zone_name"];
-                    }
-
-                    ctrl_zone->settings = settings;
-
-                    virtual_controller->Add(retained_zones[i]);
-
-                    ui->zoneList->item(i,0)->setText(QString::fromUtf8(ctrl_zone->display_name().c_str()));
-
-                } catch(const std::exception& e)
-                {
-                    has_failures = true;
-                }
-            }
-        }
-    }
-
-    QPoint button_pos = ui->main_menu->cursor().pos();
-
-    if(has_failures)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Some of the components could not be loaded, the format is probably out of date.");
-        msgBox.setWindowTitle("Sorry");
-        msgBox.move(button_pos.x(), button_pos.y());
-        msgBox.exec();
-    }
-
-    UpdateZoneButtons();
-
-    j.at("grid_settings").get_to(settings);
-
-    ui->gridOptions->SetSettings(settings);
-
-    ui->grid->ResetItems(virtual_controller->GetZones());
-
-    virtual_controller->UpdateSize(settings->w, settings->h);
-
-    if(settings->auto_register)
-    {
-        /*-------------------------------------------------*\
-        | This will auto trigger registering                |
-        \*-------------------------------------------------*/
-        register_controller->setChecked(true);
-        RegisterAction();
-    }
-
-    UpdateVirtualControllerDetails();
-}
-
-void VirtualControllerTab::UpdateZoneButtons()
-{
-    for(unsigned int i = 0; i < retained_zones.size(); i++)
-    {
-        QList<QPushButton *> buttons = ui->zoneList->cellWidget(i, 1)->findChildren<QPushButton *>();
-
-        if(buttons.size() == 1)
-        {
-            DecorateButton(buttons[0], virtual_controller->HasZone(retained_zones[i]) ? remove_icon : add_icon);
-        }
-
-    }
-}
-
-void VirtualControllerTab::OnBackgroundApplied(QImage image)
-{
-    if(settings->live_preview)
-    {
-        ui->grid->UpdatePreview(image);
-    }
-
-    virtual_controller->ApplyImage(image);
-}
-
-void VirtualControllerTab::Unregister()
-{
-    virtual_controller->Register(false, false);
-}
-
-void VirtualControllerTab::Recreate()
-{
-    retained_zones = ZoneManager::Get()->GetAvailableZones();
-
-    InitZoneList();
-
-    ReassignZones();
-
-    if(register_controller->isChecked())
-    {
-        virtual_controller->Register(true, settings->unregister_members);
-    }
-}
-
-void VirtualControllerTab::ReassignZones()
-{
-    LoadJson(saved_zones);
-}
-
-void VirtualControllerTab::BackupZones()
-{
-    saved_zones["ctrl_zones"] = virtual_controller->GetZones();
-    saved_zones["grid_settings"] = settings;
-}
-
-void VirtualControllerTab::Clear()
-{
-    ui->zoneList->clear();
-    ui->grid->Clear();
-    retained_zones.clear();
-    selected_ctrl_zone = nullptr;
 }

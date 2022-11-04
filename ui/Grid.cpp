@@ -73,7 +73,7 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
 
         connect(ctrl_zone_item, &ControllerZoneItem::RectSelectionRequest, [=](){
 
-            std::vector<ControllerZoneItem*> items = GetSelection();
+            std::vector<ControllerZoneItem*> items = GetSelectedItems();
 
             if(items.size() == 1)
             {
@@ -87,7 +87,7 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
                     item->setSelected(selection_rect.contains(item->point()));
                 }
 
-                emit SelectionChanged();
+                emit SelectionChanged(GetSelection());
             }
 
         });
@@ -201,7 +201,7 @@ void Grid::mouseReleaseEvent(QMouseEvent *event)
 
     if(left_button_pressed)
     {
-        emit SelectionChanged();
+        emit SelectionChanged(GetSelection());
     }
 
     left_button_pressed = false;
@@ -236,7 +236,22 @@ void Grid::MoveSelection(int delta_x, int delta_y)
     UpdateItems();
 }
 
-std::vector<ControllerZoneItem*> Grid::GetSelection()
+std::vector<ControllerZone*> Grid::GetSelection()
+{
+    std::vector<ControllerZone*> selection;
+
+    for(ControllerZoneItem* ctrl_zone_item: ctrl_zone_items)
+    {
+        if(ctrl_zone_item->isSelected())
+        {
+            selection.push_back(ctrl_zone_item->GetControllerZone());
+        }
+    }
+
+    return selection;
+}
+
+std::vector<ControllerZoneItem*> Grid::GetSelectedItems()
 {
     std::vector<ControllerZoneItem*> selection;
 

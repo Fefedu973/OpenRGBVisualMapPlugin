@@ -179,7 +179,7 @@ struct ControllerZone
     std::string display_name()
     {
         return this->custom_zone_name.empty() ?
-                    this->controller->name + " - " + this->controller->zones[this->zone_idx].name :
+                    this->controller->name + ": " + this->controller->zones[this->zone_idx].name :
                     this->custom_zone_name;
     }
 

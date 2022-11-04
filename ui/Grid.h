@@ -28,12 +28,13 @@ public:
     void UpdatePreview(QImage image);
 
     void SetSelection(std::vector<ControllerZone*>);
-    std::vector<ControllerZoneItem*> GetSelection();
+    std::vector<ControllerZone*> GetSelection();
+    std::vector<ControllerZoneItem*> GetSelectedItems();
     void Clear();
     void MoveSelection(int, int);
 
 signals:
-    void SelectionChanged();
+    void SelectionChanged(std::vector<ControllerZone*>);
     void Changed();
 
 protected:

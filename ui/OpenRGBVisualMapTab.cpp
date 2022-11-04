@@ -29,17 +29,6 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     new_map_button->setText("New map");
     ui->virtual_controller_tabs->addTab(new PluginInfo(), QString(""));
     ui->virtual_controller_tabs->tabBar()->setTabButton(0, QTabBar::RightSide, new_map_button);
-    ui->virtual_controller_tabs->setTabEnabled(0, false);
-
-
-    // 2md tab: plugin info
-    QToolButton *dummy_button = new QToolButton();
-    dummy_button->setText("");
-    ui->virtual_controller_tabs->addTab(new PluginInfo(), QString("Plugin info"));
-    ui->virtual_controller_tabs->tabBar()->setTabButton(1, QTabBar::RightSide, dummy_button);
-    dummy_button->setFixedWidth(0);
-    dummy_button->setFixedHeight(0);
-    dummy_button->hide();
 
     connect(new_map_button, SIGNAL(clicked()), this, SLOT(AddTabSlot()));
 
@@ -47,7 +36,6 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     {
          AddTab();
     }
-
 }
 
 OpenRGBVisualMapTab::~OpenRGBVisualMapTab()

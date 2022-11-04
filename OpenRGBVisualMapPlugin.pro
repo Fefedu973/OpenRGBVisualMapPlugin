@@ -66,7 +66,7 @@ HEADERS +=                                                                      
     OpenRGB/net_port/net_port.h                                                                 \
     OpenRGB/RGBController/RGBController.h                                                       \
     OpenRGBVisualMapPlugin.h                                                                    \
-    ZoneManager.h                                                                              \
+    ZoneManager.h                                                                               \
     VirtualController.h                                                                         \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
@@ -74,6 +74,8 @@ HEADERS +=                                                                      
     ui/ColorPicker.h                                                                            \
     ui/ColorStop.h                                                                              \
     ui/ControllerZoneItem.h                                                                     \
+    ui/DeviceList.h                                                                             \
+    ui/DeviceWidget.h                                                                           \
     ui/EditableLabel.h                                                                          \
     ui/GradientPresets.h                                                                        \
     ui/GridSettings.h                                                                           \
@@ -102,6 +104,8 @@ SOURCES +=                                                                      
     ui/ColorPicker.cpp                                                                          \
     ui/ColorStop.cpp                                                                            \
     ui/ControllerZoneItem.cpp                                                                   \
+    ui/DeviceList.cpp                                                                           \
+    ui/DeviceWidget.cpp                                                                         \
     ui/EditableLabel.cpp                                                                        \
     ui/Grid.cpp                                                                                 \
     ui/GridOptions.cpp                                                                          \
@@ -120,6 +124,8 @@ FORMS +=                                                                        
     ui/BackgroundApplier.ui                                                                     \
     ui/ColorPicker.ui                                                                           \
     ui/ColorStop.ui                                                                             \
+    ui/DeviceList.ui \
+    ui/DeviceWidget.ui \
     ui/GridOptions.ui                                                                           \
     ui/ItemOptions.ui                                                                           \
     ui/OpenRGBVisualMapTab.ui                                                                   \
