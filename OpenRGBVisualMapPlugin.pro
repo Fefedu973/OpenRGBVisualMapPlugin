@@ -71,6 +71,7 @@ HEADERS +=                                                                      
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
     ControllerZone.h                                                                            \
+    ui/ClickableLabel.h \
     ui/ColorPicker.h                                                                            \
     ui/ColorStop.h                                                                              \
     ui/ControllerZoneItem.h                                                                     \
@@ -101,6 +102,7 @@ SOURCES +=                                                                      
     VisualMapSettingsManager.cpp                                                                \
     ZoneManager.cpp                                                                             \
     ui/BackgroundApplier.cpp                                                                    \
+    ui/ClickableLabel.cpp \
     ui/ColorPicker.cpp                                                                          \
     ui/ColorStop.cpp                                                                            \
     ui/ControllerZoneItem.cpp                                                                   \

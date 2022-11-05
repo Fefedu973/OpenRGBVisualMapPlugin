@@ -176,10 +176,24 @@ struct ControllerZone
         return controller->zones[zone_idx].leds_count;
     }
 
-    std::string display_name()
+    std::string full_display_name()
     {
         return this->custom_zone_name.empty() ?
-                    this->controller->name + ": " + this->controller->zones[this->zone_idx].name :
+                    this->controller->name + " " + this->controller->zones[this->zone_idx].name:
+                    this->custom_zone_name;
+    }
+
+    std::string zone_display_name()
+    {
+        return this->custom_zone_name.empty() ?
+                    this->controller->zones[this->zone_idx].name :
+                    this->custom_zone_name;
+    }
+
+    std::string controller_display_name()
+    {
+        return this->custom_zone_name.empty() ?
+                    this->controller->name :
                     this->custom_zone_name;
     }
 

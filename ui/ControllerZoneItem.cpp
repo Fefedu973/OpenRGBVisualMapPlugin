@@ -15,7 +15,7 @@ ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone, GridSettings* 
 
     std::string tooltip =
         "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
-            + ctrl_zone->display_name()
+            + ctrl_zone->full_display_name()
         + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));

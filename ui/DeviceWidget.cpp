@@ -2,13 +2,21 @@
 #include "ui_DeviceWidget.h"
 #include <QInputDialog>
 
-DeviceWidget::DeviceWidget(QWidget *parent, ControllerZone* controller_zone) :
+DeviceWidget::DeviceWidget(QWidget *parent, ControllerZone* controller_zone, bool in_group) :
     QWidget(parent),
     ui(new Ui::DeviceWidget),
-    controller_zone(controller_zone)
+    controller_zone(controller_zone),
+    in_group(in_group)
 {
     ui->setupUi(this);
-    ui->name->setText(QString::fromStdString(controller_zone->display_name()));
+
+    updateName();
+
+    if(in_group)
+    {
+        ui->frame->setFrameShape(QFrame::NoFrame);
+        ui->frame->layout()->setMargin(0);
+    }
 }
 
 DeviceWidget::~DeviceWidget()
@@ -22,14 +30,21 @@ void DeviceWidget::on_enable_toggled(bool state)
     emit Enabled(state);
 }
 
+void DeviceWidget::on_name_clicked()
+{
+    ui->select->toggle();
+}
+
 void DeviceWidget::on_select_toggled(bool state)
 {
     emit Selected(state);
 }
 
 void DeviceWidget::updateName()
-{
-    ui->name->setText(QString::fromStdString(controller_zone->display_name()));
+{    
+    ui->name->setText(
+                in_group?"• " + QString::fromStdString(controller_zone->zone_display_name()) :
+                QString::fromStdString(controller_zone->controller_display_name()));
 }
 
 ControllerZone* DeviceWidget::getControllerZone()
@@ -46,7 +61,7 @@ void DeviceWidget::on_rename_clicked()
     if(!new_name.isEmpty())
     {
         controller_zone->custom_zone_name = new_name.toStdString();
-        ui->name->setText(new_name);
+        updateName();
         emit Renamed(new_name);
     }
 }

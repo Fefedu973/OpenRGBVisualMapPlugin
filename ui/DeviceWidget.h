@@ -13,7 +13,7 @@ class DeviceWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeviceWidget(QWidget *parent = nullptr, ControllerZone* controller_zone = nullptr);
+    explicit DeviceWidget(QWidget *parent = nullptr, ControllerZone* controller_zone = nullptr, bool in_group = false);
     ~DeviceWidget();
 
     ControllerZone* getControllerZone();
@@ -28,6 +28,7 @@ private slots:
     void on_enable_toggled(bool);
     void on_select_toggled(bool);
     void on_rename_clicked();
+    void on_name_clicked();
 
 signals:
     void Enabled(bool);
@@ -37,6 +38,7 @@ signals:
 private:
     Ui::DeviceWidget *ui;
     ControllerZone* controller_zone;
+    bool in_group;
 };
 
 #endif // DEVICEWIDGET_H

@@ -20,7 +20,7 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> o
 
     QDialog* dialog = new QDialog();
 
-    std::string title = "Widget editor: " + ctrl_zone->display_name();
+    std::string title = "Widget editor: " + ctrl_zone->full_display_name();
 
     dialog->setWindowTitle(QString::fromUtf8(title.c_str()));
     //dialog->setMinimumSize(814,489);
@@ -245,7 +245,7 @@ void WidgetEditor::on_copy_shape_button_clicked()
             continue;
         }
 
-        std::string item_text = std::to_string(i+1) + ". " +ctrl_zone_it->display_name() + "(" + std::to_string(ctrl_zone_it->led_count()) +")";
+        std::string item_text = std::to_string(i+1) + ". " +ctrl_zone_it->full_display_name() + "(" + std::to_string(ctrl_zone_it->led_count()) +")";
         QString choice = QString::fromUtf8(item_text.c_str());
 
         items << choice;
