@@ -25,6 +25,7 @@ public slots:
 
 private slots:
     void AddTabSlot();
+    void AboutSlot();
 
 private:
     Ui::OpenRGBVisualMapTab*   ui;

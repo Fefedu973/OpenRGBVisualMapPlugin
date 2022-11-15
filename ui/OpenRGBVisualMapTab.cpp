@@ -9,6 +9,9 @@
 #include <QLabel>
 #include <QInputDialog>
 #include <QTimer>
+#include <QAction>
+#include <QMenu>
+#include <QDialog>
 
 OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QWidget(parent),
@@ -24,13 +27,26 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     ui->virtual_controller_tabs->setStyleSheet("QTabBar::close-button{image:url(:close.png);}");
     ui->virtual_controller_tabs->tabBar()->setStyleSheet("QTabBar::tab:hover {text-decoration: underline;}");
 
-    // First tab: add button
-    QToolButton *new_map_button = new QToolButton();
-    new_map_button->setText("New map");
-    ui->virtual_controller_tabs->addTab(new PluginInfo(), QString(""));
-    ui->virtual_controller_tabs->tabBar()->setTabButton(0, QTabBar::RightSide, new_map_button);
+    QMenu* main_menu = new QMenu(this);
 
-    connect(new_map_button, SIGNAL(clicked()), this, SLOT(AddTabSlot()));
+    QLabel* no_map = new QLabel("You have no visual map.\n You can add one by clicking the VMap button.");
+    no_map->setAlignment(Qt::AlignCenter);
+
+    // First tab: add button
+    QPushButton* main_menu_button = new QPushButton();
+    main_menu_button->setText("VMap");
+    ui->virtual_controller_tabs->addTab(no_map, QString(""));
+    ui->virtual_controller_tabs->tabBar()->setTabButton(0, QTabBar::RightSide, main_menu_button);
+    ui->virtual_controller_tabs->setTabEnabled(0, false);
+    main_menu_button->setMenu(main_menu);
+
+    QAction* new_map = new QAction("New map", this);
+    connect(new_map, &QAction::triggered, this, &OpenRGBVisualMapTab::AddTabSlot);
+    main_menu->addAction(new_map);
+
+    QAction* about = new QAction("About", this);
+    connect(about, &QAction::triggered, this, &OpenRGBVisualMapTab::AboutSlot);
+    main_menu->addAction(about);
 
     if(!SearchAndAutoLoad())
     {
@@ -168,4 +184,20 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 void OpenRGBVisualMapTab::AddTabSlot()
 {
     AddTab();
+}
+
+void OpenRGBVisualMapTab::AboutSlot()
+{
+    QDialog* dialog = new QDialog();
+    dialog->setWindowTitle("Visual Map");
+    dialog->setMinimumSize(300,320);
+    dialog->setModal(true);
+
+    QVBoxLayout* dialog_layout = new QVBoxLayout(dialog);
+
+    PluginInfo* plugin_info = new PluginInfo(dialog);
+
+    dialog_layout->addWidget(plugin_info);
+
+    dialog->exec();
 }
