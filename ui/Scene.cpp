@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "OpenRGBVisualMapPlugin.h"
 
 void Scene::ApplySettings(GridSettings* settings)
 {    
@@ -17,6 +18,9 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
 
     if(settings->show_grid)
     {
+        QColor line_color = OpenRGBVisualMapPlugin::DarkTheme ?
+                    QColor(0xFF, 0xFF, 0xFF, 0x3F) : QColor(0x00, 0x00, 0x00, 0x3F);
+
         QVarLengthArray<QLineF, 64> grid_lines;
 
         for (qreal x = left; x < rect.right(); x += (settings->grid_size))
@@ -24,7 +28,7 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
         for (qreal y = top; y < rect.bottom(); y += (settings->grid_size))
             grid_lines.append(QLineF(rect.left(), y, rect.right(), y));
 
-        painter->setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x18), 0.1));
+        painter->setPen(QPen(line_color, 0.1));
         painter->drawLines(grid_lines.data(), grid_lines.size());
     }
 
@@ -37,8 +41,7 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
         bound_lines.append(QLineF(0, 0, 0, settings->h));
         bound_lines.append(QLineF(0, settings->h, settings->w, settings->h));
         bound_lines.append(QLineF(settings->w, 0, settings->w, settings->h));
-
-        painter->setPen(QPen(QColor(0xC7, 0x95, 0x6D, 0xA0), 0.1));
+        painter->setPen(QPen(QColor(0xFF, 0x63, 0x00, 0xFF), 0.1));
         painter->drawLines(bound_lines.data(), bound_lines.size());
     }
 }

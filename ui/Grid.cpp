@@ -1,10 +1,14 @@
 #include "Grid.h"
 #include "math.h"
 #include "ControllerZoneItem.h"
+#include "OpenRGBVisualMapPlugin.h"
 
 void Grid::Init()
 {
-    setStyleSheet("background-color: #534e52;");
+    QString background = OpenRGBVisualMapPlugin::DarkTheme ?
+                    "#353535" : "#eff0f1";
+
+    setStyleSheet("background-color: " + background + ";");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
