@@ -82,6 +82,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -96,6 +99,9 @@
    </item>
    <item row="0" column="1" rowspan="5">
     <widget class="QFrame" name="frame">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -125,6 +131,9 @@
           <width>400</width>
           <height>400</height>
          </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -178,6 +187,9 @@
           <width>0</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
