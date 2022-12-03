@@ -136,6 +136,7 @@ void VirtualControllerTab::LoadJson(json j)
     virtual_controller->Clear();
 
     auto ctrl_zones = j["ctrl_zones"];
+    std::vector<ControllerZone*> all_zones = retained_zones;
 
     bool has_failures = false;
 
@@ -145,10 +146,10 @@ void VirtualControllerTab::LoadJson(json j)
         auto controller = entry["controller"];
         auto settings = entry["settings"];
 
-        for(unsigned int i= 0; i < retained_zones.size(); i++)
-        {
-            ControllerZone* ctrl_zone = retained_zones[i];
+        std::vector<ControllerZone*> candidates;
 
+        for(ControllerZone* ctrl_zone : all_zones)
+        {
             /*-------------------------------------------------*\
             | Don't compare location for HID devices,           |
             | because it constantly changes                     |
@@ -162,24 +163,61 @@ void VirtualControllerTab::LoadJson(json j)
                 (ctrl_zone->controller->location == controller["location"] || hid_location) &&
                 ctrl_zone->zone_idx == entry["zone_idx"])
             {
-                try
+                if(entry.contains("custom_zone_name"))
                 {
-                    if(entry.contains("custom_zone_name"))
-                    {
-                        ctrl_zone->custom_zone_name = entry["custom_zone_name"];
-                    }
-
-                    ctrl_zone->settings = settings;
-
-                    virtual_controller->Add(retained_zones[i]);
-
-                    ui->device_list->UpdateControllerState(retained_zones[i]);
+                    ctrl_zone->custom_zone_name = entry["custom_zone_name"];
                 }
-                catch(const std::exception& e)
+
+                ctrl_zone->settings = settings;
+
+                candidates.push_back(ctrl_zone);
+            }
+        }
+
+        ControllerZone* zone = nullptr;
+        if (candidates.size() > 1)
+        {
+            /*-------------------------------------------------*\
+            | If we found more than onne zone matching the      |
+            | saved one then fall back to comparing by location |
+            | even for HID devices.                             |
+            | This is a workaround to prevent us from loading   |
+            | the wrong device when multiple HID devices have   |
+            | the same name, vendor, serial, and zone_idx.      |
+            | It won't work 100% of the time, but it will work  |
+            | in some situations                                |
+            \*-------------------------------------------------*/
+            for (ControllerZone* z : candidates)
+            {
+                if (z->controller->location == controller["location"])
                 {
-                    has_failures = true;
+                    zone = z;
+                    break;
                 }
             }
+        }
+        else if (candidates.size() == 1)
+        {
+            zone = candidates[0];
+        }
+
+        try
+        {
+            if (zone)
+            {
+                virtual_controller->Add(zone);
+                ui->device_list->UpdateControllerState(zone);
+                /*-------------------------------------------------*\
+                | Remove this zone from the list of all zones so    |
+                | that we don't modify its custom name or settings  |
+                | if there's another collision.                     |
+                \*-------------------------------------------------*/
+                all_zones.erase(std::find(all_zones.begin(), all_zones.end(), zone));
+            }
+        }
+        catch (const std::exception&)
+        {
+            has_failures = true;
         }
     }
 
