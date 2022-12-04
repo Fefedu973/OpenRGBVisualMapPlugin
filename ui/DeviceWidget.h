@@ -39,6 +39,7 @@ private:
     Ui::DeviceWidget *ui;
     ControllerZone* controller_zone;
     bool in_group;
+    void UpdateCheckState();
 };
 
 #endif // DEVICEWIDGET_H

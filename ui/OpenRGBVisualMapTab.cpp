@@ -24,7 +24,7 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 
     // define tab style + settings
     ui->virtual_controller_tabs->setTabsClosable(true);
-    ui->virtual_controller_tabs->setStyleSheet("QTabBar::close-button{image:url(:close.png);}");
+    ui->virtual_controller_tabs->setStyleSheet("QTabBar::close-button{image:url(:images/close.png);}");
     ui->virtual_controller_tabs->tabBar()->setStyleSheet("QTabBar::tab:hover {text-decoration: underline;}");
 
     QMenu* main_menu = new QMenu(this);

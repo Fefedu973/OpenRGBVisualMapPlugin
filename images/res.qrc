@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>remove.png</file>
-        <file>add.png</file>
-        <file>close.png</file>
-        <file>OpenRGBVisualMapPlugin.png</file>
-    </qresource>
-</RCC>

@@ -65,13 +65,14 @@ HEADERS +=                                                                      
     OpenRGB/i2c_smbus/i2c_smbus.h                                                               \
     OpenRGB/net_port/net_port.h                                                                 \
     OpenRGB/RGBController/RGBController.h                                                       \
+    OpenRGBPluginsFont.h                                                                        \
     OpenRGBVisualMapPlugin.h                                                                    \
     ZoneManager.h                                                                               \
     VirtualController.h                                                                         \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
     ControllerZone.h                                                                            \
-    ui/ClickableLabel.h \
+    ui/ClickableLabel.h                                                                         \
     ui/ColorPicker.h                                                                            \
     ui/ColorStop.h                                                                              \
     ui/ControllerZoneItem.h                                                                     \
@@ -97,12 +98,13 @@ HEADERS +=                                                                      
 
 SOURCES +=                                                                                      \
     OpenRGB/RGBController/RGBController.cpp                                                     \
+    OpenRGBPluginsFont.cpp                                                                      \
     OpenRGBVisualMapPlugin.cpp                                                                  \
     VirtualController.cpp                                                                       \
     VisualMapSettingsManager.cpp                                                                \
     ZoneManager.cpp                                                                             \
     ui/BackgroundApplier.cpp                                                                    \
-    ui/ClickableLabel.cpp \
+    ui/ClickableLabel.cpp                                                                       \
     ui/ColorPicker.cpp                                                                          \
     ui/ColorStop.cpp                                                                            \
     ui/ControllerZoneItem.cpp                                                                   \
@@ -126,8 +128,8 @@ FORMS +=                                                                        
     ui/BackgroundApplier.ui                                                                     \
     ui/ColorPicker.ui                                                                           \
     ui/ColorStop.ui                                                                             \
-    ui/DeviceList.ui \
-    ui/DeviceWidget.ui \
+    ui/DeviceList.ui                                                                            \
+    ui/DeviceWidget.ui                                                                          \
     ui/GridOptions.ui                                                                           \
     ui/ItemOptions.ui                                                                           \
     ui/OpenRGBVisualMapTab.ui                                                                   \
@@ -187,4 +189,4 @@ macx: {
 }
 
 RESOURCES += \
-    images/res.qrc
+    resources.qrc

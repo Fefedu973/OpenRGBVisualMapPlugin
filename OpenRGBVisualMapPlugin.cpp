@@ -18,7 +18,7 @@ OpenRGBPluginInfo OpenRGBVisualMapPlugin::GetPluginInfo()
     info.Label          = "Visual Map";
     info.Location       = OPENRGB_PLUGIN_LOCATION_TOP;
 
-    info.Icon.load(":/OpenRGBVisualMapPlugin.png");
+    info.Icon.load(":/images/OpenRGBVisualMapPlugin.png");
 
     return(info);
 }
