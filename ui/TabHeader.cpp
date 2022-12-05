@@ -9,7 +9,7 @@ TabHeader::TabHeader(QWidget *parent) :
     ui->setupUi(this);
 
     ui->close->setFont(OpenRGBPluginsFont::GetFont());
-    ui->close->setText(OpenRGBPluginsFont::icon(OpenRGBPluginsFont::close_o));
+    ui->close->setText(OpenRGBPluginsFont::icon(OpenRGBPluginsFont::close));
 }
 
 void TabHeader::Rename(QString name)
