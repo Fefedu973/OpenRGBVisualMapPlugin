@@ -4,7 +4,6 @@
 #include "stdlib.h"
 
 EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
-    setStyleSheet("background-color: #534e52;");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

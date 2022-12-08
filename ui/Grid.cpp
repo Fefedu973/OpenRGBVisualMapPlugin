@@ -5,10 +5,6 @@
 
 void Grid::Init()
 {
-//    QString background = OpenRGBVisualMapPlugin::DarkTheme ?
-//                    "#353535" : "#eff0f1";
-//
-//    setStyleSheet("background-color: " + background + ";");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
