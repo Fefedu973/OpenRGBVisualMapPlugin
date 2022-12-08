@@ -4,6 +4,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QString>
 #include <QCursor>
+#include <QPalette>
+#include <QApplication>
 
 LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
     led_position(led_position),
@@ -15,8 +17,8 @@ LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
             + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
-    setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
-    setAcceptHoverEvents(true);    
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
+    setAcceptHoverEvents(true);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     setCursor(Qt::OpenHandCursor);
     setScale(0.1);
@@ -34,23 +36,25 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
 {
     QRectF rect = boundingRect();
 
-    QPen pen(QColor(0, 0, 0, 0x80), 0.05);
+    QPalette pal = QApplication::palette();
+    QColor col = pal.color(QPalette::Highlight);
+    QColor txt_col = pal.color(QPalette::Text);
+    QColor inv_col = QColor(0xff - col.red(),0xff - col.green(),0xff - col.blue());
 
-    painter->setPen(pen);
-    painter->setRenderHint(QPainter::Antialiasing);  
+    QBrush brush =  isSelected() ?
+                QBrush(inv_col, Qt::BrushStyle::SolidPattern) : hover ?
+                    QBrush(col, Qt::BrushStyle::SolidPattern) : default_brush;
 
-    QBrush brush =  isSelected() ? selected_brush : hasFocus() ? focus_brush:  hover ? hover_brush :  default_brush;
-    painter->setBrush(brush);
-
-    painter->drawRect(rect);
-    painter->setBrush(QColor("#534e52"));
-
-    QPen text_pen(QColor("#534e52"));
-
+    QPen pen(txt_col);
+    QPen text_pen(txt_col);
     QFont font;
     font.setPixelSize(4);
-    painter->setFont(font);
 
+    painter->setPen(pen);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setBrush(brush);
+    painter->drawRect(rect);
+    painter->setFont(font);
     painter->setPen(text_pen);
     painter->drawText(rect, Qt::AlignCenter, QString::number(led_position->led_num));
 }

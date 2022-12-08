@@ -5,6 +5,10 @@
 #include <QPainter>
 #include "GridSettings.h"
 
+#define GRID_LINE_WIDTH   0.1
+#define GRID_LINE_ALPHA   0x40
+#define BOUNDS_LINE_WIDTH 0.2
+
 class Scene: public QGraphicsScene
 {
 public:

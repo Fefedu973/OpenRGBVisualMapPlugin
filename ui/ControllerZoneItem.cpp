@@ -2,21 +2,23 @@
 #include "math.h"
 #include <QString>
 #include <QCursor>
+#include <QPalette>
+#include <QApplication>
 
 ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone, GridSettings* settings) :
-   ctrl_zone(ctrl_zone),
-   settings(settings)
+    ctrl_zone(ctrl_zone),
+    settings(settings)
 {
-    setFlags(ItemIsMovable | ItemIsSelectable | ItemIsFocusable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
+    setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
     setAcceptHoverEvents(true);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
     setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
 
     std::string tooltip =
-        "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
+            "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
             + ctrl_zone->full_display_name()
-        + "</div>";
+            + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
 
@@ -44,10 +46,19 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
                                            -ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
 
 
-    QBrush brush =  isSelected() ? selected_brush : hasFocus() ? focus_brush:  hover ? hover_brush :  default_brush;
+    QPalette pal = QApplication::palette();
+    QColor col = pal.color(QPalette::Highlight);
+    QColor txt_col = pal.color(QPalette::Text);
+    QColor inv_col = QColor(0xff - col.red(),0xff - col.green(),0xff - col.blue());
+
+    QBrush brush =  isSelected() ?
+                QBrush(inv_col, Qt::BrushStyle::SolidPattern) : hover ?
+                    QBrush(col, Qt::BrushStyle::SolidPattern) : default_brush;
 
     painter->setBrush(brush);
-    QPen pen(QColor(0, 0, 0, 0x80), 0.2);
+
+    QPen pen(txt_col, ITEM_BORDER_WIDTH);
+
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setCompositionMode(QPainter::CompositionMode_Source);

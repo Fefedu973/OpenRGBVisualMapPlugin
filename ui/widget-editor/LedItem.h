@@ -38,10 +38,7 @@ private:
     bool hover = false;
     bool pressed = false;
 
-    const QBrush selected_brush  = QBrush(QColor("#c7956d"));
-    const QBrush focus_brush       =   QBrush(QColor("#965d62"));
-    const QBrush default_brush     =  QBrush(QColor("#f2d974"));
-    const QBrush hover_brush   =    QBrush(QColor("#00ff00"));
+    const QBrush default_brush     =  QBrush(QColor("#f2d974"), Qt::BrushStyle::NoBrush);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent*);

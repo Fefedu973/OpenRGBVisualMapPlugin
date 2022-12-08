@@ -7,8 +7,9 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include "GridSettings.h"
-
 #include "ControllerZone.h"
+
+#define ITEM_BORDER_WIDTH 0.2
 
 class ControllerZoneItem : public QObject, public QGraphicsItem
 {
@@ -34,10 +35,7 @@ private:
     bool pressed = false;
     bool hover = false;
 
-    const QBrush selected_brush = QBrush(QColor("#c7956d"), Qt::BrushStyle::SolidPattern);
-    const QBrush focus_brush    = QBrush(QColor("#965d62"), Qt::BrushStyle::SolidPattern);
     const QBrush default_brush  = QBrush(QColor("#f2d974"), Qt::BrushStyle::NoBrush);
-    const QBrush hover_brush    = QBrush(QColor("#00ff00"), Qt::BrushStyle::SolidPattern);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
