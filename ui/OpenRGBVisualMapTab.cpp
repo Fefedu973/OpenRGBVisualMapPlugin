@@ -44,6 +44,11 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     connect(new_map, &QAction::triggered, this, &OpenRGBVisualMapTab::AddTabSlot);
     main_menu->addAction(new_map);
 
+
+    QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
+    connect(open_vmap_folder, &QAction::triggered, this, &OpenRGBVisualMapTab::OpenVmapsFolder);
+    main_menu->addAction(open_vmap_folder);
+
     QAction* about = new QAction("About", this);
     connect(about, &QAction::triggered, this, &OpenRGBVisualMapTab::AboutSlot);
     main_menu->addAction(about);
@@ -200,4 +205,14 @@ void OpenRGBVisualMapTab::AboutSlot()
     dialog_layout->addWidget(plugin_info);
 
     dialog->exec();
+}
+
+void OpenRGBVisualMapTab::OpenVmapsFolder()
+{
+    std::string config_dir = VisualMapSettingsManager::MapsFolder();
+    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
+
+    printf("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
+
+    QDesktopServices::openUrl(url);
 }

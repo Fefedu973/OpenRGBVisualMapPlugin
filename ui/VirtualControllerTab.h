@@ -57,7 +57,6 @@ private slots:
     void SaveVmapAction();
     void LoadVmapAction();
     void ClearVmapAction();
-    void OpenVmapsFolder();
     void RegisterAction();
     void AddBackgroundAction();
 

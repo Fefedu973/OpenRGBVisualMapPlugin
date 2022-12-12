@@ -65,8 +65,10 @@ VirtualControllerTab::~VirtualControllerTab()
 void VirtualControllerTab::CreateMainMenu()
 {
     // todo move this to own method
-    QMenu* main_menu = new QMenu(this);
+    QMenu* main_menu = new QMenu(ui->main_menu);
     ui->main_menu->setMenu(main_menu);
+
+    main_menu->setMaximumWidth(ui->main_menu->maximumWidth());
 
     register_controller = new QAction("Register controller", this);
     register_controller->setCheckable(true);
@@ -89,10 +91,6 @@ void VirtualControllerTab::CreateMainMenu()
     QAction* clear = new QAction("Clear", this);
     connect(clear, &QAction::triggered, this, &VirtualControllerTab::ClearVmapAction);
     main_menu->addAction(clear);
-
-    QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
-    connect(open_vmap_folder, &QAction::triggered, this, &VirtualControllerTab::OpenVmapsFolder);
-    main_menu->addAction(open_vmap_folder);
 }
 
 void VirtualControllerTab::RenameController(std::string value)
@@ -503,14 +501,4 @@ void VirtualControllerTab::LoadVmapAction()
     QString filename = inp->textValue();
 
     LoadFile(filename.toStdString());
-}
-
-void VirtualControllerTab::OpenVmapsFolder()
-{
-    std::string config_dir = VisualMapSettingsManager::MapsFolder();
-    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
-
-    printf("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
-
-    QDesktopServices::openUrl(url);
 }
