@@ -2,6 +2,7 @@
 #define VISUALMAPSETTINGSMANAGER_H
 
 #include "json.hpp"
+#include "filesystem.h"
 
 using json = nlohmann::json;
 
@@ -17,19 +18,18 @@ public:
     static std::vector<std::string> GetGradientsNames();
 
     static bool CreateSettingsDirectory();
-    static std::string MapsFolder();
+    static filesystem::path MapsFolder();
 
 private:
     static bool CreateMapsDirectory();
     static bool CreateGradientsDirectory();
 
-    static std::string SettingsFolder();
-    static std::string GradientsFolder();
-    static std::string folder_separator();
-    static bool create_dir(std::string);
-    static std::vector<std::string> list_files(std::string);
-    static json load_json_file(std::string);
-    static bool write_file(std::string, json);
+    static filesystem::path SettingsFolder();
+    static filesystem::path GradientsFolder();
+    static bool create_dir(filesystem::path);
+    static std::vector<std::string> list_files(filesystem::path);
+    static json load_json_file(filesystem::path);
+    static bool write_file(filesystem::path, json);
 };
 
 #endif // VISUALMAPSETTINGSMANAGER_H

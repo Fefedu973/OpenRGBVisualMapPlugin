@@ -17,7 +17,7 @@ bool VisualMapSettingsManager::SaveMap(std::string filename, json j)
         return false;
     }
 
-    return write_file(MapsFolder() + folder_separator() + filename, j);
+    return write_file(MapsFolder() / filename, j);
 }
 
 json VisualMapSettingsManager::LoadMap(std::string filename)
@@ -34,7 +34,7 @@ json VisualMapSettingsManager::LoadMap(std::string filename)
         return j;
     }
 
-    return load_json_file(MapsFolder() + folder_separator() + filename);
+    return load_json_file(MapsFolder() / filename);
 }
 
 std::vector<std::string> VisualMapSettingsManager::GetMapNames()
@@ -54,7 +54,7 @@ bool VisualMapSettingsManager::SaveGradient(std::string filename, json j)
         return false;
     }
 
-    return write_file(GradientsFolder() + folder_separator() + filename, j);
+    return write_file(GradientsFolder() / filename, j);
 }
 
 json VisualMapSettingsManager::LoadGradient(std::string filename)
@@ -71,7 +71,7 @@ json VisualMapSettingsManager::LoadGradient(std::string filename)
         return j;
     }
 
-    return load_json_file(GradientsFolder() + folder_separator() + filename);
+    return load_json_file(GradientsFolder() / filename);
 }
 
 std::vector<std::string> VisualMapSettingsManager::GetGradientsNames()
@@ -94,31 +94,22 @@ bool VisualMapSettingsManager::CreateGradientsDirectory()
     return create_dir(GradientsFolder());
 }
 
-std::string VisualMapSettingsManager::SettingsFolder()
+filesystem::path VisualMapSettingsManager::SettingsFolder()
 {
-    return OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() + "plugins" + folder_separator() + "settings";
+    return OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() / "plugins" / "settings";
 }
 
-std::string VisualMapSettingsManager::MapsFolder()
+filesystem::path VisualMapSettingsManager::MapsFolder()
 {
-    return SettingsFolder() + folder_separator() + "virtual-controllers";
+    return SettingsFolder() / "virtual-controllers";
 }
 
-std::string VisualMapSettingsManager::GradientsFolder()
+filesystem::path VisualMapSettingsManager::GradientsFolder()
 {
-    return SettingsFolder() + folder_separator() + "gradients";
+    return SettingsFolder() / "gradients";
 }
 
-std::string VisualMapSettingsManager::folder_separator()
-{
-#if defined(WIN32) || defined(_WIN32)
-    return "\\";
-#else
-    return "/";
-#endif
-}
-
-bool VisualMapSettingsManager::write_file(std::string file_name, json j)
+bool VisualMapSettingsManager::write_file(filesystem::path file_name, json j)
 {
     std::ofstream file(file_name, std::ios::out | std::ios::binary);
 
@@ -139,7 +130,7 @@ bool VisualMapSettingsManager::write_file(std::string file_name, json j)
     return true;
 }
 
-json VisualMapSettingsManager::load_json_file(std::string file_name)
+json VisualMapSettingsManager::load_json_file(filesystem::path file_name)
 {
     json j;
 
@@ -161,7 +152,7 @@ json VisualMapSettingsManager::load_json_file(std::string file_name)
     return j;
 }
 
-std::vector<std::string> VisualMapSettingsManager::list_files(std::string path)
+std::vector<std::string> VisualMapSettingsManager::list_files(filesystem::path path)
 {
     std::vector<std::string> filenames;
 
@@ -181,7 +172,7 @@ std::vector<std::string> VisualMapSettingsManager::list_files(std::string path)
     return filenames;
 }
 
-bool VisualMapSettingsManager::create_dir(std::string directory)
+bool VisualMapSettingsManager::create_dir(filesystem::path directory)
 {
     QDir dir(QString::fromStdString(directory));
 
