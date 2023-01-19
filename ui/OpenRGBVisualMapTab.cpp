@@ -209,8 +209,8 @@ void OpenRGBVisualMapTab::AboutSlot()
 
 void OpenRGBVisualMapTab::OpenVmapsFolder()
 {
-    std::string config_dir = VisualMapSettingsManager::MapsFolder();
-    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir));
+    filesystem::path config_dir = VisualMapSettingsManager::MapsFolder();
+    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir.string()));
 
     printf("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
 

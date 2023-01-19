@@ -156,7 +156,7 @@ std::vector<std::string> VisualMapSettingsManager::list_files(filesystem::path p
 {
     std::vector<std::string> filenames;
 
-    QDir dir(QString::fromStdString(path));
+    QDir dir(QString::fromStdString(path.string()));
 
     if(dir.exists())
     {
@@ -174,7 +174,7 @@ std::vector<std::string> VisualMapSettingsManager::list_files(filesystem::path p
 
 bool VisualMapSettingsManager::create_dir(filesystem::path directory)
 {
-    QDir dir(QString::fromStdString(directory));
+    QDir dir(QString::fromStdString(directory.string()));
 
     if(dir.exists())
     {
