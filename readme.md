@@ -6,7 +6,7 @@
 
 This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that allows you to organize your real devices on a map and create a virtual devices (or many). You can then apply gradients (presets or custom), and expose it to an other plugin (eg. Effect Engine plugin).
 
-## Downloads
+## Experimental (Master)
 
 * [Windows 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Windows%2064)
 * [Buster 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Buster%2064)
@@ -14,6 +14,13 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 * [Bookworm 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Bookworm%2064)
 * [MacOS ARM64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=MacOS%20ARM64)
 * [MacOS Intel](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=MacOS%20Intel)
+
+## Stable (0.8)
+
+* [Windows 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187477/artifacts/download)
+* [Linux 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187474/artifacts/download)
+* [MacOS ARM64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187479/artifacts/download)
+* [MacOS Intel](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187481/artifacts/download)
 
 ## How do I install it?
 
