@@ -142,7 +142,7 @@ void ControllerZoneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     QGraphicsItem::hoverLeaveEvent( event );
 }
 
-void ControllerZoneItem::Restrict()
+void ControllerZoneItem::Snap()
 {
     int new_x = 10 * x();
     int new_y = 10 * y();
@@ -158,17 +158,15 @@ void ControllerZoneItem::Restrict()
         new_y += 5;
     }
 
-    // restrict to bounds
-    new_x = std::min<int>(std::max<int>(0,new_x/10),  settings->w - 1);
-    new_y = std::min<int>(std::max<int>(0,new_y/10), settings->h - 1);
+    // Snap to grid
+    new_x /= 10;
+    new_y /= 10;
 
     setX(new_x);
     setY(new_y);
 
     ctrl_zone->settings.x = new_x;
     ctrl_zone->settings.y = new_y;
-
-    // todo : check if the shape is inside the bounds
 }
 
 ControllerZone* ControllerZoneItem::GetControllerZone()

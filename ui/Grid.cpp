@@ -65,7 +65,7 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
         connect(ctrl_zone_item, &ControllerZoneItem::Released, [=](){
             for(ControllerZoneItem* item : ctrl_zone_items)
             {
-                item->Restrict();
+                item->Snap();
             }
 
             emit Changed();
@@ -229,7 +229,7 @@ void Grid::MoveSelection(int delta_x, int delta_y)
         {
             ctrl_zone_item->setX(ctrl_zone_item->x() + delta_x);
             ctrl_zone_item->setY(ctrl_zone_item->y() + delta_y);
-            ctrl_zone_item->Restrict();
+            ctrl_zone_item->Snap();
         }
     }
 

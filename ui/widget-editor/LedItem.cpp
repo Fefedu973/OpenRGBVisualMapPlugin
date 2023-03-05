@@ -59,18 +59,11 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
     painter->drawText(rect, Qt::AlignCenter, QString::number(led_position->led_num));
 }
 
-void LedItem::Restrict()
+void LedItem::Snap()
 {
-    int round_x = round(x());
-    int round_y = round(y());
-
-    // restrict to bounds
-    int new_x = std::min<int>(std::max<int>(0,round_x), settings->w - 1);
-    int new_y = std::min<int>(std::max<int>(0,round_y), settings->h - 1);
-
     // update led position
-    led_position->setX(new_x);
-    led_position->setY(new_y);
+    led_position->setX(round(x()));
+    led_position->setY(round(y()));
 
     setX(led_position->x());
     setY(led_position->y());

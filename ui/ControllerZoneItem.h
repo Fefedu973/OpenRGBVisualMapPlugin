@@ -20,7 +20,7 @@ public:
     ControllerZoneItem(ControllerZone*, GridSettings*);
     QRectF boundingRect() const;
     void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
-    void Restrict();
+    void Snap();
     ControllerZone* GetControllerZone();
     QPoint point();
 

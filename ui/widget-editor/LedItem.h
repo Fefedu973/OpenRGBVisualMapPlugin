@@ -25,7 +25,7 @@ public:
 
     LedPosition* GetLedPosition();
 
-    void Restrict();
+    void Snap();
 
 signals:
       void Released();

@@ -142,7 +142,7 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
         connect(led_item, &LedItem::Released, [=](){
             for(LedItem* item : led_items)
             {
-                item->Restrict();
+                item->Snap();
             }
 
             emit Changed();
@@ -198,7 +198,7 @@ void EditorGrid::MoveSelection(int delta_x, int delta_y)
         {
             led_item->setX(led_item->x() + delta_x);
             led_item->setY(led_item->y() + delta_y);
-            led_item->Restrict();
+            led_item->Snap();
         }
     }
 
