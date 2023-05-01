@@ -167,7 +167,7 @@ void VirtualController::UpdateVirtualZone()
 
                 if(real_leds[xy].size() > 1)
                 {
-                    leds[i].name = "Multiple LEDs (" + std::to_string(real_leds[xy].size()) + ") \n coucou \n blabla";
+                    leds[i].name = "Multiple LEDs (" + std::to_string(real_leds[xy].size()) + ")";
                 }
                 else
                 {
