@@ -50,6 +50,7 @@ INCLUDEPATH +=                                                                  
     OpenRGB/RGBController                                                                       \
     OpenRGB/dependencies/json                                                                   \
     OpenRGB/qt                                                                                  \
+    OpenRGB/hidapi_wrapper                                                                      \
     ui/                                                                                         \
     ui/widget-editor/                                                                           \
 
