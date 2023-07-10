@@ -49,6 +49,7 @@ INCLUDEPATH +=                                                                  
     OpenRGB/net_port                                                                            \
     OpenRGB/RGBController                                                                       \
     OpenRGB/dependencies/json                                                                   \
+    OpenRGB/dependencies/hidapi                                                                 \
     OpenRGB/qt                                                                                  \
     OpenRGB/hidapi_wrapper                                                                      \
     ui/                                                                                         \
