@@ -15,12 +15,14 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 * [MacOS ARM64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=MacOS%20ARM64)
 * [MacOS Intel](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=MacOS%20Intel)
 
-## Stable (0.8)
+## Stable (0.9)
 
-* [Windows 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187477/artifacts/download)
-* [Linux 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187474/artifacts/download)
-* [MacOS ARM64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187479/artifacts/download)
-* [MacOS Intel](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/3418187481/artifacts/download)
+* [Windows 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/4632289590/artifacts/download)
+* [Linux 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/4632289588/artifacts/download)
+* [MacOS ARM64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/4632289591/artifacts/download)
+* [MacOS Intel](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/4632428898/artifacts/download)
+
+You can get older releases [here](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/releases).
 
 ## How do I install it?
 
