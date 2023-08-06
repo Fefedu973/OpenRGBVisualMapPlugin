@@ -59,7 +59,6 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     settings->h = temp_shape->h;
     settings->show_grid = true;
     settings->show_bounds = true;
-    settings->live_preview = false;
     settings->grid_size = 1;
 
     ui->grid->ApplySettings(settings);

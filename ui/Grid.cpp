@@ -135,6 +135,7 @@ void Grid::UpdatePreview(QImage image)
     preview->update();
 }
 
+
 void Grid::wheelEvent(QWheelEvent *event)
 {
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);

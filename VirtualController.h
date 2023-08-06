@@ -29,7 +29,7 @@ public:
 
     // Internals
     void                            UpdateSize(int,int);
-    void                            SetCallBack(std::function<void(QImage)>);
+    void                            SetPostUpdateCallBack(std::function<void(QImage)>);
     void                            Register(bool, bool);
     bool                            HasZone(ControllerZone*);
     void                            Add(ControllerZone*);
@@ -37,7 +37,9 @@ public:
     void                            Clear();
     std::vector<ControllerZone*>    GetZones();
     bool                            IsEmpty();
+    void                            ApplyToDevice(QImage);
     void                            ApplyImage(QImage);
+    void                            ApplyToZone(ControllerZone*, QImage);
     unsigned int                    GetTotalLeds();
     void                            UpdateVirtualZone();
 

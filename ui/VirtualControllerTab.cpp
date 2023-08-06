@@ -26,33 +26,46 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     settings->h             = 64;
     settings->show_bounds   = true;
     settings->show_grid     = true;
-    settings->live_preview  = true;
     settings->grid_size     = 1;
 
+    /*-------------------------------------------------*\
+    | Init the grid                                     |
+    \*-------------------------------------------------*/
     ui->grid->Init();
     ui->gridOptions->Init(settings);
     ui->grid->ApplySettings(settings);
 
     virtual_controller->UpdateSize(settings->w, settings->h);
 
-    retained_zones = ZoneManager::Get()->GetAvailableZones();
-
+    /*-------------------------------------------------*\
+    | Init the grid                                     |
+    \*-------------------------------------------------*/
     InitZoneList();
 
+    /*-------------------------------------------------*\
+    | Init other ui parts                               |
+    \*-------------------------------------------------*/
     ui->itemFrame->hide();
     ui->backgroundApplier->SetSize(settings->w, settings->h);
     ui->backgroundFrame->hide();
 
-    // todo move this to .h
-    connect(this, SIGNAL(ApplyBackground(QImage)), this, SLOT(OnBackgroundApplied(QImage)));
+    /*-------------------------------------------------*\
+    | Listen for virtual controller updates, redraw     |
+    \*-------------------------------------------------*/
+    connect(this, &VirtualControllerTab::VirtualControllerPostUpdateSignal, this, &VirtualControllerTab::VirtualControllerPostUpdateSlot);
 
-    // todo change this
-    virtual_controller->SetCallBack([=](QImage image){
-        emit ApplyBackground(image);
+    virtual_controller->SetPostUpdateCallBack([&](QImage image){
+        emit VirtualControllerPostUpdateSignal(image);
     });
 
+    /*-------------------------------------------------*\
+    | Init other ui parts                               |
+    \*-------------------------------------------------*/
     UpdateVirtualControllerDetails();
 
+    /*-------------------------------------------------*\
+    | Init Menu                                         |
+    \*-------------------------------------------------*/
     CreateMainMenu();
 }
 
@@ -117,6 +130,7 @@ void VirtualControllerTab::UpdateVirtualControllerDetails()
 
 void VirtualControllerTab::InitZoneList()
 {
+    retained_zones = ZoneManager::Get()->GetAvailableZones();
     ui->device_list->Init(retained_zones);
 }
 
@@ -248,17 +262,16 @@ void VirtualControllerTab::LoadJson(json j)
     }
 
     UpdateVirtualControllerDetails();
-
 }
 
-void VirtualControllerTab::OnBackgroundApplied(QImage image)
+void VirtualControllerTab::on_backgroundApplier_BackgroundUpdated(QImage image)
 {
-    if(settings->live_preview)
-    {
-        ui->grid->UpdatePreview(image);
-    }
-
     virtual_controller->ApplyImage(image);
+}
+
+void VirtualControllerTab::VirtualControllerPostUpdateSlot(QImage image)
+{
+    ui->grid->UpdatePreview(image);
 }
 
 void VirtualControllerTab::Unregister()
@@ -268,8 +281,6 @@ void VirtualControllerTab::Unregister()
 
 void VirtualControllerTab::Recreate()
 {
-    retained_zones = ZoneManager::Get()->GetAvailableZones();
-
     InitZoneList();
 
     ReassignZones();
@@ -425,11 +436,6 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
     ui->gridOptions->SetSettings(settings);
 }
 
-void VirtualControllerTab::on_backgroundApplier_BackgroundApplied(QImage image)
-{
-    OnBackgroundApplied(image);
-}
-
 /*-------------------------------------------------*\
 | Main menu actions                                 |
 \*-------------------------------------------------*/
@@ -460,8 +466,8 @@ void VirtualControllerTab::ClearVmapAction()
 void VirtualControllerTab::SaveVmapAction()
 {
     QString filename = QInputDialog::getText(
-                nullptr, "Save virtual controller", "Choose a filename",
-                QLineEdit::Normal, QString::fromUtf8(GetControllerName().c_str())).trimmed();
+                           nullptr, "Save virtual controller", "Choose a filename",
+                           QLineEdit::Normal, QString::fromUtf8(GetControllerName().c_str())).trimmed();
 
     if(!filename.isEmpty())
     {

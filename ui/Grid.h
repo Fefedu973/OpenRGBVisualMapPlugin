@@ -25,13 +25,13 @@ public:
     void UpdateItems();
     void ClearSelection();
     void ApplySettings(GridSettings* settings);
-    void UpdatePreview(QImage image);
 
     void SetSelection(std::vector<ControllerZone*>);
     std::vector<ControllerZone*> GetSelection();
     std::vector<ControllerZoneItem*> GetSelectedItems();
     void Clear();
     void MoveSelection(int, int);
+    void UpdatePreview(QImage image);
 
 signals:
     void SelectionChanged(std::vector<ControllerZone*>);
@@ -44,14 +44,14 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 private:
-    QGraphicsPixmapItem* preview;
-    QPixmap preview_pixmap;
     GridSettings* settings;
     std::vector<ControllerZoneItem*> ctrl_zone_items;
     Scene* scene = nullptr;
     bool left_button_pressed = false;
     bool right_button_pressed = false;
 
+    QGraphicsPixmapItem* preview;
+    QPixmap preview_pixmap;
 
 };
 

@@ -142,7 +142,7 @@ void BackgroundApplier::ApplyCustom()
     if(color_stops.empty())
     {
         image.fill(Qt::black);
-        emit BackgroundApplied(image);
+        emit BackgroundUpdated(image);
         return;
     }
 
@@ -179,7 +179,7 @@ void BackgroundApplier::ApplyCustom()
 
     painter.fillRect(rect, brush);
 
-    emit BackgroundApplied(image);
+    emit BackgroundUpdated(image);
 }
 
 QBrush BackgroundApplier::ApplyLinearGradient(QGradientStops stops, QGradient::Spread spread, int angle, int x_offset, int y_offset)
@@ -280,7 +280,7 @@ void BackgroundApplier::OpenFileDialog()
 
     QImage user_image;
     user_image.load(fileName);
-    emit BackgroundApplied(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
+    emit BackgroundUpdated(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
 
     // Add this image to already applied list
     QPixmap pm(fileName);
@@ -300,7 +300,7 @@ void BackgroundApplier::OpenFileDialog()
     ui->images->layout()->setAlignment(button, Qt::AlignLeft | Qt::AlignTop);
 
     connect(button, &QPushButton::clicked, [=](){
-        emit BackgroundApplied(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
+        emit BackgroundUpdated(user_image.scaled(w, h, Qt::IgnoreAspectRatio));
     });
 }
 

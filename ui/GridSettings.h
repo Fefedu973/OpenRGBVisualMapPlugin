@@ -7,7 +7,6 @@ struct GridSettings
     int h;
     bool show_grid;
     bool show_bounds;
-    bool live_preview;
     int grid_size;
     bool auto_load;
     bool auto_register;

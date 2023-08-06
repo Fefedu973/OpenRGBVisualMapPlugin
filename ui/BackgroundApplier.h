@@ -23,7 +23,7 @@ public:
     QImage GetImage();
 
 signals:
-    void BackgroundApplied(QImage) const;
+    void BackgroundUpdated(QImage) const;
 
 private slots:
     void on_gradient_type_currentIndexChanged(int);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>170</width>
-    <height>314</height>
+    <width>173</width>
+    <height>275</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0">
-   <item row="7" column="1">
+   <item row="6" column="1">
     <widget class="QSpinBox" name="w_spinBox">
      <property name="minimum">
       <number>1</number>
@@ -33,65 +33,10 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="width">
-     <property name="text">
-      <string>Width</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QSpinBox" name="h_spinBox">
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>1024</number>
-     </property>
-     <property name="singleStep">
-      <number>1</number>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="height">
-     <property name="text">
-      <string>Height</string>
-     </property>
-    </widget>
-   </item>
-   <item row="14" column="0" colspan="2">
-    <widget class="QPushButton" name="auto_resize">
-     <property name="text">
-      <string>Auto resize</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Grid options</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QCheckBox" name="auto_load_checkBox">
-     <property name="text">
-      <string>Auto load</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QCheckBox" name="auto_register_checkBox">
-     <property name="text">
-      <string>Auto register</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QCheckBox" name="unregister_members_checkBox">
-     <property name="text">
-      <string>Unregister members</string>
      </property>
     </widget>
    </item>
@@ -109,10 +54,58 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QCheckBox" name="live_preview_checkBox">
+   <item row="3" column="0" colspan="2">
+    <widget class="QCheckBox" name="unregister_members_checkBox">
      <property name="text">
-      <string>Live preview</string>
+      <string>Unregister members</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QCheckBox" name="auto_load_checkBox">
+     <property name="text">
+      <string>Auto load</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QSpinBox" name="h_spinBox">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0" colspan="2">
+    <widget class="QPushButton" name="auto_resize">
+     <property name="text">
+      <string>Auto resize</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QCheckBox" name="auto_register_checkBox">
+     <property name="text">
+      <string>Auto register</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="height">
+     <property name="text">
+      <string>Height</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="width">
+     <property name="text">
+      <string>Width</string>
      </property>
     </widget>
    </item>

@@ -1,7 +1,6 @@
 #include "VirtualController.h"
 #include "OpenRGBVisualMapPlugin.h"
 #include "RGBController.h"
-#include "ZoneManager.h"
 #include <set>
 
 std::string VirtualController::VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
@@ -230,7 +229,7 @@ void VirtualController::DeviceUpdateLEDs() {
         }
     }
 
-    callback(image);
+    ApplyToDevice(image);
 }
 
 void VirtualController::UpdateSize(int w, int h)
@@ -241,7 +240,7 @@ void VirtualController::UpdateSize(int w, int h)
     UpdateVirtualZone();
 }
 
-void VirtualController::SetCallBack(std::function<void(QImage)> callback)
+void VirtualController::SetPostUpdateCallBack(std::function<void(QImage)> callback)
 {
     this->callback = callback;
 }
@@ -373,7 +372,117 @@ unsigned int VirtualController::GetTotalLeds()
     return result;
 }
 
-void VirtualController::ApplyImage(QImage image)
+void VirtualController::ApplyImage(QImage original)
 {
-    ZoneManager::Get()->ApplyImage(added_zones, image);
+    // Make sure the image only targets the existing LEDs
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    float brightness = modes[0].brightness / 100.f;
+
+    QColor transparent("#00000000");
+
+    for(unsigned int h = 0; h < height; h++)
+    {
+        for(unsigned int w = 0; w < width; w++)
+        {
+            QColor color;
+
+            if(zones[0].matrix_map->map[(h*width) + w] == NA)
+            {
+                color = transparent;
+            }
+            else
+            {
+                QColor original_color = original.pixelColor(QPoint(w, h));
+                int red = original_color.red()   * brightness;
+                int grn = original_color.green() * brightness;
+                int blu = original_color.blue()  * brightness;
+                color = QColor(red, grn, blu);
+            }
+
+            image.setPixelColor(w, h, color);
+        }
+    }
+
+    ApplyToDevice(image);
+}
+
+void VirtualController::ApplyToDevice(QImage image)
+{
+    // make sure we update the controller only once by using a set
+    std::set<RGBController*> controllers;
+
+    for(ControllerZone* ctrl_zone: added_zones)
+    {
+        ApplyToZone(ctrl_zone, image);
+        controllers.insert(ctrl_zone->controller);
+    }
+
+    for(RGBController* controller : controllers)
+    {
+        controller->UpdateLEDs();
+    }
+
+    callback(image);
+}
+
+void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, QImage image)
+{
+    RGBController* controller = ctrl_zone->controller;
+    zone z = controller->zones[ctrl_zone->zone_idx];
+    ControllerZoneSettings settings = ctrl_zone->settings;
+    int leds_count = z.leds_count;
+    int start_idx = z.start_idx;
+
+    switch (ctrl_zone->settings.shape) {
+    case HORIZONTAL_LINE:
+        for(int i = 0; i < leds_count; i++)
+        {
+            int idx = settings.reverse ? leds_count - 1 - i : i;
+
+            unsigned int x = idx * settings.led_spacing + settings.x;
+            unsigned int y = settings.y;
+
+            if(image.valid(x,y))
+            {
+                QColor color = image.pixelColor(x, y);
+                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+
+        }
+        break;
+
+    case VERTICAL_LINE:
+        for(int i = 0; i < leds_count; i++)
+        {
+            int idx = settings.reverse ? leds_count - 1 - i : i;
+
+            unsigned int x = settings.x;
+            unsigned int y = idx * settings.led_spacing + settings.y;
+
+            if(image.valid(x,y))
+            {
+                QColor color = image.pixelColor(x, y);
+                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+        }
+        break;
+
+    case CUSTOM:
+        std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
+
+        for(unsigned int i = 0; i < led_positions.size(); i++)
+        {
+            unsigned int x = settings.x + led_positions[i]->x();
+            unsigned int y = settings.y + led_positions[i]->y();
+
+            if(image.valid(x,y))
+            {
+                QColor color = image.pixelColor(x, y);
+                controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
+            }
+        }
+
+        break;
+    }
 }
