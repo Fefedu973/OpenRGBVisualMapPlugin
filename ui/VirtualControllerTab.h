@@ -39,7 +39,7 @@ public:
 
 private slots:
     // ui element signals
-    void on_backgroundApplier_BackgroundUpdated(QImage);
+    void on_backgroundApplier_BackgroundUpdated(const QImage&);
     void on_gridOptions_SettingsChanged();
     void on_gridOptions_AutoResizeRequest();
 
@@ -53,7 +53,7 @@ private slots:
     void on_device_list_DeviceRemoved(ControllerZone*);
     void on_device_list_SelectionChanged(std::vector<ControllerZone*>);
 
-    void VirtualControllerPostUpdateSlot(QImage image);
+    void VirtualControllerPostUpdateSlot(const QImage&);
 
     // Main menu actions
     void SaveVmapAction();
@@ -64,7 +64,7 @@ private slots:
 
 signals:
     void ControllerRenamed(std::string);
-    void VirtualControllerPostUpdateSignal(QImage image);
+    void VirtualControllerPostUpdateSignal(const QImage&);
 
 private:    
     void CreateMainMenu();

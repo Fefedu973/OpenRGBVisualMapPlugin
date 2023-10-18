@@ -54,7 +54,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     \*-------------------------------------------------*/
     connect(this, &VirtualControllerTab::VirtualControllerPostUpdateSignal, this, &VirtualControllerTab::VirtualControllerPostUpdateSlot);
 
-    virtual_controller->SetPostUpdateCallBack([&](QImage image){
+    virtual_controller->SetPostUpdateCallBack([&](const QImage& image){
         emit VirtualControllerPostUpdateSignal(image);
     });
 
@@ -264,12 +264,12 @@ void VirtualControllerTab::LoadJson(json j)
     UpdateVirtualControllerDetails();
 }
 
-void VirtualControllerTab::on_backgroundApplier_BackgroundUpdated(QImage image)
+void VirtualControllerTab::on_backgroundApplier_BackgroundUpdated(const QImage& image)
 {
     virtual_controller->ApplyImage(image);
 }
 
-void VirtualControllerTab::VirtualControllerPostUpdateSlot(QImage image)
+void VirtualControllerTab::VirtualControllerPostUpdateSlot(const QImage& image)
 {
     ui->grid->UpdatePreview(image);
 }

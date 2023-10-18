@@ -240,7 +240,7 @@ void VirtualController::UpdateSize(int w, int h)
     UpdateVirtualZone();
 }
 
-void VirtualController::SetPostUpdateCallBack(std::function<void(QImage)> callback)
+void VirtualController::SetPostUpdateCallBack(std::function<void(const QImage&)> callback)
 {
     this->callback = callback;
 }
@@ -372,7 +372,7 @@ unsigned int VirtualController::GetTotalLeds()
     return result;
 }
 
-void VirtualController::ApplyImage(QImage original)
+void VirtualController::ApplyImage(const QImage& original)
 {
     // Make sure the image only targets the existing LEDs
     QImage image(width, height, QImage::Format_ARGB32);
@@ -407,7 +407,7 @@ void VirtualController::ApplyImage(QImage original)
     ApplyToDevice(image);
 }
 
-void VirtualController::ApplyToDevice(QImage image)
+void VirtualController::ApplyToDevice(const QImage& image)
 {
     // make sure we update the controller only once by using a set
     std::set<RGBController*> controllers;
@@ -426,7 +426,7 @@ void VirtualController::ApplyToDevice(QImage image)
     callback(image);
 }
 
-void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, QImage image)
+void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& image)
 {
     RGBController* controller = ctrl_zone->controller;
     zone z = controller->zones[ctrl_zone->zone_idx];
