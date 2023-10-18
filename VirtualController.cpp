@@ -19,33 +19,41 @@ VirtualController::VirtualController()
     active_mode = 0;
     type        = DEVICE_TYPE_VIRTUAL;
 
+    zones.clear();
+    modes.clear();
+
+    zone new_zone;
+
     /*-------------------------------------------------*\
     | Setup zone                                        |
     \*-------------------------------------------------*/
-    zones.resize(1);
-    zones[0]                = zone();
-    zones[0].name           = "Virtual zone";
-    zones[0].start_idx      = 0;
-    zones[0].type           = ZONE_TYPE_MATRIX;
-    zones[0].matrix_map     = new matrix_map_type();
+    new_zone.name           = "Virtual zone";
+    new_zone.start_idx      = 0;
+    new_zone.type           = ZONE_TYPE_MATRIX;
+    new_zone.matrix_map     = new matrix_map_type();
+
+    zones.push_back(new_zone);
 
     /*-------------------------------------------------*\
     | Setup mode details                                |
     \*-------------------------------------------------*/
-    modes.resize(1);
-    modes[0]                    = mode();
-    modes[0].name               = "Direct";
-    modes[0].value              = 0;
-    modes[0].flags              = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
-    modes[0].brightness         = 100;
-    modes[0].brightness_max     = 100;
-    modes[0].brightness_min     = 0;
-    modes[0].color_mode         = MODE_COLORS_PER_LED;
 
+    mode new_mode;
+    new_mode.name               = "Direct";
+    new_mode.value              = 0;
+    new_mode.flags              = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
+    new_mode.brightness         = 100;
+    new_mode.brightness_max     = 100;
+    new_mode.brightness_min     = 0;
+    new_mode.color_mode         = MODE_COLORS_PER_LED;
+
+    modes.push_back(new_mode);
 }
 
 VirtualController::~VirtualController()
 {
+    delete[] zones[0].matrix_map->map;
+
     Register(false, false);
 }
 
