@@ -1,23 +1,32 @@
-QT +=                  \
-    gui                \
-    widgets            \
-    core               \
+#-----------------------------------------------------------------------------------------------#
+# OpenRGB Visual Map Plugin QMake Project                                                       #
+#-----------------------------------------------------------------------------------------------#
 
-win32:CONFIG += QTPLUGIN
+#-----------------------------------------------------------------------------------------------#
+# Qt Configuration                                                                              #
+#-----------------------------------------------------------------------------------------------#
+QT +=                                                                                           \
+    core                                                                                        \
+    gui                                                                                         \
+    widgets
 
-TEMPLATE = lib
 DEFINES += ORGBVISUALMAPPLUGIN_LIBRARY
+TEMPLATE = lib
 
-win32:CONFIG += c++17
-
-unix:!macx {
-  QMAKE_CXXFLAGS += -std=c++17
-}
+#-----------------------------------------------------------------------------------------------#
+# Build Configuration                                                                           #
+#-----------------------------------------------------------------------------------------------#
+CONFIG +=                                                                                       \
+    plugin                                                                                      \
+    silent
 
 #-----------------------------------------------------------------------------------------------#
 # Application Configuration                                                                     #
 #-----------------------------------------------------------------------------------------------#
-PLUGIN_VERSION     = 0.9
+MAJOR           = 0
+MINOR           = 9
+REVISION        = 1
+PLUGIN_VERSION  = $$MAJOR"."$$MINOR$$REVISION
 
 #-----------------------------------------------------------------------------------------------#
 # Automatically generated build information                                                     #
@@ -28,10 +37,15 @@ GIT_COMMIT_ID   = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PR
 GIT_COMMIT_DATE = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PRO_FILE_PWD_ show -s --format=%ci HEAD)
 GIT_BRANCH      = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PRO_FILE_PWD_ rev-parse --abbrev-ref HEAD)
 
-
+#-----------------------------------------------------------------------------------------------#
+# Download links                                                                                #
+#-----------------------------------------------------------------------------------------------#
 win32:LATEST_BUILD_URL="https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows 64"
 unix:!macx:LATEST_BUILD_URL="https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Linux 64"
 
+#-----------------------------------------------------------------------------------------------#
+# Inject vars in defines                                                                        #
+#-----------------------------------------------------------------------------------------------#
 DEFINES +=                                                                                      \
     VERSION_STRING=\\"\"\"$$PLUGIN_VERSION\\"\"\"                                               \
     BUILDDATE_STRING=\\"\"\"$$BUILDDATE\\"\"\"                                                  \
@@ -140,9 +154,11 @@ FORMS +=                                                                        
     ui/VirtualControllerTab.ui                                                                  \
     ui/widget-editor/WidgetEditor.ui                                                            \
 
-#-------------------------------------------------------------------#
-# Windows GitLab CI Configuration                                   #
-#-------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+# Windows-specific Configuration                                                                #
+#-----------------------------------------------------------------------------------------------#
+win32:CONFIG += QTPLUGIN c++17
+
 win32:CONFIG(debug, debug|release) {
     win32:DESTDIR = debug
 }
@@ -157,38 +173,41 @@ win32:RCC_DIR     = _intermediate_$$DESTDIR/.qrc
 win32:UI_DIR      = _intermediate_$$DESTDIR/.ui
 
 win32:contains(QMAKE_TARGET.arch, x86_64) {
-    LIBS +=                                                             \
-        -lws2_32                                                        \
-        -lole32                                                         \
+    LIBS +=                                                                                     \
+        -lws2_32                                                                                \
+        -lole32                                                                                 \
 }
 
 win32:contains(QMAKE_TARGET.arch, x86) {
-    LIBS +=                                                             \
-        -lws2_32                                                        \
-        -lole32                                                         \
+    LIBS +=                                                                                     \
+        -lws2_32                                                                                \
+        -lole32                                                                                 \
 }
 
-win32:DEFINES +=                                                        \
-    _MBCS                                                               \
-    WIN32                                                               \
-    _CRT_SECURE_NO_WARNINGS                                             \
-    _WINSOCK_DEPRECATED_NO_WARNINGS                                     \
-    WIN32_LEAN_AND_MEAN                                                 \
+win32:DEFINES +=                                                                                \
+    _MBCS                                                                                       \
+    WIN32                                                                                       \
+    _CRT_SECURE_NO_WARNINGS                                                                     \
+    _WINSOCK_DEPRECATED_NO_WARNINGS                                                             \
+    WIN32_LEAN_AND_MEAN                                                                         \
 
-#-----------------------------------------------------------------------#
-# Linux-specific Configuration                                          #
-#-----------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+# Linux-specific Configuration                                                                  #
+#-----------------------------------------------------------------------------------------------#
 unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++17 -Wno-psabi
+    target.path=$$PREFIX/lib/openrgb/plugins/
+    INSTALLS += target
 }
 
-#-----------------------------------------------------------------------#
-# MacOS-specific Configuration                                          #
-#-----------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+# MacOS-specific Configuration                                                                  #
+#-----------------------------------------------------------------------------------------------#
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 macx: {
     CONFIG += c++17
 }
 
-RESOURCES += \
+RESOURCES +=                                                                                    \
     resources.qrc
