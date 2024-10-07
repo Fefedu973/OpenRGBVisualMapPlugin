@@ -63,11 +63,11 @@ INCLUDEPATH +=                                                                  
     OpenRGB/net_port                                                                            \
     OpenRGB/RGBController                                                                       \
     OpenRGB/dependencies/json                                                                   \
-    OpenRGB/dependencies/hidapi                                                                 \
     OpenRGB/qt                                                                                  \
-    OpenRGB/hidapi_wrapper                                                                      \
     ui/                                                                                         \
     ui/widget-editor/                                                                           \
+    OpenRGB/dependencies/hidapi/hidapi                                                          \
+    OpenRGB/hidapi_wrapper/                                                                     \
 
 HEADERS +=                                                                                      \
     OpenRGB/NetworkClient.h                                                                     \
@@ -111,6 +111,7 @@ HEADERS +=                                                                      
     ui/GridOptions.h                                                                            \
     ui/ItemOptions.h                                                                            \
     OpenRGB/qt/hsv.h                                                                            \
+    OpenRGB/hidapi_wrapper/hidapi_wrapper.h                                                     \
 
 SOURCES +=                                                                                      \
     OpenRGB/RGBController/RGBController.cpp                                                     \
@@ -198,6 +199,10 @@ unix:!macx {
     QMAKE_CXXFLAGS += -std=c++17 -Wno-psabi
     target.path=$$PREFIX/lib/openrgb/plugins/
     INSTALLS += target
+}
+
+contains(QMAKE_PLATFORM, linux) {
+   INCLUDEPATH+=/usr/include/hidapi
 }
 
 #-----------------------------------------------------------------------------------------------#
