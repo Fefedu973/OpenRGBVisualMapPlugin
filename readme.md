@@ -9,9 +9,10 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 ## Experimental (Master)
 
 * [Windows 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Windows%2064)
-* [Buster 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Buster%2064)
-* [Bullseye 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Bullseye%2064)
-* [Bookworm 64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Bookworm%2064)
+* [Linux i386](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Linux%20i386)
+* [Linux amd64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Linux%20amd64)
+* [Linux armhf](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Linux%20armhf)
+* [Linux arm64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=Linux%20arm64)
 * [MacOS ARM64](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=MacOS%20ARM64)
 * [MacOS Intel](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/jobs/artifacts/master/download?job=MacOS%20Intel)
 
