@@ -192,6 +192,8 @@ win32:DEFINES +=                                                                
     _WINSOCK_DEPRECATED_NO_WARNINGS                                                             \
     WIN32_LEAN_AND_MEAN                                                                         \
 
+win32:INCLUDEPATH +=                                                                            \
+    OpenRGB/dependencies/hidapi-win/include
 #-----------------------------------------------------------------------------------------------#
 # Linux-specific Configuration                                                                  #
 #-----------------------------------------------------------------------------------------------#
@@ -211,7 +213,9 @@ contains(QMAKE_PLATFORM, linux) {
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 macx: {
-    CONFIG += c++17
+    CONFIG += c++17 link_pkgconfig
+    PKGCONFIG +=                                                                                \
+    hidapi
 }
 
 RESOURCES +=                                                                                    \
