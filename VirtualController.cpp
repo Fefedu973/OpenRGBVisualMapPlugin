@@ -342,6 +342,12 @@ void VirtualController::Add(ControllerZone* ctrl_zone)
     if(!HasZone(ctrl_zone))
     {
         added_zones.push_back(ctrl_zone);
+
+        // make sure to have the correct led size
+        if(ctrl_zone->isCustomShape() && ctrl_zone->led_count() !=  ctrl_zone->settings.custom_shape->led_positions.size())
+        {
+            ctrl_zone->settings.custom_shape->resizeCustomShape(ctrl_zone->led_count());
+        }
     }
 }
 

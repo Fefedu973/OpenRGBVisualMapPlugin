@@ -119,6 +119,23 @@ struct CustomShape
 
         return false;
     }
+
+    void resizeCustomShape(unsigned int led_count)
+    {
+        led_positions.resize(led_count);
+
+        for(unsigned int i = 0; i < led_count; i++)
+        {
+            if(led_positions[i] == nullptr)
+            {
+                LedPosition* led_position = new LedPosition();
+                led_position->led_num = i;
+                led_position->setX(i);
+                led_position->setY(0);
+                led_positions[i] = led_position;
+            }
+        }
+    }
 };
 
 enum ZoneShape {
