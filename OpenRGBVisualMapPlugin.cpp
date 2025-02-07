@@ -2,8 +2,7 @@
 #include "TooltipProxy.h"
 #include "VisualMapSettingsManager.h"
 
-bool OpenRGBVisualMapPlugin::DarkTheme = false;
-ResourceManager* OpenRGBVisualMapPlugin::RMPointer = nullptr;
+ResourceManagerInterface* OpenRGBVisualMapPlugin::RMPointer = nullptr;
 
 OpenRGBPluginInfo OpenRGBVisualMapPlugin::GetPluginInfo()
 {
@@ -28,9 +27,8 @@ unsigned int OpenRGBVisualMapPlugin::GetPluginAPIVersion()
     return(OPENRGB_PLUGIN_API_VERSION);
 }
 
-void OpenRGBVisualMapPlugin::Load(bool Dt, ResourceManager *RM)
+void OpenRGBVisualMapPlugin::Load(ResourceManagerInterface* RM)
 {
-    DarkTheme = Dt;
     RMPointer = RM;
 }
 

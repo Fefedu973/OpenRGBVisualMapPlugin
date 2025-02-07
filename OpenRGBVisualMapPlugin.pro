@@ -87,33 +87,40 @@ DEFINES +=                                                                      
     GIT_BRANCH=\\"\"\"$$GIT_BRANCH\\"\"\"                                                       \
     LATEST_BUILD_URL=\\"\"\"$$LATEST_BUILD_URL\\"\"\"                                           \
 
+#-----------------------------------------------------------------------------------------------#
+# OpenRGB Plugin SDK                                                                            #
+#-----------------------------------------------------------------------------------------------#
+INCLUDEPATH +=                                                                                  \
+    OpenRGB/                                                                                    \
+    OpenRGB/i2c_smbus                                                                           \
+    OpenRGB/RGBController                                                                       \
+    OpenRGB/net_port                                                                            \
+    OpenRGB/dependencies/json                                                                   \
+    OpenRGB/qt                                                                                  \
+
+HEADERS +=                                                                                      \
+    OpenRGB/Colors.h                                                                            \
+    OpenRGB/OpenRGBPluginInterface.h                                                            \
+    OpenRGB/ResourceManagerInterface.h                                                          \
+
+SOURCES +=                                                                                      \
+    OpenRGB/RGBController/RGBController.cpp                                                     \
+    OpenRGB/RGBController/RGBController_Network.cpp                                             \
+    OpenRGB/NetworkServer.cpp                                                                   \
+    OpenRGB/NetworkClient.cpp                                                                   \
+    OpenRGB/NetworkProtocol.cpp                                                                 \
+    OpenRGB/LogManager.cpp                                                                      \
+    OpenRGB/net_port/net_port.cpp                                                               \
+    OpenRGB/qt/hsv.cpp
+
 #-------------------------------------------------------------------#
 # Includes                                                          #
 #-------------------------------------------------------------------#
 INCLUDEPATH +=                                                                                  \
-    OpenRGB/                                                                                    \
-    OpenRGB/i2c_smbus                                                                           \
-    OpenRGB/net_port                                                                            \
-    OpenRGB/RGBController                                                                       \
-    OpenRGB/dependencies/json                                                                   \
-    OpenRGB/qt                                                                                  \
-    ui/                                                                                         \
-    ui/widget-editor/                                                                           \
-    OpenRGB/dependencies/hidapi/hidapi                                                          \
-    OpenRGB/hidapi_wrapper/                                                                     \
+    ui                                                                                          \
+    ui/widget-editor                                                                            \
 
 HEADERS +=                                                                                      \
-    OpenRGB/NetworkClient.h                                                                     \
-    OpenRGB/NetworkProtocol.h                                                                   \
-    OpenRGB/NetworkServer.h                                                                     \
-    OpenRGB/OpenRGBPluginInterface.h                                                            \
-    OpenRGB/ProfileManager.h                                                                    \
-    OpenRGB/ResourceManager.h                                                                   \
-    OpenRGB/SettingsManager.h                                                                   \
-    OpenRGB/dependencies/json/json.hpp                                                          \
-    OpenRGB/i2c_smbus/i2c_smbus.h                                                               \
-    OpenRGB/net_port/net_port.h                                                                 \
-    OpenRGB/RGBController/RGBController.h                                                       \
     OpenRGBPluginsFont.h                                                                        \
     OpenRGBVisualMapPlugin.h                                                                    \
     ZoneManager.h                                                                               \
@@ -143,11 +150,8 @@ HEADERS +=                                                                      
     ui/Grid.h                                                                                   \
     ui/GridOptions.h                                                                            \
     ui/ItemOptions.h                                                                            \
-    OpenRGB/qt/hsv.h                                                                            \
-    OpenRGB/hidapi_wrapper/hidapi_wrapper.h                                                     \
 
 SOURCES +=                                                                                      \
-    OpenRGB/RGBController/RGBController.cpp                                                     \
     OpenRGBPluginsFont.cpp                                                                      \
     OpenRGBVisualMapPlugin.cpp                                                                  \
     VirtualController.cpp                                                                       \
@@ -172,7 +176,6 @@ SOURCES +=                                                                      
     ui/widget-editor/EditorGrid.cpp                                                             \
     ui/widget-editor/LedItem.cpp                                                                \
     ui/widget-editor/WidgetEditor.cpp                                                           \
-    OpenRGB/qt/hsv.cpp                                                                          \
 
 FORMS +=                                                                                        \
     ui/BackgroundApplier.ui                                                                     \
@@ -225,8 +228,6 @@ win32:DEFINES +=                                                                
     _WINSOCK_DEPRECATED_NO_WARNINGS                                                             \
     WIN32_LEAN_AND_MEAN                                                                         \
 
-win32:INCLUDEPATH +=                                                                            \
-    OpenRGB/dependencies/hidapi-win/include
 #-----------------------------------------------------------------------------------------------#
 # Linux-specific Configuration                                                                  #
 #-----------------------------------------------------------------------------------------------#
@@ -236,19 +237,13 @@ unix:!macx {
     INSTALLS += target
 }
 
-contains(QMAKE_PLATFORM, linux) {
-   INCLUDEPATH+=/usr/include/hidapi
-}
-
 #-----------------------------------------------------------------------------------------------#
 # MacOS-specific Configuration                                                                  #
 #-----------------------------------------------------------------------------------------------#
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
 macx: {
-    CONFIG += c++17 link_pkgconfig
-    PKGCONFIG +=                                                                                \
-    hidapi
+    CONFIG += c++17
 }
 
 RESOURCES +=                                                                                    \

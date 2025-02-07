@@ -2,7 +2,7 @@
 #define OPENRGBVISUALMAPPLUGIN_H
 
 #include "OpenRGBPluginInterface.h"
-#include "ResourceManager.h"
+#include "ResourceManagerInterface.h"
 #include "OpenRGBVisualMapTab.h"
 
 #include <QObject>
@@ -26,25 +26,24 @@ public:
     /*-------------------------------------------------------------------------------------------------*\
     | Plugin Information                                                                                |
     \*-------------------------------------------------------------------------------------------------*/
-    virtual OpenRGBPluginInfo   GetPluginInfo()                                                     override;
-    virtual unsigned int        GetPluginAPIVersion()                                               override;
+    virtual OpenRGBPluginInfo   GetPluginInfo()                                                 override;
+    virtual unsigned int        GetPluginAPIVersion()                                           override;
 
     /*-------------------------------------------------------------------------------------------------*\
     | Plugin Functionality                                                                              |
     \*-------------------------------------------------------------------------------------------------*/
-    virtual void                Load(bool dark_theme, ResourceManager* resource_manager_ptr)        override;
-    virtual QWidget*            GetWidget()                                                         override;
-    virtual QMenu*              GetTrayMenu()                                                       override;
-    virtual void                Unload()                                                            override;
+    virtual void                Load(ResourceManagerInterface* resource_manager_ptr)            override;
+    virtual QWidget*            GetWidget()                                                     override;
+    virtual QMenu*              GetTrayMenu()                                                   override;
+    virtual void                Unload()                                                        override;
 
-    static bool             DarkTheme;
-    static ResourceManager* RMPointer;
+    static ResourceManagerInterface* RMPointer;
 
-     OpenRGBVisualMapTab* ui;
+    OpenRGBVisualMapTab* ui;
 
 private:
     static void DetectionStart(void*);
-    static void DetectionEnd(void* );
+    static void DetectionEnd(void*);
 };
 
 #endif // OPENRGBVISUALMAPPLUGIN_H
