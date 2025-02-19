@@ -63,49 +63,85 @@ do
         EXE_ID=${PRODUCTNAME}00
         EXE_FILE=${filename}
         #Add special entry to files list
-        FILES="$FILES\t\t\t\t\t<File Id='${EXE_ID}' Source='${WORKING_PATH}${filename}'/>\n"
+        FILES="$FILES                        <File Id='${EXE_ID}' Source='${WORKING_PATH}${filename}'/>\n"
     elif [ -d "$file" ] ; then
             #If this is a directory then we need to add another component
-            COMPONENTS="${COMPONENTS}\t\t\t<ComponentRef Id='${filename}Files'/>\n"
-            TEMP="\t\t\t\t<Directory Id='${filename}' Name='${filename}'>\n\t\t\t\t\t<Component Id='${filename}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\n"
+            COMPONENTS="${COMPONENTS}                <ComponentRef Id='${filename}Files'/>\n"
+            TEMP="                    <Directory Id='${filename}' Name='${filename}'>\n                        <Component Id='${filename}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\n"
             for file2 in "$file"/*;
             do
                 filename2=$(basename "$file2")
-                TEMP="$TEMP\t\t\t\t\t\t<File Id='${PRODUCTNAME}${count}' Source='${WORKING_PATH}${filename}/${filename2}'/>\n"
+                TEMP="$TEMP                            <File Id='${PRODUCTNAME}${count}' Source='${WORKING_PATH}${filename}/${filename2}'/>\n"
                 count=$((count+1))
             done
-            DIRECTORIES="$DIRECTORIES$TEMP\t\t\t\t\t</Component>\n\t\t\t\t</Directory>\n"
+            DIRECTORIES="$DIRECTORIES$TEMP                        </Component>\n                    </Directory>\n"
     else
             #Any other file to files list
-            FILES="$FILES\t\t\t\t\t<File Id='${PN_SANS_WS}${count}' Source='${WORKING_PATH}${filename}'/>\n"
+            FILES="$FILES                        <File Id='${PN_SANS_WS}${count}' Source='${WORKING_PATH}${filename}'/>\n"
             count=$((count+1))
     fi
 done
 
-echo -e "Building XML:\t" $XMLOUTFILE
+#############################################################
+# Create the Wix XML file                                   #
+#   Set IFS to the empty string to allow arbitrary spacing  #
+#   within the XML_FILE variable, then set it back to a     #
+#   space character after we print the XML file             #
+#############################################################
+IFS=""
+XML_FILE=""
 
-XML_PACKAGE="\t<Package Keywords='Installer' Description='${PRODUCTNAME} Installer'\n\t\tComments=\"${PRODUCTCOMMENT}\" Manufacturer='OpenRGB'\n\t\tInstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' Platform='x64'/>\n"
-XML_MEDIA="\t<Media Id='1' Cabinet='${PRODUCTNAME,,}.cab' EmbedCab='yes'/>\n"
-XML_CONDITIONS="\t<Condition Message='This package supports Windows 64bit Only'>VersionNT64</Condition>\n"
-XML_ICON="\t<Icon Id='OpenRGBIcon' SourceFile='${ICONFILE}'/>\n"
-XML_PROPERTY="\t<Property Id='ARPPRODUCTICON' Value='OpenRGBIcon'/>\n\t<Property Id='ARPURLINFOABOUT' Value='https://www.openrgb.org'/>\n"
-XML_WIX_UI="\t<Property Id='WIXUI_INSTALLDIR' Value='INSTALLDIR' />\n\t<UIRef Id='WixUI_InstallDir'/>\n\t<UIRef Id='WixUI_ErrorProgressText'/>\n\t<WixVariable Id='WixUILicenseRtf' Value='${LICENSEFILE}'/>\n\t<WixVariable Id='WixUIBannerBmp' Value='${BANNERIMAGE}'/>\n\t<WixVariable Id='WixUIDialogBmp' Value='${DIALOGBACKGROUND}'/>\n"
-XML_MAJOR_UPGRADE="\t<MajorUpgrade Schedule='afterInstallInitialize' AllowDowngrades='yes'/>\n"
-XML_METADATA="$XML_PACKAGE $XML_MEDIA $XML_CONDITIONS $XML_ICON $XML_PROPERTY $XML_ACTIONS_EXECUTE $XML_WIX_UI"
+XML_FILE+="<?xml version='1.0' encoding='windows-1252'?>\r\n"
+XML_FILE+="<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>\r\n"
+XML_FILE+="    <Product Name='${PRODUCTNAME}' Manufacturer='${VENDOR}'\r\n"
+XML_FILE+="        Id='*'\r\n"
+XML_FILE+="        UpgradeCode='"${UPGRADECODE}"'\r\n"
+XML_FILE+="        Language='1033' Codepage='1252' Version='${VERSION}'>\r\n"
+XML_FILE+="        <Package Keywords='Installer' Description='${PRODUCTNAME} Installer'\r\n"
+XML_FILE+="            Comments=\"${PRODUCTCOMMENT}\" Manufacturer='OpenRGB'\r\n"
+XML_FILE+="            InstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' Platform='x64'/>\r\n"
+XML_FILE+="        <Media Id='1' Cabinet='${PRODUCTNAME,,}.cab' EmbedCab='yes'/>\r\n"
+XML_FILE+="        <Condition Message='This package supports Windows 64bit Only'>VersionNT64</Condition>\r\n"
+#XML_FILE+="        <MajorUpgrade Schedule='afterInstallInitialize' AllowDowngrades='yes'/>\r\n"
+XML_FILE+="        <Icon Id='OpenRGBIcon' SourceFile='${ICONFILE}'/>\r\n"
+XML_FILE+="        <Property Id='ARPPRODUCTICON' Value='OpenRGBIcon'/>\r\n"
+XML_FILE+="        <Property Id='ARPURLINFOABOUT' Value='https://www.openrgb.org'/>\r\n"
+XML_FILE+="        <Property Id='WIXUI_INSTALLDIR' Value='INSTALLDIR'/>\r\n"
+XML_FILE+="        <UIRef Id='WixUI_InstallDir'/>\r\n"
+XML_FILE+="        <UIRef Id='WixUI_ErrorProgressText'/>\r\n"
+XML_FILE+="        <WixVariable Id='WixUILicenseRtf' Value='${LICENSEFILE}'/>\r\n"
+XML_FILE+="        <WixVariable Id='WixUIBannerBmp' Value='${BANNERIMAGE}'/>\r\n"
+XML_FILE+="        <WixVariable Id='WixUIDialogBmp' Value='${DIALOGBACKGROUND}'/>\r\n"
+XML_FILE+="\r\n"
+XML_FILE+="        <Directory Id='TARGETDIR' Name='SourceDir'>\r\n"
+XML_FILE+="            <Directory Id='ProgramFiles64Folder'>\r\n"
+XML_FILE+="                <Directory Id='INSTALLDIR' Name='${PRODUCTNAME}'>\r\n"
+XML_FILE+="                    <Component Id='${PN_SANS_WS}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\r\n"
+XML_FILE+="${FILES}\r\n"
+XML_FILE+="                    </Component>\r\n"
+XML_FILE+="${DIRECTORIES}\r\n"
+XML_FILE+="                </Directory>\r\n"
+XML_FILE+="            </Directory>\r\n"
+XML_FILE+="        </Directory>\r\n"
+XML_FILE+="        <Feature Id='Complete' Title='${PRODUCTNAME}' Description='Install all ${PRODUCTNAME} files.' Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>\r\n"
+XML_FILE+="            <Feature Id='${PN_SANS_WS}Complete' Title='${PRODUCTNAME}' Description='The complete package.' Level='1' AllowAdvertise='no' InstallDefault='local'>\r\n"
+XML_FILE+="                <ComponentRef Id='${PN_SANS_WS}Files'/>\r\n"
+XML_FILE+="${COMPONENTS}\r\n"
+XML_FILE+="            </Feature>\r\n"
+XML_FILE+="        </Feature>\r\n"
+XML_FILE+="    </Product>\r\n"
+XML_FILE+="</Wix>"
 
-XML_DIRECTORIES="\t<Directory Id='TARGETDIR' Name='SourceDir'>\n\t\t<Directory Id='ProgramFiles64Folder'>\n\t\t\t<Directory Id='${VENDOR}' Name='${VENDOR}'>\n\t\t\t\t<Directory Id='INSTALLDIR' Name='plugins'>\n\t\t\t\t\t<Component Id='${PN_SANS_WS}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\n$FILES\n\t\t\t\t\t</Component>\n$DIRECTORIES\t\t\t\t</Directory>\n\t\t\t</Directory>\n\t\t</Directory>\n\t</Directory>\n"
+echo -e $XML_FILE > $XMLOUTFILE
+IFS=" "
 
-XML_COMPONENTS="\t<Feature Id='Complete' Title='${PRODUCTNAME}' Description='Install all ${PRODUCTNAME} files.' Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>\n\t\t<Feature Id='${PN_SANS_WS}Complete' Title='${PRODUCTNAME}' Description='The complete package.' Level='1' AllowAdvertise='no' InstallDefault='local'>\n\t\t\t<ComponentRef Id='${PN_SANS_WS}Files'/>\n$COMPONENTS\t\t</Feature>\n\t</Feature>\n"
-XML_DATA="$XML_DIRECTORIES $XML_COMPONENTS"
+#############################################################
+# Print the XML for debugging                               #
+#############################################################
+cat $XMLOUTFILE
 
-#Wipe out any previous XMLOUTFILE and add the header
-XML_HEADER="<?xml version='1.0' encoding='windows-1252'?>\n<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>\n"
-XML_PRODUCT="\t<Product Name='${PRODUCTNAME}' Manufacturer='${VENDOR}'\n\t\tId='*'\n\t\tUpgradeCode='"${UPGRADECODE}"'\n\t\tLanguage='1033' Codepage='1252' Version='${VERSION}'>\n$XML_METADATA\n$XML_DATA\n\t</Product>\n</Wix>"
-
-echo -e $XML_HEADER $XML_PRODUCT > $XMLOUTFILE
-echo -e "\t...Done!\n\n"
-
-
-#Once the XML file manifest is created create the package
+#############################################################
+# Once the XML file manifest is created, create the package #
+#############################################################
 candle -arch x64 ${XMLOUTFILE}
 light -sval -ext WixUIExtension ${PN_SANS_WS}.wixobj -out ${PN_SANS_WS}_Windows_64.msi
