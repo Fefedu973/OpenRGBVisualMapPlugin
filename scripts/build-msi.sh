@@ -63,21 +63,21 @@ do
         EXE_ID=${PRODUCTNAME}00
         EXE_FILE=${filename}
         #Add special entry to files list
-        FILES="$FILES                        <File Id='${EXE_ID}' Source='${WORKING_PATH}${filename}'/>\n"
+        FILES="$FILES                            <File Id='${EXE_ID}' Source='${WORKING_PATH}${filename}'/>\n"
     elif [ -d "$file" ] ; then
             #If this is a directory then we need to add another component
             COMPONENTS="${COMPONENTS}                <ComponentRef Id='${filename}Files'/>\n"
-            TEMP="                    <Directory Id='${filename}' Name='${filename}'>\n                        <Component Id='${filename}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\n"
+            TEMP="                        <Directory Id='${filename}' Name='${filename}'>\n                            <Component Id='${filename}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\n"
             for file2 in "$file"/*;
             do
                 filename2=$(basename "$file2")
-                TEMP="$TEMP                            <File Id='${PRODUCTNAME}${count}' Source='${WORKING_PATH}${filename}/${filename2}'/>\n"
+                TEMP="$TEMP                                <File Id='${PRODUCTNAME}${count}' Source='${WORKING_PATH}${filename}/${filename2}'/>\n"
                 count=$((count+1))
             done
-            DIRECTORIES="$DIRECTORIES$TEMP                        </Component>\n                    </Directory>\n"
+            DIRECTORIES="$DIRECTORIES$TEMP                            </Component>\n                        </Directory>\n"
     else
             #Any other file to files list
-            FILES="$FILES                        <File Id='${PN_SANS_WS}${count}' Source='${WORKING_PATH}${filename}'/>\n"
+            FILES="$FILES                            <File Id='${PN_SANS_WS}${count}' Source='${WORKING_PATH}${filename}'/>\n"
             count=$((count+1))
     fi
 done
@@ -115,11 +115,13 @@ XML_FILE+="        <WixVariable Id='WixUIDialogBmp' Value='${DIALOGBACKGROUND}'/
 XML_FILE+="\r\n"
 XML_FILE+="        <Directory Id='TARGETDIR' Name='SourceDir'>\r\n"
 XML_FILE+="            <Directory Id='ProgramFiles64Folder'>\r\n"
-XML_FILE+="                <Directory Id='INSTALLDIR' Name='${PRODUCTNAME}'>\r\n"
-XML_FILE+="                    <Component Id='${PN_SANS_WS}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\r\n"
+XML_FILE+="                <Directory Id='${VENDOR}' Name='${VENDOR}'>\r\n"
+XML_FILE+="                    <Directory Id='INSTALLDIR' Name='plugins'>\r\n"
+XML_FILE+="                        <Component Id='${PN_SANS_WS}Files' Guid='"$(uuidgen -t | awk '{ print toupper($0) }')"'>\r\n"
 XML_FILE+="${FILES}\r\n"
-XML_FILE+="                    </Component>\r\n"
+XML_FILE+="                        </Component>\r\n"
 XML_FILE+="${DIRECTORIES}\r\n"
+XML_FILE+="                    </Directory>\r\n"
 XML_FILE+="                </Directory>\r\n"
 XML_FILE+="            </Directory>\r\n"
 XML_FILE+="        </Directory>\r\n"
