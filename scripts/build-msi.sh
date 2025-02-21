@@ -7,7 +7,7 @@ TLD="org"
 WEBSITE="https://${VENDOR,,}.${TLD}"
 NAMESPACE=$(uuidgen -n @url -N ${WEBSITE} --sha1 | awk '{ print toupper($0) }')
 VENDOR_ID="${TLD}.${VENDOR}"
-APP_ID="${VENDOR_ID}.${PRODUCTNAME,,}"
+APP_ID="${VENDOR_ID}.${PN_SANS_WS,,}"
 
 GITURL="https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-"
 GITPARAM="?inline=false"
