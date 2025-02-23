@@ -395,6 +395,8 @@ void VirtualController::ApplyImage(const QImage& original)
 
     QColor transparent("#00000000");
 
+    unsigned int color_idx = 0;
+
     for(unsigned int h = 0; h < height; h++)
     {
         for(unsigned int w = 0; w < width; w++)
@@ -412,6 +414,13 @@ void VirtualController::ApplyImage(const QImage& original)
                 int grn = original_color.green() * brightness;
                 int blu = original_color.blue()  * brightness;
                 color = QColor(red, grn, blu);
+
+                if(color_idx < colors.size())
+                {
+                    colors[color_idx] = ToRGBColor(red,grn,blu);
+                }
+
+                color_idx++;
             }
 
             image.setPixelColor(w, h, color);
