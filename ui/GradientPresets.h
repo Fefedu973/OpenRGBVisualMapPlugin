@@ -151,6 +151,23 @@ const std::vector<GradientPreset> GRADIENT_PRESETS = {
         100,
         100
     },
+    {
+        "HexaFox",
+        QGradient::LinearGradient,
+        QGradient::PadSpread,
+        QGradientStops({
+            QGradientStop(0,   "#e66000"),
+            QGradientStop(0.3,   "#ff9500"),
+            QGradientStop(0.46,   "#ffcb00"),
+            QGradientStop(0.59,   "#00539f"),
+            QGradientStop(0.71,   "#0095dd"),
+            QGradientStop(0.86,   "#331e54"),
+            QGradientStop(1,   "#002147"),
+        }),
+        0,
+        100,
+        100
+    },
 
 };
 
