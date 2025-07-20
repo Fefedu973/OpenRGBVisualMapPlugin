@@ -26,7 +26,7 @@ DeviceWidget::DeviceWidget(QWidget *parent, ControllerZone* controller_zone, boo
     if(in_group)
     {
         ui->frame->setFrameShape(QFrame::NoFrame);
-        ui->frame->layout()->setMargin(0);
+        ui->frame->layout()->setContentsMargins(0, 0, 0, 0);
     }
 }
 
