@@ -94,7 +94,7 @@ void EditorGrid::mousePressEvent(QMouseEvent *event)
         setDragMode(QGraphicsView::DragMode::RubberBandDrag);
 
         mousePressEvent(new QMouseEvent(QEvent::GraphicsSceneMousePress,
-                                        event->pos(), Qt::MouseButton::LeftButton,
+                                        event->pos(), QCursor::pos(), Qt::MouseButton::LeftButton,
                                         Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier));
 
         QGraphicsView::mousePressEvent(event);
@@ -106,7 +106,7 @@ void EditorGrid::mousePressEvent(QMouseEvent *event)
         setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 
         mousePressEvent(new QMouseEvent(QEvent::GraphicsSceneMousePress,
-                                        event->pos(), Qt::MouseButton::LeftButton,
+                                        event->pos(), QCursor::pos(), Qt::MouseButton::LeftButton,
                                         Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier));
 
         QGraphicsView::mousePressEvent(event);
