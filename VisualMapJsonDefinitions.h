@@ -1,10 +1,10 @@
 #ifndef VISUALMAPJSONDEFINITIONS_H
 #define VISUALMAPJSONDEFINITIONS_H
 
+#include <nlohmann/json.hpp>
 #include "ControllerZone.h"
 #include "RGBController.h"
 #include "GridSettings.h"
-#include "json.hpp"
 
 using json = nlohmann::json;
 

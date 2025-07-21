@@ -1,11 +1,3 @@
-#include "BackgroundApplier.h"
-#include "ColorStop.h"
-#include "ui_BackgroundApplier.h"
-#include "json.hpp"
-#include "math.h"
-#include "VisualMapSettingsManager.h"
-#include "GradientPresets.h"
-
 #include <QImage>
 #include <QPainter>
 #include <QGradient>
@@ -15,6 +7,15 @@
 #include <QGradientStops>
 #include <QFileDialog>
 #include <QInputDialog>
+
+#include <nlohmann/json.hpp>
+
+#include "BackgroundApplier.h"
+#include "ColorStop.h"
+#include "ui_BackgroundApplier.h"
+#include "math.h"
+#include "VisualMapSettingsManager.h"
+#include "GradientPresets.h"
 
 using json = nlohmann::json;
 

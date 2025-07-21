@@ -8,10 +8,10 @@
 #include <QTreeWidgetItem>
 #include <QSignalMapper>
 #include <QDesktopServices>
+#include <nlohmann/json.hpp>
 
 #include "ui_VirtualControllerTab.h"
 #include "VirtualController.h"
-#include "json.hpp"
 
 using json = nlohmann::json;
 

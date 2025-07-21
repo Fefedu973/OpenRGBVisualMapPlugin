@@ -1,7 +1,7 @@
 #ifndef VISUALMAPSETTINGSMANAGER_H
 #define VISUALMAPSETTINGSMANAGER_H
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "filesystem.h"
 
 using json = nlohmann::json;
