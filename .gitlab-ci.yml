@@ -214,6 +214,22 @@ before_script:
     expire_in: 30 days
 
 #-----------------------------------------------------------------------#
+# Windows (32-bit) Qt6 Build Target                                     #
+#-----------------------------------------------------------------------#
+"Windows 32 Qt6":
+  extends:
+  - .shared_windows_runners
+  stage: build
+  script:
+  - scripts\build-windows.bat 6.8.3 2022 32
+  - mv "OpenRGBVisualMapPlugin Windows 32-Bit\OpenRGBVisualMapPlugin.dll" .
+  artifacts:
+    name: "${CI_PROJECT_NAME}_Windows_32_${CI_COMMIT_SHORT_SHA}"
+    paths:
+    - OpenRGBVisualMapPlugin.dll
+    expire_in: 30 days
+
+#-----------------------------------------------------------------------#
 # Windows (32-bit) Build Target                                         #
 #-----------------------------------------------------------------------#
 "Windows 32":
@@ -225,6 +241,22 @@ before_script:
   - mv "OpenRGBVisualMapPlugin Windows 32-Bit\OpenRGBVisualMapPlugin.dll" .
   artifacts:
     name: "${CI_PROJECT_NAME}_Windows_32_${CI_COMMIT_SHORT_SHA}"
+    paths:
+    - OpenRGBVisualMapPlugin.dll
+    expire_in: 30 days
+
+#-----------------------------------------------------------------------#
+# Windows (64-bit) Qt6 Build Target                                     #
+#-----------------------------------------------------------------------#
+"Windows 64 Qt6":
+  extends:
+  - .shared_windows_runners
+  stage: build
+  script:
+  - scripts\build-windows.bat 6.8.3 2022 64
+  - mv "OpenRGBVisualMapPlugin Windows 64-Bit\OpenRGBVisualMapPlugin.dll" .
+  artifacts:
+    name: "${CI_PROJECT_NAME}_Windows_64_${CI_COMMIT_SHORT_SHA}"
     paths:
     - OpenRGBVisualMapPlugin.dll
     expire_in: 30 days
