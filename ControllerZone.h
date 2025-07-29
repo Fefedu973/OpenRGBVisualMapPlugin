@@ -1,7 +1,7 @@
 #ifndef CONTROLLERZONE_H
 #define CONTROLLERZONE_H
 
-#include "RGBController.h"
+#include "RGBControllerInterface.h"
 #include <vector>
 #include <QPoint>
 #include <QStringList>
@@ -164,21 +164,21 @@ struct ControllerZoneSettings
 
 struct ControllerZone
 {
-    RGBController* controller;
+    RGBControllerInterface* controller;
     unsigned int zone_idx;
 
     std::string custom_zone_name;
 
     ControllerZoneSettings settings;
 
-    bool compare_controller(RGBController* other) const {
+    bool compare_controller(RGBControllerInterface* other) const {
         return
-                this->controller->name == other->name &&
-                this->controller->vendor == other->vendor &&
-                this->controller->description == other->description &&
-                this->controller->version == other->version &&
-                this->controller->serial == other->serial &&
-                this->controller->location == other->location ;
+                this->controller->GetName()        == other->GetName() &&
+                this->controller->GetVendor()      == other->GetVendor() &&
+                this->controller->GetDescription() == other->GetDescription() &&
+                this->controller->GetVersion()     == other->GetVersion() &&
+                this->controller->GetSerial()      == other->GetSerial() &&
+                this->controller->GetLocation()    == other->GetLocation() ;
     }
 
     bool compare(ControllerZone* rhs) const {
@@ -190,27 +190,27 @@ struct ControllerZone
     }
 
     unsigned int led_count() const {
-        return controller->zones[zone_idx].leds_count;
+        return controller->GetZoneLEDsCount(zone_idx);
     }
 
     std::string full_display_name()
     {
         return this->custom_zone_name.empty() ?
-                    this->controller->name + " " + this->controller->zones[this->zone_idx].name:
+                    this->controller->GetName() + " " + this->controller->GetZoneName(this->zone_idx):
                     this->custom_zone_name;
     }
 
     std::string zone_display_name()
     {
         return this->custom_zone_name.empty() ?
-                    this->controller->zones[this->zone_idx].name :
+                    this->controller->GetZoneName(this->zone_idx):
                     this->custom_zone_name;
     }
 
     std::string controller_display_name()
     {
         return this->custom_zone_name.empty() ?
-                    this->controller->name :
+                    this->controller->GetName() :
                     this->custom_zone_name;
     }
 

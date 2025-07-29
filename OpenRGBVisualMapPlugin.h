@@ -1,49 +1,81 @@
-#ifndef OPENRGBVISUALMAPPLUGIN_H
-#define OPENRGBVISUALMAPPLUGIN_H
+/*---------------------------------------------------------*\
+| OpenRGBVisualMapPlugin.h                                  |
+|                                                           |
+|   OpenRGB Visual Map Plugin                               |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "OpenRGBPluginInterface.h"
-#include "ResourceManagerInterface.h"
-#include "OpenRGBVisualMapTab.h"
+#pragma once
 
-#include <QObject>
-#include <QString>
-#include <QtPlugin>
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QDialog>
 #include <QAction>
+#include <QDialog>
+#include <QLabel>
+#include <QObject>
+#include <QtPlugin>
+#include <QPushButton>
+#include <QString>
+#include <QWidget>
+#include "LogManager.h"
+#include "OpenRGBPluginInterface.h"
+#include "OpenRGBVisualMapTab.h"
+#include "ResourceManagerCallback.h"
 
 class OpenRGBVisualMapPlugin : public QObject, public OpenRGBPluginInterface
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID OpenRGBPluginInterface_IID)
+    Q_PLUGIN_METADATA(IID OpenRGBPluginInterface_IID FILE "OpenRGBVisualMapPlugin.json")
     Q_INTERFACES(OpenRGBPluginInterface)
 
 public:
     ~OpenRGBVisualMapPlugin() {};
 
-    /*-------------------------------------------------------------------------------------------------*\
-    | Plugin Information                                                                                |
-    \*-------------------------------------------------------------------------------------------------*/
-    virtual OpenRGBPluginInfo   GetPluginInfo()                                                 override;
-    virtual unsigned int        GetPluginAPIVersion()                                           override;
+    /*-----------------------------------------------------*\
+    | Plugin Information                                    |
+    \*-----------------------------------------------------*/
+    virtual OpenRGBPluginInfo   GetPluginInfo()                                                                     override;
+    virtual unsigned int        GetPluginAPIVersion()                                                               override;
 
-    /*-------------------------------------------------------------------------------------------------*\
-    | Plugin Functionality                                                                              |
-    \*-------------------------------------------------------------------------------------------------*/
-    virtual void                Load(ResourceManagerInterface* resource_manager_ptr)            override;
-    virtual QWidget*            GetWidget()                                                     override;
-    virtual QMenu*              GetTrayMenu()                                                   override;
-    virtual void                Unload()                                                        override;
+    /*-----------------------------------------------------*\
+    | Plugin Functionality                                  |
+    \*-----------------------------------------------------*/
+    void                        Load(OpenRGBPluginAPIInterface* plugin_api_ptr)                                     override;
+    QWidget*                    GetWidget()                                                                         override;
+    QMenu*                      GetTrayMenu()                                                                       override;
+    void                        Unload()                                                                            override;
+    void                        OnProfileAboutToLoad()                                                              override;
+    void                        OnProfileLoad(nlohmann::json profile_data)                                          override;
+    nlohmann::json              OnProfileSave()                                                                     override;
+    unsigned char*              OnSDKCommand(unsigned int pkt_id, unsigned char * pkt_data, unsigned int *pkt_size) override;
 
-    static ResourceManagerInterface* RMPointer;
+    /*-----------------------------------------------------*\
+    | Update Signals                                        |
+    \*-----------------------------------------------------*/
+    void                        ProfileManagerUpdated(unsigned int update_reason)                                   override;
+    void                        ResourceManagerUpdated(unsigned int update_reason)                                  override;
+    void                        SettingsManagerUpdated(unsigned int update_reason)                                  override;
 
-    OpenRGBVisualMapTab* ui;
+private:
+    /*-----------------------------------------------------*\
+    | User interface widget                                 |
+    \*-----------------------------------------------------*/
+    OpenRGBVisualMapTab*        ui;
 
 private:
     static void DetectionStart(void*);
     static void DetectionEnd(void*);
+
+public:
+    /*-----------------------------------------------------*\
+    | Plugin Global Variables                               |
+    \*-----------------------------------------------------*/
+    static OpenRGBPluginAPIInterface *  api;
 };
 
-#endif // OPENRGBVISUALMAPPLUGIN_H
+/*---------------------------------------------------------*\
+| LogManager logging macros                                 |
+\*---------------------------------------------------------*/
+#undef  LogAppend
+#define LogAppend(level, ...)   OpenRGBVisualMapPlugin::api->LogEntry(__FILE__, __LINE__, level, __VA_ARGS__)

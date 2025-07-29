@@ -16,7 +16,7 @@ class OpenRGBVisualMapTab : public QWidget
 public:
     explicit OpenRGBVisualMapTab(QWidget *parent = nullptr);
     ~OpenRGBVisualMapTab();
-    void UnregisterAll();
+    void HideAll();
 
 public slots:
     void Clear();

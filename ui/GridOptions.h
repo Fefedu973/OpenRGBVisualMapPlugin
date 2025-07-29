@@ -33,7 +33,7 @@ private slots:
     void on_auto_register_checkBox_stateChanged(int);
     void on_auto_resize_clicked();
 
-    void on_unregister_members_checkBox_stateChanged(int arg1);
+    void on_hide_members_checkBox_stateChanged(int arg1);
 
 private:
     Ui::GridOptions *ui;

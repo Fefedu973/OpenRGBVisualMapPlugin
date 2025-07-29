@@ -64,11 +64,11 @@ OpenRGBVisualMapTab::~OpenRGBVisualMapTab()
     delete ui;
 }
 
-void OpenRGBVisualMapTab::UnregisterAll()
+void OpenRGBVisualMapTab::HideAll()
 {
     for(VirtualControllerTab* controller_tab: controller_tabs)
     {
-        controller_tab->Unregister();
+        controller_tab->Hide();
     }
 }
 

@@ -1,163 +1,181 @@
 #include "VirtualController.h"
 #include "OpenRGBVisualMapPlugin.h"
-#include "RGBController.h"
+#include "RGBControllerInterface.h"
 #include <set>
 
 std::string VirtualController::VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
 
 VirtualController::VirtualController()
 {
-    width       = 1;
-    height      = 1;
+    width                                               = 1;
+    height                                              = 1;
 
-    name        = "VisualMap controller";
-    vendor      = "VisualMap plugin";
-    description = "Virtual controller provided by VisualMap plugin";
-    version     = "1.0.0";
-    serial      = VIRTUAL_CONTROLLER_SERIAL;
-    location    = "Somewhere over the rainbow";
-    active_mode = 0;
-    type        = DEVICE_TYPE_VIRTUAL;
+    /*-----------------------------------------------------*\
+    | Setup controller details                              |
+    \*-----------------------------------------------------*/
+    setup.object_ptr                                    = this;
+    setup.name                                          = "Visual Map Controller";
+    setup.vendor                                        = "OpenRGB Visual Map Plugin";
+    setup.description                                   = "Virtual controller provided by the OpenRGB Visual Map Plugin";
+    setup.version                                       = VERSION_STRING;
+    setup.serial                                        = VIRTUAL_CONTROLLER_SERIAL;
+    setup.location                                      = "Somewhere over the rainbow";
+    setup.type                                          = DEVICE_TYPE_VIRTUAL;
+    setup.active_mode                                   = 0;
 
-    zones.clear();
-    modes.clear();
+    /*-----------------------------------------------------*\
+    | Setup zone                                            |
+    \*-----------------------------------------------------*/
+    setup.zones.resize(1);
 
-    zone new_zone;
+    setup.zones[0].name                                 = "Virtual Zone";
+    setup.zones[0].type                                 = ZONE_TYPE_MATRIX;
 
-    /*-------------------------------------------------*\
-    | Setup zone                                        |
-    \*-------------------------------------------------*/
-    new_zone.name           = "Virtual zone";
-    new_zone.start_idx      = 0;
-    new_zone.type           = ZONE_TYPE_MATRIX;
-    new_zone.matrix_map     = new matrix_map_type();
+    /*-----------------------------------------------------*\
+    | Setup mode details                                    |
+    \*-----------------------------------------------------*/
+    setup.modes.resize(1);
 
-    zones.push_back(new_zone);
+    setup.modes[0].name                                 = "Direct";
+    setup.modes[0].value                                = 0;
+    setup.modes[0].flags                                = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
+    setup.modes[0].brightness                           = 100;
+    setup.modes[0].brightness_max                       = 100;
+    setup.modes[0].brightness_min                       = 0;
+    setup.modes[0].color_mode                           = MODE_COLORS_PER_LED;
 
-    /*-------------------------------------------------*\
-    | Setup mode details                                |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Setup function pointers                               |
+    \*-----------------------------------------------------*/
+    setup.DeviceConfigureZone                           = nullptr;
+    setup.DeviceUpdateLEDs                              = DeviceUpdateLEDs_func;
+    setup.DeviceUpdateZoneLEDs                          = nullptr;
+    setup.DeviceUpdateSingleLED                         = nullptr;
+    setup.DeviceUpdateMode                              = nullptr;
+    setup.DeviceSaveMode                                = nullptr;
+    setup.DeviceUpdateZoneMode                          = nullptr;
+    setup.DeviceUpdateDeviceSpecificConfiguration       = nullptr;
+    setup.DeviceUpdateDeviceSpecificZoneConfiguration   = nullptr;
 
-    mode new_mode;
-    new_mode.name               = "Direct";
-    new_mode.value              = 0;
-    new_mode.flags              = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
-    new_mode.brightness         = 100;
-    new_mode.brightness_max     = 100;
-    new_mode.brightness_min     = 0;
-    new_mode.color_mode         = MODE_COLORS_PER_LED;
-
-    modes.push_back(new_mode);
+    virtual_controller = OpenRGBVisualMapPlugin::api->CreateVirtualRGBController(&setup);
 }
 
 VirtualController::~VirtualController()
 {
-    delete[] zones[0].matrix_map->map;
-
     Register(false, false);
 }
 
 void VirtualController::UpdateVirtualZone()
 {
-    unsigned int size       = width * height;
-    unsigned int *map       = new unsigned int[size];
+    /*-----------------------------------------------------*\
+    | Resize matrix map                                     |
+    \*-----------------------------------------------------*/
+    setup.zones[0].matrix_map.height                    = height;
+    setup.zones[0].matrix_map.width                     = width;
+    setup.zones[0].matrix_map.map.resize(height * width);
 
     std::vector<std::vector<std::string>> real_leds;
-    real_leds.resize(size);
+    real_leds.resize(setup.zones[0].matrix_map.map.size());
 
-    /*-------------------------------------------------*\
-    | Fill the map with NA                              |
-    \*-------------------------------------------------*/
-    memset(map, NA, size * sizeof(unsigned int));
+    /*-----------------------------------------------------*\
+    | Fill the map with NA                                  |
+    \*-----------------------------------------------------*/
+    for(std::size_t led_idx = 0; led_idx < setup.zones[0].matrix_map.map.size(); led_idx++)
+    {
+        setup.zones[0].matrix_map.map[led_idx]          = NA;
+    }
 
-    /*-------------------------------------------------*\
-    | Iterate controllers, count and place leds         |
-    | Count real leds in the same loop                  |
-    \*-------------------------------------------------*/
-    unsigned int map_leds_count = 0;
+    /*-----------------------------------------------------*\
+    | Iterate controllers, count and place LEDs             |
+    | Count real LEDs in the same loop                      |
+    \*-----------------------------------------------------*/
+    unsigned int    map_leds_count                      = 0;
 
     for(ControllerZone* ctrl_zone: added_zones)
     {
-        RGBController* controller = ctrl_zone->controller;
-        const ControllerZoneSettings& settings = ctrl_zone->settings;
-        unsigned int leds_count = controller->zones[ctrl_zone->zone_idx].leds_count;
+        RGBControllerInterface*         controller      = ctrl_zone->controller;
+        const ControllerZoneSettings&   settings        = ctrl_zone->settings;
+        unsigned int                    leds_count      = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
 
-        switch (ctrl_zone->settings.shape) {
-        case HORIZONTAL_LINE:
-            for(unsigned int i = 0; i < leds_count; i++)
-            {
-                unsigned int idx = settings.reverse ? leds_count - 1 - i : i;
-
-                unsigned int x = idx * settings.led_spacing + settings.x;
-                unsigned int y = settings.y;
-
-                if(y < height && x < width)
+        switch(ctrl_zone->settings.shape)
+        {
+            case HORIZONTAL_LINE:
+                for(unsigned int i = 0; i < leds_count; i++)
                 {
-                    unsigned int xy = y * width + x;
+                    unsigned int        idx             = settings.reverse ? leds_count - 1 - i : i;
+                    unsigned int        x               = idx * settings.led_spacing + settings.x;
+                    unsigned int        y               = settings.y;
 
-                    if(real_leds[xy].empty())
+                    if(y < height && x < width)
                     {
-                        map_leds_count++;
+                        unsigned int    xy              = y * width + x;
+
+                        if(real_leds[xy].empty())
+                        {
+                            map_leds_count++;
+                        }
+
+                        real_leds[xy].push_back(controller->GetLEDName(i));
                     }
-
-                    real_leds[xy].push_back(controller->leds[i].name);
                 }
-            }
-            break;
+                break;
 
-        case VERTICAL_LINE:
-            for(unsigned int i = 0; i < leds_count; i++)
-            {
-                unsigned int idx = settings.reverse ? leds_count - 1 - i : i;
-
-                unsigned int x = settings.x;
-                unsigned int y = idx * settings.led_spacing + settings.y;
-
-                if(y < height && x < width)
+            case VERTICAL_LINE:
+                for(unsigned int i = 0; i < leds_count; i++)
                 {
-                    unsigned int xy = y * width + x;
+                    unsigned int        idx             = settings.reverse ? leds_count - 1 - i : i;
+                    unsigned int        x               = settings.x;
+                    unsigned int        y               = idx * settings.led_spacing + settings.y;
 
-                    if(real_leds[xy].empty())
+                    if(y < height && x < width)
                     {
-                        map_leds_count++;
+                        unsigned int    xy              = y * width + x;
+
+                        if(real_leds[xy].empty())
+                        {
+                            map_leds_count++;
+                        }
+
+                        real_leds[xy].push_back(controller->GetLEDName(i));
                     }
-
-                    real_leds[xy].push_back(controller->leds[i].name);
                 }
-            }
-            break;
+                break;
 
-        case CUSTOM:
-            std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
+            case CUSTOM:
+                std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
 
-            for(unsigned int i = 0; i < led_positions.size(); i++)
-            {
-                unsigned int x = settings.x + led_positions[i]->x();
-                unsigned int y = settings.y + led_positions[i]->y();
-
-                if(y < height && x < width)
+                for(unsigned int i = 0; i < led_positions.size(); i++)
                 {
-                    unsigned int xy = y * width + x;
+                    unsigned int        x               = settings.x + led_positions[i]->x();
+                    unsigned int        y               = settings.y + led_positions[i]->y();
 
-                    if(real_leds[xy].empty())
+                    if(y < height && x < width)
                     {
-                        map_leds_count++;
+                        unsigned int    xy              = y * width + x;
+
+                        if(real_leds[xy].empty())
+                        {
+                            map_leds_count++;
+                        }
+
+                        real_leds[xy].push_back(controller->GetLEDName(led_positions[i]->led_num));
                     }
-
-                    real_leds[xy].push_back(controller->leds[led_positions[i]->led_num].name);
                 }
-            }
-
-            break;
+                break;
         }
     }
 
     /*-------------------------------------------------*\
-    | Setup map, colors and leds                        |
+    | Update zone data                                  |
     \*-------------------------------------------------*/
-    colors.resize(map_leds_count);
-    leds.resize(map_leds_count);
+    setup.zones[0].leds_count                       = map_leds_count;
+    setup.zones[0].leds_min                         = map_leds_count;
+    setup.zones[0].leds_max                         = map_leds_count;
+    setup.leds.resize(map_leds_count);
 
+    /*-------------------------------------------------*\
+    | Update LED names and positions in matrix map      |
+    \*-------------------------------------------------*/
     int i = 0;
 
     for(unsigned int h = 0; h < height; h++)
@@ -168,17 +186,15 @@ void VirtualController::UpdateVirtualZone()
 
             if(!real_leds[xy].empty())
             {
-                map[xy] = i;
-
-                colors[i] = ToRGBColor(0,0,0);
+                setup.zones[0].matrix_map.map[xy]   = i;
 
                 if(real_leds[xy].size() > 1)
                 {
-                    leds[i].name = "Multiple LEDs (" + std::to_string(real_leds[xy].size()) + ")";
+                    setup.leds[i].name = "Multiple LEDs (" + std::to_string(real_leds[xy].size()) + ")";
                 }
                 else
                 {
-                    leds[i].name = real_leds[xy][0];
+                    setup.leds[i].name = real_leds[xy][0];
                 }
 
                 i++;
@@ -186,36 +202,15 @@ void VirtualController::UpdateVirtualZone()
         }
     }
 
-    /*-------------------------------------------------*\
-    | Update zone data                                  |
-    \*-------------------------------------------------*/
-    zones[0].leds_count             = map_leds_count;
-    zones[0].leds_min               = map_leds_count;
-    zones[0].leds_max               = map_leds_count;
-    zones[0].matrix_map->width      = width;
-    zones[0].matrix_map->height     = height;
-
-    if(colors.size() > 0 && leds.size() > 0)
-    {
-        zones[0].colors                 = &colors[0];
-        zones[0].leds                   = &leds[0];
-    }
-
-    /*-------------------------------------------------*\
-    | Clean up old map and set the new one              |
-    \*-------------------------------------------------*/
-    delete[] zones[0].matrix_map->map;
-    zones[0].matrix_map->map = map;
+    OpenRGBVisualMapPlugin::api->UpdateVirtualRGBController(virtual_controller, &setup);
 }
 
-void VirtualController::DeviceUpdateLEDs() {
-    QImage image(width, height, QImage::Format_ARGB32);
-
-    float brightness = modes[0].brightness / 100.f;
-
-    unsigned int color_index = 0;
-
-    QColor transparent("#00000000");
+void VirtualController::DeviceUpdateLEDs()
+{
+    float           brightness = virtual_controller->GetModeBrightness(0) / 100.f;
+    unsigned int    color_index = 0;
+    QImage          image(width, height, QImage::Format_ARGB32);
+    QColor          transparent("#00000000");
 
     for(unsigned int h = 0; h < height; h++)
     {
@@ -223,13 +218,13 @@ void VirtualController::DeviceUpdateLEDs() {
         {
             QColor color;
 
-            if(zones[0].matrix_map->map[(h*width) + w] == NA)
+            if(setup.zones[0].matrix_map.map[(h*width) + w] == NA)
             {
                 color = transparent;
             }
             else
             {
-                const RGBColor& rgb = colors[color_index++];
+                const RGBColor rgb = virtual_controller->GetColor(color_index++);
                 color = QColor(RGBGetRValue(rgb) * brightness, RGBGetGValue(rgb)* brightness, RGBGetBValue(rgb)* brightness);
             }
 
@@ -248,39 +243,43 @@ void VirtualController::UpdateSize(int w, int h)
     UpdateVirtualZone();
 }
 
+void VirtualController::SetName(std::string name)
+{
+    setup.name = name;
+    OpenRGBVisualMapPlugin::api->UpdateVirtualRGBController(virtual_controller, &setup);   
+}
+
 void VirtualController::SetPostUpdateCallBack(std::function<void(const QImage&)> callback)
 {
     this->callback = callback;
 }
 
-void VirtualController::Register(bool state, bool unregister_members)
+void VirtualController::Register(bool state, bool hide_members)
 {
     if(state)
     {
         if(!registered)
         {
             ForceDirectMode();
-            OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(this);
 
-            printf("[OpenRGBVisualMapPlugin] Virtual map \"%s\" registered\n", name.c_str());
-
-            if(unregister_members)
+            if(hide_members)
             {
-                std::set<RGBController*> controllers;
+                std::set<RGBControllerInterface*> controllers;
 
                 for(ControllerZone* ctrl_zone: added_zones)
                 {
                     controllers.insert(ctrl_zone->controller);
                 }
 
-                for(RGBController* controller : controllers)
+                for(RGBControllerInterface* controller : controllers)
                 {
-                    OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(controller);
+                    controller->SetHidden(true);
                 }
 
-                members_unregistered = true;
+                members_hidden = true;
             }
 
+            OpenRGBVisualMapPlugin::api->RegisterVirtualRGBControllerInThread(virtual_controller);
             registered = true;
         }
     }
@@ -288,24 +287,24 @@ void VirtualController::Register(bool state, bool unregister_members)
     {
         if(registered)
         {
-            OpenRGBVisualMapPlugin::RMPointer->UnregisterRGBController(this);
+            OpenRGBVisualMapPlugin::api->UnregisterVirtualRGBControllerInThread(virtual_controller);
             registered = false;
 
-            if(members_unregistered)
+            if(members_hidden)
             {
-                std::set<RGBController*> controllers;
+                std::set<RGBControllerInterface*> controllers;
 
                 for(ControllerZone* ctrl_zone: added_zones)
                 {
                     controllers.insert(ctrl_zone->controller);
                 }
 
-                for(RGBController* controller : controllers)
+                for(RGBControllerInterface* controller : controllers)
                 {
-                    OpenRGBVisualMapPlugin::RMPointer->RegisterRGBController(controller);
+                    controller->SetHidden(false);
                 }
 
-                members_unregistered = false;
+                members_hidden = false;
             }
         }
     }
@@ -313,20 +312,20 @@ void VirtualController::Register(bool state, bool unregister_members)
 
 void VirtualController::ForceDirectMode()
 {
-    std::set<RGBController*> controllers;
+    std::set<RGBControllerInterface*> controllers;
 
     for(ControllerZone* ctrl_zone: added_zones)
     {
         controllers.insert(ctrl_zone->controller);
     }
 
-    for(RGBController* controller : controllers)
+    for(RGBControllerInterface* controller : controllers)
     {
-        for(unsigned int i = 0; i < controller->modes.size(); i++)
+        for(unsigned int i = 0; i < controller->GetModeCount(); i++)
         {
-            if(controller->modes[i].name == "Direct")
+            if(controller->GetModeName(i) == "Direct")
             {
-                controller->SetMode(i);
+                controller->SetActiveMode(i);
             }
         }
     }
@@ -374,6 +373,11 @@ bool VirtualController::IsEmpty()
     return added_zones.empty();
 }
 
+std::string VirtualController::GetName()
+{
+    return virtual_controller->GetName();
+}
+
 unsigned int VirtualController::GetTotalLeds()
 {
     unsigned int result = 0;
@@ -391,7 +395,7 @@ void VirtualController::ApplyImage(const QImage& original)
     // Make sure the image only targets the existing LEDs
     QImage image(width, height, QImage::Format_ARGB32);
 
-    float brightness = modes[0].brightness / 100.f;
+    float brightness = virtual_controller->GetModeBrightness(0) / 100.f;
 
     QColor transparent("#00000000");
 
@@ -403,7 +407,7 @@ void VirtualController::ApplyImage(const QImage& original)
         {
             QColor color;
 
-            if(zones[0].matrix_map->map[(h*width) + w] == NA)
+            if(setup.zones[0].matrix_map.map[(h*width) + w] == NA)
             {
                 color = transparent;
             }
@@ -415,9 +419,9 @@ void VirtualController::ApplyImage(const QImage& original)
                 int blu = original_color.blue()  * brightness;
                 color = QColor(red, grn, blu);
 
-                if(color_idx < colors.size())
+                if(color_idx < virtual_controller->GetLEDCount())
                 {
-                    colors[color_idx] = ToRGBColor(red,grn,blu);
+                    virtual_controller->SetColor(color_idx, ToRGBColor(red,grn,blu));
                 }
 
                 color_idx++;
@@ -433,7 +437,7 @@ void VirtualController::ApplyImage(const QImage& original)
 void VirtualController::ApplyToDevice(const QImage& image)
 {
     // make sure we update the controller only once by using a set
-    std::set<RGBController*> controllers;
+    std::set<RGBControllerInterface*> controllers;
 
     for(ControllerZone* ctrl_zone: added_zones)
     {
@@ -441,7 +445,7 @@ void VirtualController::ApplyToDevice(const QImage& image)
         controllers.insert(ctrl_zone->controller);
     }
 
-    for(RGBController* controller : controllers)
+    for(RGBControllerInterface* controller : controllers)
     {
         controller->UpdateLEDs();
     }
@@ -451,13 +455,13 @@ void VirtualController::ApplyToDevice(const QImage& image)
 
 void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& image)
 {
-    RGBController* controller = ctrl_zone->controller;
-    zone z = controller->zones[ctrl_zone->zone_idx];
-    ControllerZoneSettings settings = ctrl_zone->settings;
-    int leds_count = z.leds_count;
-    int start_idx = z.start_idx;
+    RGBControllerInterface* controller  = ctrl_zone->controller;
+    ControllerZoneSettings  settings    = ctrl_zone->settings;
+    unsigned int            leds_count  = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
+    unsigned int            start_idx   = controller->GetZoneStartIndex(ctrl_zone->zone_idx);
 
-    switch (ctrl_zone->settings.shape) {
+    switch(ctrl_zone->settings.shape)
+    {
     case HORIZONTAL_LINE:
         for(int i = 0; i < leds_count; i++)
         {
@@ -469,7 +473,7 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
             if(image.valid(x,y))
             {
                 QColor color = image.pixelColor(x, y);
-                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+                controller->SetColor(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
             }
 
         }
@@ -486,7 +490,7 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
             if(image.valid(x,y))
             {
                 QColor color = image.pixelColor(x, y);
-                controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+                controller->SetColor(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
             }
         }
         break;
@@ -502,10 +506,15 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
             if(image.valid(x,y))
             {
                 QColor color = image.pixelColor(x, y);
-                controller->SetLED(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
+                controller->SetColor(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
             }
         }
 
         break;
     }
+}
+
+void VirtualController::DeviceUpdateLEDs_func(void* object_ptr)
+{
+    ((VirtualController*)object_ptr)->DeviceUpdateLEDs();
 }

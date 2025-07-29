@@ -33,7 +33,7 @@ public:
     void LoadFile(std::string);
     void LoadJson(json);
     void Clear();
-    void Unregister();
+    void Hide();
     void Recreate();
     void BackupZones();
 

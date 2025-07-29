@@ -10,7 +10,7 @@ struct GridSettings
     int grid_size;
     bool auto_load;
     bool auto_register;
-    bool unregister_members;
+    bool hide_members;
 };
 
 #endif // GRIDSETTINGS_H

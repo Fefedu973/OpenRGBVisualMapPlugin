@@ -96,7 +96,7 @@ bool VisualMapSettingsManager::CreateGradientsDirectory()
 
 filesystem::path VisualMapSettingsManager::SettingsFolder()
 {
-    return OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() / "plugins" / "settings";
+    return OpenRGBVisualMapPlugin::api->GetConfigurationDirectory() / "plugins" / "settings";
 }
 
 filesystem::path VisualMapSettingsManager::MapsFolder()

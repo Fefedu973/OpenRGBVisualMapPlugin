@@ -34,9 +34,9 @@ void DeviceList::Clear()
 void DeviceList::Init(std::vector<ControllerZone*> controller_zones)
 {
     /*-------------------------------------------------*\
-    | Group by RGBController                            |
+    | Group by RGBControllerInterface                            |
     \*-------------------------------------------------*/
-    std::map<RGBController*,std::vector<ControllerZone*>> groups;
+    std::map<RGBControllerInterface*,std::vector<ControllerZone*>> groups;
 
     for(ControllerZone* controller_zone: controller_zones)
     {
@@ -53,11 +53,11 @@ void DeviceList::Init(std::vector<ControllerZone*> controller_zones)
     | Iterate groups, add widgets                       |
     \*-------------------------------------------------*/
 
-    std::vector<RGBController*> controllers = OpenRGBVisualMapPlugin::RMPointer->GetRGBControllers();
+    std::vector<RGBControllerInterface*> controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
 
-    for (RGBController* controller: controllers)
+    for (RGBControllerInterface* controller: controllers)
     {
-        if(controller->serial == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
+        if(controller->GetSerial() == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
         {
             continue;
         }
@@ -79,7 +79,7 @@ void DeviceList::Init(std::vector<ControllerZone*> controller_zones)
             group_frame->setLayout(new QVBoxLayout(group_frame));
             group_frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
-            QLabel* group_name_label = new QLabel(QString::fromStdString(controller->name));
+            QLabel* group_name_label = new QLabel(QString::fromStdString(controller->GetName()));
             group_name_label->setWordWrap(true);
             group_name_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 

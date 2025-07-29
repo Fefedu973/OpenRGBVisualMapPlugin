@@ -20,16 +20,16 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
 {
     std::vector<ControllerZone*> available_zones;
 
-    std::vector<RGBController*> controllers = OpenRGBVisualMapPlugin::RMPointer->GetRGBControllers();
+    std::vector<RGBControllerInterface*> controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
 
     for (unsigned int i = 0; i < controllers.size(); i++)
     {
-        if(controllers[i]->serial == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
+        if(controllers[i]->GetSerial() == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
         {
             continue;
         }
 
-        for(unsigned int zone_idx = 0; zone_idx < controllers[i]->zones.size(); zone_idx++)
+        for(unsigned int zone_idx = 0; zone_idx < controllers[i]->GetZoneCount(); zone_idx++)
         {
             ControllerZone* ctrl_zone = new ControllerZone();
 
@@ -38,7 +38,7 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
             ctrl_zone->settings = ControllerZoneSettings::defaults();
             ctrl_zone->custom_zone_name = "";
 
-            if(ctrl_zone->controller->zones[ctrl_zone->zone_idx].type == ZONE_TYPE_MATRIX)
+            if(ctrl_zone->controller->GetZoneType(ctrl_zone->zone_idx) == ZONE_TYPE_MATRIX)
             {
                 InitMatrixCustomShape(ctrl_zone);
             }
@@ -55,7 +55,7 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
 void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 {
     // make sure we update the controller only once by using a set
-    std::set<RGBController*> controllers;
+    std::set<RGBControllerInterface*> controllers;
 
     std::vector<ControllerZone*> available_zones = GetAvailableZones();
 
@@ -65,7 +65,7 @@ void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
         controllers.insert(ctrl_zone->controller);
     }
 
-    for(RGBController* controller : controllers)
+    for(RGBControllerInterface* controller : controllers)
     {
         controller->UpdateLEDs();
     }
@@ -73,29 +73,26 @@ void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 
 void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color)
 {
-    RGBController* controller = ctrl_zone->controller;
-    zone z = controller->zones[ctrl_zone->zone_idx];
-    int leds_count = z.leds_count;
-    int start_idx = z.start_idx;
+    RGBControllerInterface*  controller  = ctrl_zone->controller;
+    unsigned int    leds_count  = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
+    unsigned int    start_idx   = controller->GetZoneStartIndex(ctrl_zone->zone_idx);
 
-    for(int i = 0; i < leds_count; i++)
+    for(unsigned int i = 0; i < leds_count; i++)
     {
-        controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+        controller->SetColor(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
     }
 }
 
 void ZoneManager::IdentifyLeds(ControllerZone* ctrl_zone, std::vector<unsigned int> led_nums)
 {
-    RGBController* controller = ctrl_zone->controller;
-    zone z = controller->zones[ctrl_zone->zone_idx];
-
-    unsigned int leds_count = z.leds_count;
-    unsigned int start_idx = z.start_idx;
+    RGBControllerInterface*  controller  = ctrl_zone->controller;
+    unsigned int    leds_count  = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
+    unsigned int    start_idx   = controller->GetZoneStartIndex(ctrl_zone->zone_idx);
 
     for(unsigned int i = 0; i < leds_count; i++)
     {
         QColor color = std::find(led_nums.begin(), led_nums.end(), i) != led_nums.end() ? Qt::green : Qt::black;
-        controller->SetLED(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
+        controller->SetColor(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
     }
 
     controller->UpdateLEDs();
@@ -103,18 +100,18 @@ void ZoneManager::IdentifyLeds(ControllerZone* ctrl_zone, std::vector<unsigned i
 
 void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
 {
-    matrix_map_type* matrix_map = ctrl_zone->controller->zones[ctrl_zone->zone_idx].matrix_map;
+    RGBControllerInterface*  controller          = ctrl_zone->controller;
 
-    ctrl_zone->settings.shape = CUSTOM;
-    ctrl_zone->settings.custom_shape = new CustomShape();
-    ctrl_zone->settings.custom_shape->w = matrix_map->width;
-    ctrl_zone->settings.custom_shape->h = matrix_map->height;
+    ctrl_zone->settings.shape           = CUSTOM;
+    ctrl_zone->settings.custom_shape    = new CustomShape();
+    ctrl_zone->settings.custom_shape->w = controller->GetZoneMatrixMapWidth(ctrl_zone->zone_idx);
+    ctrl_zone->settings.custom_shape->h = controller->GetZoneMatrixMapWidth(ctrl_zone->zone_idx);
 
-    for(unsigned int h = 0; h < matrix_map->height; h++)
+    for(unsigned int h = 0; h < ctrl_zone->settings.custom_shape->h; h++)
     {
-        for(unsigned int w = 0; w < matrix_map->width; w++)
+        for(unsigned int w = 0; w < ctrl_zone->settings.custom_shape->w; w++)
         {
-            unsigned int led_num = matrix_map->map[h * matrix_map->width + w];
+            unsigned int led_num = controller->GetZoneMatrixMapData(ctrl_zone->zone_idx)[h * ctrl_zone->settings.custom_shape->w + w];
 
             if(led_num != NA)
             {

@@ -108,13 +108,13 @@ void VirtualControllerTab::CreateMainMenu()
 
 void VirtualControllerTab::RenameController(std::string value)
 {
-    virtual_controller->name = value;
+    virtual_controller->SetName(value);
     emit ControllerRenamed(value);
 }
 
 std::string VirtualControllerTab::GetControllerName()
 {
-    return virtual_controller->name;
+    return virtual_controller->GetName();
 }
 
 void VirtualControllerTab::resizeEvent(QResizeEvent*)
@@ -169,10 +169,10 @@ void VirtualControllerTab::LoadJson(json j)
             bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
 
             if(
-                ctrl_zone->controller->name == controller["name"] &&
-                ctrl_zone->controller->vendor == controller["vendor"] &&
-                ctrl_zone->controller->serial == controller["serial"] &&
-                (ctrl_zone->controller->location == controller["location"] || hid_location) &&
+                ctrl_zone->controller->GetName() == controller["name"] &&
+                ctrl_zone->controller->GetVendor() == controller["vendor"] &&
+                ctrl_zone->controller->GetSerial() == controller["serial"] &&
+                (ctrl_zone->controller->GetLocation() == controller["location"] || hid_location) &&
                 ctrl_zone->zone_idx == entry["zone_idx"])
             {
                 if(entry.contains("custom_zone_name"))
@@ -201,7 +201,7 @@ void VirtualControllerTab::LoadJson(json j)
             \*-------------------------------------------------*/
             for (ControllerZone* z : candidates)
             {
-                if (z->controller->location == controller["location"])
+                if (z->controller->GetLocation() == controller["location"])
                 {
                     zone = z;
                     break;
@@ -274,7 +274,7 @@ void VirtualControllerTab::VirtualControllerPostUpdateSlot(const QImage& image)
     ui->grid->UpdatePreview(image);
 }
 
-void VirtualControllerTab::Unregister()
+void VirtualControllerTab::Hide()
 {
     virtual_controller->Register(false, false);
 }
@@ -287,7 +287,7 @@ void VirtualControllerTab::Recreate()
 
     if(register_controller->isChecked())
     {
-        virtual_controller->Register(true, settings->unregister_members);
+        virtual_controller->Register(true, settings->hide_members);
     }
 }
 
@@ -441,7 +441,7 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
 \*-------------------------------------------------*/
 void VirtualControllerTab::RegisterAction()
 {
-    virtual_controller->Register(register_controller->isChecked(), settings->unregister_members);
+    virtual_controller->Register(register_controller->isChecked(), settings->hide_members);
 }
 
 void VirtualControllerTab::AddBackgroundAction()

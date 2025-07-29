@@ -25,7 +25,7 @@ PluginInfo::~PluginInfo()
 
 void PluginInfo::on_open_plugin_folder_clicked()
 {
-    filesystem::path config_dir = OpenRGBVisualMapPlugin::RMPointer->GetConfigurationDirectory() / "plugins";
+    filesystem::path config_dir = OpenRGBVisualMapPlugin::api->GetConfigurationDirectory() / "plugins";
     QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir.string()));
 
     QDesktopServices::openUrl(url);
