@@ -433,13 +433,7 @@ before_script:
   - macos
   stage: build
   script:
-  - eval $(/opt/homebrew/bin/brew shellenv)
-  - /opt/homebrew/opt/qt@5/bin/qmake OpenRGBVisualMapPlugin.pro
-  - make -j16
-  - install_name_tool libOpenRGBVisualMapPlugin.dylib -change /opt/homebrew/opt/qt@5/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets
-  - install_name_tool libOpenRGBVisualMapPlugin.dylib -change /opt/homebrew/opt/qt@5/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui
-  - install_name_tool libOpenRGBVisualMapPlugin.dylib -change /opt/homebrew/opt/qt@5/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore
-  - codesign --force --verify -s OpenRGB libOpenRGBVisualMapPlugin.dylib
+  - ./scripts/build-macos.sh qt5 arm
 
   artifacts:
     name: "${CI_PROJECT_NAME}_MacOS_ARM64_${CI_COMMIT_SHORT_SHA}"
@@ -455,13 +449,7 @@ before_script:
   - macos
   stage: build
   script:
-  - eval $(/opt/homebrew/bin/brew shellenv)
-  - qmake OpenRGBVisualMapPlugin.pro
-  - make -j16
-  - install_name_tool libOpenRGBVisualMapPlugin.dylib -change /opt/homebrew/opt/qt@6/lib/QtWidgets.framework/Versions/Current/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/Current/QtWidgets
-  - install_name_tool libOpenRGBVisualMapPlugin.dylib -change /opt/homebrew/opt/qt@6/lib/QtGui.framework/Versions/Current/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/Current/QtGui
-  - install_name_tool libOpenRGBVisualMapPlugin.dylib -change /opt/homebrew/opt/qt@6/lib/QtCore.framework/Versions/Current/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/Current/QtCore
-  - codesign --force --verify -s OpenRGB libOpenRGBVisualMapPlugin.dylib
+  - ./scripts/build-macos.sh qt6 arm
 
   artifacts:
     name: "${CI_PROJECT_NAME}_MacOS_ARM64_Qt6_${CI_COMMIT_SHORT_SHA}"
@@ -477,13 +465,7 @@ before_script:
   - macos
   stage: build
   script:
-  - eval $(/usr/local/bin/brew shellenv)
-  - arch -x86_64 /usr/local/opt/qt@5/bin/qmake OpenRGBVisualMapPlugin.pro
-  - arch -x86_64 make -j16
-  - arch -x86_64 install_name_tool libOpenRGBVisualMapPlugin.dylib -change /usr/local/opt/qt@5/lib/QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets
-  - arch -x86_64 install_name_tool libOpenRGBVisualMapPlugin.dylib -change /usr/local/opt/qt@5/lib/QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui
-  - arch -x86_64 install_name_tool libOpenRGBVisualMapPlugin.dylib -change /usr/local/opt/qt@5/lib/QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore
-  - arch -x86_64 codesign --force --verify -s OpenRGB libOpenRGBVisualMapPlugin.dylib
+  - ./scripts/build-macos.sh qt5 intel
   
   artifacts:
     name: "${CI_PROJECT_NAME}_MacOS_Intel_${CI_COMMIT_SHORT_SHA}"
@@ -499,13 +481,7 @@ before_script:
   - macos
   stage: build
   script:
-  - eval $(/usr/local/bin/brew shellenv)
-  - arch -x86_64 /usr/local/bin/qmake OpenRGBVisualMapPlugin.pro
-  - arch -x86_64 make -j16
-  - arch -x86_64 install_name_tool libOpenRGBVisualMapPlugin.dylib -change /usr/local/opt/qt@6/lib/QtWidgets.framework/Versions/Current/QtWidgets @executable_path/../Frameworks/QtWidgets.framework/Versions/Current/QtWidgets
-  - arch -x86_64 install_name_tool libOpenRGBVisualMapPlugin.dylib -change /usr/local/opt/qt@6/lib/QtGui.framework/Versions/Current/QtGui @executable_path/../Frameworks/QtGui.framework/Versions/Current/QtGui
-  - arch -x86_64 install_name_tool libOpenRGBVisualMapPlugin.dylib -change /usr/local/opt/qt@6/lib/QtCore.framework/Versions/Current/QtCore @executable_path/../Frameworks/QtCore.framework/Versions/Current/QtCore
-  - arch -x86_64 codesign --force --verify -s OpenRGB libOpenRGBVisualMapPlugin.dylib
+  - ./scripts/build-macos.sh qt6 intel
   
   artifacts:
     name: "${CI_PROJECT_NAME}_MacOS_Intel_Qt6_${CI_COMMIT_SHORT_SHA}"
