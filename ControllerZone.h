@@ -165,11 +165,11 @@ struct ControllerZoneSettings
 struct ControllerZone
 {
     RGBControllerInterface* controller;
-    unsigned int zone_idx;
-
-    std::string custom_zone_name;
-
-    ControllerZoneSettings settings;
+    unsigned int            zone_idx;
+    unsigned int            segment_idx;
+    bool                    is_segment;
+    std::string             custom_zone_name;
+    ControllerZoneSettings  settings;
 
     bool compare_controller(RGBControllerInterface* other) const {
         return
@@ -190,21 +190,46 @@ struct ControllerZone
     }
 
     unsigned int led_count() const {
-        return controller->GetZoneLEDsCount(zone_idx);
+        if(is_segment)
+        {
+            return controller->GetZoneSegmentLEDsCount(zone_idx, segment_idx);
+        }
+        else
+        {
+            return controller->GetZoneLEDsCount(zone_idx);
+        }
     }
 
     std::string full_display_name()
     {
-        return this->custom_zone_name.empty() ?
-                    this->controller->GetName() + " " + this->controller->GetZoneName(this->zone_idx):
-                    this->custom_zone_name;
+        if(is_segment)
+        {
+            return this->custom_zone_name.empty() ?
+                        this->controller->GetName() + " " + this->controller->GetZoneName(this->zone_idx) + " " + this->controller->GetZoneSegmentName(this->zone_idx, this->segment_idx):
+                        this->custom_zone_name;
+        }
+        else
+        {
+            return this->custom_zone_name.empty() ?
+                        this->controller->GetName() + " " + this->controller->GetZoneName(this->zone_idx):
+                        this->custom_zone_name;
+        }
     }
 
     std::string zone_display_name()
     {
-        return this->custom_zone_name.empty() ?
-                    this->controller->GetZoneName(this->zone_idx):
-                    this->custom_zone_name;
+        if(is_segment)
+        {
+            return this->custom_zone_name.empty() ?
+                        this->controller->GetZoneName(this->zone_idx) + " " + this->controller->GetZoneSegmentName(this->zone_idx, this->segment_idx):
+                        this->custom_zone_name;
+        }
+        else
+        {
+            return this->custom_zone_name.empty() ?
+                        this->controller->GetZoneName(this->zone_idx):
+                        this->custom_zone_name;
+        }
     }
 
     std::string controller_display_name()

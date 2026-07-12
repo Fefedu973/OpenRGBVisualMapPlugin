@@ -457,9 +457,20 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
 {
     RGBControllerInterface* controller  = ctrl_zone->controller;
     ControllerZoneSettings  settings    = ctrl_zone->settings;
-    unsigned int            leds_count  = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
-    unsigned int            start_idx   = controller->GetZoneStartIndex(ctrl_zone->zone_idx);
+    unsigned int            leds_count;
+    unsigned int            start_idx;
 
+    if(ctrl_zone->is_segment)
+    {
+        leds_count                      = controller->GetZoneSegmentLEDsCount(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
+        start_idx                       = controller->GetZoneSegmentStartIndex(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
+    }
+    else
+    {
+        leds_count                      = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
+        start_idx                       = controller->GetZoneStartIndex(ctrl_zone->zone_idx);
+    }
+    
     switch(ctrl_zone->settings.shape)
     {
     case HORIZONTAL_LINE:
