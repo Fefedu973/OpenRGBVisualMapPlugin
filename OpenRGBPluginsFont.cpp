@@ -1,4 +1,5 @@
 #include "OpenRGBPluginsFont.h"
+#include "OpenRGBVisualMapPlugin.h"
 #include <QFontDatabase>
 #include <QList>
 #include <QString>
@@ -16,7 +17,7 @@ OpenRGBPluginsFont *OpenRGBPluginsFont::Get()
 
         if(instance->fontId == -1)
         {
-            printf("Cannot load requested font.\n");
+            LOG_ERROR("[OpenRGBVisualMapPlugin] Cannot load requested font.\n");
         }
         else
         {

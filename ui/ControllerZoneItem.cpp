@@ -4,6 +4,7 @@
 #include <QCursor>
 #include <QPalette>
 #include <QApplication>
+#include "OpenRGBVisualMapPlugin.h"
 
 ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone, GridSettings* settings) :
     ctrl_zone(ctrl_zone),
@@ -95,7 +96,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     }
     else
     {
-        printf("[OpenRGBVisualMapPlugin] Unsupported shape\n");
+        LOG_ERROR("[OpenRGBVisualMapPlugin] Unsupported shape\n");
     }
 }
 

@@ -1,4 +1,5 @@
 #include "OpenRGBVisualMapTab.h"
+#include "OpenRGBVisualMapPlugin.h"
 #include "VirtualControllerTab.h"
 #include "VisualMapSettingsManager.h"
 #include "PluginInfo.h"
@@ -74,38 +75,38 @@ void OpenRGBVisualMapTab::HideAll()
 
 void OpenRGBVisualMapTab::Backup()
 {
-    printf("[OpenRGBVisualMapPlugin] Backup\n");
+    LOG_INFO("[OpenRGBVisualMapPlugin] Backup\n");
 
     for(VirtualControllerTab* controller_tab: controller_tabs)
     {
         controller_tab->BackupZones();
     }
 
-    printf("[OpenRGBVisualMapPlugin] Backup done\n");
+    LOG_INFO("[OpenRGBVisualMapPlugin] Backup done\n");
 }
 
 void OpenRGBVisualMapTab::Clear()
 {    
-    printf("[OpenRGBVisualMapPlugin] Clear\n");
+    LOG_INFO("[OpenRGBVisualMapPlugin] Clear\n");
 
     for(VirtualControllerTab* controller_tab: controller_tabs)
     {
         controller_tab->Clear();
     }
 
-    printf("[OpenRGBVisualMapPlugin] Clear done\n");
+    LOG_INFO("[OpenRGBVisualMapPlugin] Clear done\n");
 }
 
 void OpenRGBVisualMapTab::Recreate()
 {
-    printf("[OpenRGBVisualMapPlugin] Recreate\n");
+    LOG_INFO("[OpenRGBVisualMapPlugin] Recreate\n");
 
     for(VirtualControllerTab* controller_tab: controller_tabs)
     {
         controller_tab->Recreate();
     }
 
-    printf("[OpenRGBVisualMapPlugin] Recreate done\n");
+    LOG_INFO("[OpenRGBVisualMapPlugin] Recreate done\n");
 }
 
 VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
@@ -171,7 +172,7 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 
             if(auto_load)
             {
-                printf("[OpenRGBVisualMapPlugin] Auto load: loading file %s\n", filename.c_str());
+                LOG_INFO("[OpenRGBVisualMapPlugin] Auto load: loading file %s\n", filename.c_str());
                 VirtualControllerTab* tab = AddTab();
                 tab->LoadFile(filename);
                 has_loaded = true;
@@ -179,7 +180,7 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
         }
         catch(const std::exception& e)
         {
-            printf("[OpenRGBVisualMapPlugin] Not able to load file %s: \n%s\n", filename.c_str(), e.what());
+            LOG_ERROR("[OpenRGBVisualMapPlugin] Not able to load file %s: \n%s\n", filename.c_str(), e.what());
         }
     }
 
@@ -212,7 +213,7 @@ void OpenRGBVisualMapTab::OpenVmapsFolder()
     filesystem::path config_dir = VisualMapSettingsManager::MapsFolder();
     QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir.string()));
 
-    printf("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
+    LOG_INFO("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
 
     QDesktopServices::openUrl(url);
 }

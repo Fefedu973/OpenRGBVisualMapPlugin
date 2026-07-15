@@ -122,7 +122,7 @@ bool VisualMapSettingsManager::write_file(filesystem::path file_name, json j)
         }
         catch(const std::exception& e)
         {
-            printf("[OpenRGBVisualMapPlugin] Cannot write file: %s\n", e.what());
+            LOG_ERROR("[OpenRGBVisualMapPlugin] Cannot write file: %s\n", e.what());
             return false;
         }
     }
@@ -145,7 +145,7 @@ json VisualMapSettingsManager::load_json_file(filesystem::path file_name)
         }
         catch(const std::exception& e)
         {
-             printf("[OpenRGBVisualMapPlugin] Cannot read file: %s\n", e.what());
+            LOG_ERROR("[OpenRGBVisualMapPlugin] Cannot read file: %s\n", e.what());
         }
     }
 
