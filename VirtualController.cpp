@@ -504,9 +504,9 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
     switch(ctrl_zone->settings.shape)
     {
     case HORIZONTAL_LINE:
-        for(int i = 0; i < leds_count; i++)
+        for(int i = 0; i < (int)leds_count; i++)
         {
-            int idx = settings.reverse ? leds_count - 1 - i : i;
+            int idx = settings.reverse ? (int)leds_count - 1 - i : i;
 
             unsigned int x = idx * settings.led_spacing + settings.x;
             unsigned int y = settings.y;
@@ -521,9 +521,9 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
         break;
 
     case VERTICAL_LINE:
-        for(int i = 0; i < leds_count; i++)
+        for(int i = 0; i < (int)leds_count; i++)
         {
-            int idx = settings.reverse ? leds_count - 1 - i : i;
+            int idx = settings.reverse ? (int)leds_count - 1 - i : i;
 
             unsigned int x = settings.x;
             unsigned int y = idx * settings.led_spacing + settings.y;

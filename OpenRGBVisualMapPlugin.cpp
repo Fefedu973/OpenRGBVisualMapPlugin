@@ -78,7 +78,7 @@ void OpenRGBVisualMapPlugin::OnProfileAboutToLoad()
 
 }
 
-void OpenRGBVisualMapPlugin::OnProfileLoad(nlohmann::json profile_data)
+void OpenRGBVisualMapPlugin::OnProfileLoad(nlohmann::json /*profile_data*/)
 {
 
 }
@@ -89,7 +89,7 @@ nlohmann::json OpenRGBVisualMapPlugin::OnProfileSave()
     return(profile_json);
 }
 
-unsigned char* OpenRGBVisualMapPlugin::OnSDKCommand(unsigned int pkt_id, unsigned char * pkt_data, unsigned int *pkt_size)
+unsigned char* OpenRGBVisualMapPlugin::OnSDKCommand(unsigned int /*pkt_id*/, unsigned char * /*pkt_data*/, unsigned int * /*pkt_size*/)
 {
     return(NULL);
 }
