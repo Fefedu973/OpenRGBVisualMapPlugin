@@ -271,6 +271,21 @@ void VirtualController::Register(bool state, bool hide_members)
                     controllers.insert(ctrl_zone->controller);
                 }
 
+                /*-----------------------------------------*\
+                | Ensure controller is in the latest list   |
+                | as this function can be called during     |
+                | list updates                              |
+                \*-----------------------------------------*/
+                std::vector<RGBControllerInterface*> available_controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
+
+                for(RGBControllerInterface* controller : controllers)
+                {
+                    if(std::find(available_controllers.begin(), available_controllers.end(), controller) == available_controllers.end())
+                    {
+                        controllers.erase(controller);
+                    }
+                }
+
                 for(RGBControllerInterface* controller : controllers)
                 {
                     controller->SetHidden(true);
@@ -297,6 +312,21 @@ void VirtualController::Register(bool state, bool hide_members)
                 for(ControllerZone* ctrl_zone: added_zones)
                 {
                     controllers.insert(ctrl_zone->controller);
+                }
+
+                /*-----------------------------------------*\
+                | Ensure controller is in the latest list   |
+                | as this function can be called during     |
+                | list updates                              |
+                \*-----------------------------------------*/
+                std::vector<RGBControllerInterface*> available_controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
+
+                for(RGBControllerInterface* controller : controllers)
+                {
+                    if(std::find(available_controllers.begin(), available_controllers.end(), controller) == available_controllers.end())
+                    {
+                        controllers.erase(controller);
+                    }
                 }
 
                 for(RGBControllerInterface* controller : controllers)
