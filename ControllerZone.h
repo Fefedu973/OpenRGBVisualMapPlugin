@@ -138,6 +138,16 @@ struct CustomShape
     }
 };
 
+struct ControllerInfo
+{
+    std::string name;
+    std::string vendor;
+    std::string description;
+    std::string version;
+    std::string serial;
+    std::string location;
+};
+
 enum ZoneShape {
     HORIZONTAL_LINE = 0,
     VERTICAL_LINE = 1,
@@ -170,15 +180,26 @@ struct ControllerZone
     bool                    is_segment;
     std::string             custom_zone_name;
     ControllerZoneSettings  settings;
+    ControllerInfo          controller_info;
+
+    void set_controller(RGBControllerInterface* new_controller) {
+        this->controller                    = new_controller;
+        this->controller_info.name          = this->controller->GetName();
+        this->controller_info.vendor        = this->controller->GetVendor();
+        this->controller_info.description   = this->controller->GetDescription();
+        this->controller_info.version       = this->controller->GetVersion();
+        this->controller_info.serial        = this->controller->GetSerial();
+        this->controller_info.location      = this->controller->GetLocation();
+    }
 
     bool compare_controller(RGBControllerInterface* other) const {
         return
-                this->controller->GetName()        == other->GetName() &&
-                this->controller->GetVendor()      == other->GetVendor() &&
-                this->controller->GetDescription() == other->GetDescription() &&
-                this->controller->GetVersion()     == other->GetVersion() &&
-                this->controller->GetSerial()      == other->GetSerial() &&
-                this->controller->GetLocation()    == other->GetLocation() ;
+                this->controller_info.name          == other->GetName() &&
+                this->controller_info.vendor        == other->GetVendor() &&
+                this->controller_info.description   == other->GetDescription() &&
+                this->controller_info.version       == other->GetVersion() &&
+                this->controller_info.serial        == other->GetSerial() &&
+                this->controller_info.location      == other->GetLocation() ;
     }
 
     bool compare(ControllerZone* rhs) const {

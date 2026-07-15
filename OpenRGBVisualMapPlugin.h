@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include <atomic>
+#include <shared_mutex>
+#include <vector>
 #include <QAction>
 #include <QDialog>
 #include <QLabel>
@@ -71,6 +74,9 @@ public:
     /*-----------------------------------------------------*\
     | Plugin Global Variables                               |
     \*-----------------------------------------------------*/
+    static std::atomic<bool>            controllers_updating;
+    static std::vector<ControllerZone*> controller_zones;
+    static std::shared_mutex            controller_zones_mutex;
     static OpenRGBPluginAPIInterface *  api;
 };
 

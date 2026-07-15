@@ -73,18 +73,6 @@ void OpenRGBVisualMapTab::HideAll()
     }
 }
 
-void OpenRGBVisualMapTab::Backup()
-{
-    LOG_INFO("[OpenRGBVisualMapPlugin] Backup\n");
-
-    for(VirtualControllerTab* controller_tab: controller_tabs)
-    {
-        controller_tab->BackupZones();
-    }
-
-    LOG_INFO("[OpenRGBVisualMapPlugin] Backup done\n");
-}
-
 void OpenRGBVisualMapTab::Clear()
 {    
     LOG_INFO("[OpenRGBVisualMapPlugin] Clear\n");

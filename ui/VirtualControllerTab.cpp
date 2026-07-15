@@ -1,3 +1,4 @@
+#include "OpenRGBVisualMapPlugin.h"
 #include "VirtualControllerTab.h"
 #include "VisualMapSettingsManager.h"
 #include "ZoneManager.h"
@@ -27,6 +28,8 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     settings->show_bounds   = true;
     settings->show_grid     = true;
     settings->grid_size     = 1;
+
+    active_state["ctrl_zones"] = json::array();
 
     /*-------------------------------------------------*\
     | Init the grid                                     |
@@ -130,8 +133,7 @@ void VirtualControllerTab::UpdateVirtualControllerDetails()
 
 void VirtualControllerTab::InitZoneList()
 {
-    retained_zones = ZoneManager::Get()->GetAvailableZones();
-    ui->device_list->Init(retained_zones);
+    ui->device_list->Init();
 }
 
 void VirtualControllerTab::LoadFile(std::string filename)
@@ -147,121 +149,140 @@ void VirtualControllerTab::LoadJson(json j)
 {    
     virtual_controller->Clear();
 
-    json ctrl_zones = j["ctrl_zones"];
-    std::vector<ControllerZone*> all_zones = retained_zones;
-
-    bool has_failures = false;
-
-    for (json::iterator it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
+    if(j.contains("ctrl_zones"))
     {
-        json entry = it.value();
-        json controller = entry["controller"];
-        json settings = entry["settings"];
+        json ctrl_zones = j["ctrl_zones"];
+        std::vector<ControllerZone*> all_zones = OpenRGBVisualMapPlugin::controller_zones;
 
-        std::vector<ControllerZone*> candidates;
+        bool has_failures = false;
 
-        for(ControllerZone* ctrl_zone : all_zones)
+        for (json::iterator it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
         {
-            /*-------------------------------------------------*\
-            | Don't compare location for HID devices,           |
-            | because it constantly changes                     |
-            \*-------------------------------------------------*/
-            bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
+            json entry = it.value();
 
-            if(
-                ctrl_zone->controller->GetName() == controller["name"] &&
-                ctrl_zone->controller->GetVendor() == controller["vendor"] &&
-                ctrl_zone->controller->GetSerial() == controller["serial"] &&
-                (ctrl_zone->controller->GetLocation() == controller["location"] || hid_location) &&
-                ctrl_zone->zone_idx == entry["zone_idx"])
+            if(entry.contains("controller") && entry.contains("settings") && entry.contains("zone_idx"))
             {
-                if(entry.contains("custom_zone_name"))
+                json controller = entry["controller"];
+                json settings = entry["settings"];
+
+                std::vector<ControllerZone*> candidates;
+
+                for(ControllerZone* ctrl_zone : all_zones)
                 {
-                    ctrl_zone->custom_zone_name = entry["custom_zone_name"];
+                    if(controller.contains("name") && controller.contains("location") && controller.contains("vendor") && controller.contains("serial"))
+                    {
+                        /*---------------------------------*\
+                        | Don't compare location for HID    |
+                        | devices, because it constantly    |
+                        | changes                           |
+                        \*---------------------------------*/
+                        bool hid_location = std::string(controller["location"]).find("HID: ") == 0;
+
+                        if(
+                            ctrl_zone->controller->GetName() == controller["name"] &&
+                            ctrl_zone->controller->GetVendor() == controller["vendor"] &&
+                            ctrl_zone->controller->GetSerial() == controller["serial"] &&
+                            (ctrl_zone->controller->GetLocation() == controller["location"] || hid_location) &&
+                            ctrl_zone->zone_idx == entry["zone_idx"])
+                        {
+                            if(entry.contains("custom_zone_name"))
+                            {
+                                ctrl_zone->custom_zone_name = entry["custom_zone_name"];
+                            }
+
+                            ctrl_zone->settings = settings;
+
+                            candidates.push_back(ctrl_zone);
+                        }
+                    }
                 }
 
-                ctrl_zone->settings = settings;
-
-                candidates.push_back(ctrl_zone);
-            }
-        }
-
-        ControllerZone* zone = nullptr;
-        if (candidates.size() > 1)
-        {
-            /*-------------------------------------------------*\
-            | If we found more than onne zone matching the      |
-            | saved one then fall back to comparing by location |
-            | even for HID devices.                             |
-            | This is a workaround to prevent us from loading   |
-            | the wrong device when multiple HID devices have   |
-            | the same name, vendor, serial, and zone_idx.      |
-            | It won't work 100% of the time, but it will work  |
-            | in some situations                                |
-            \*-------------------------------------------------*/
-            for (ControllerZone* z : candidates)
-            {
-                if (z->controller->GetLocation() == controller["location"])
+                ControllerZone* zone = nullptr;
+                if (candidates.size() > 1)
                 {
-                    zone = z;
-                    break;
+                    /*-------------------------------------*\
+                    | If we found more than onne zone       |
+                    | matching the saved one then fall back |
+                    | to comparing by location even for HID |
+                    | devices.                              |
+                    | This is a workaround to prevent us    |
+                    | from loading the wrong device when    |
+                    | multiple HID devices have the same    |
+                    | name, vendor, serial, and zone_idx.   |
+                    | It won't work 100% of the time, but   |
+                    | it will work in some situations       |
+                    \*-------------------------------------*/
+                    for (ControllerZone* z : candidates)
+                    {
+                        if (controller.contains("location") && (z->controller->GetLocation() == controller["location"]))
+                        {
+                            zone = z;
+                            break;
+                        }
+                    }
+                }
+                else if (candidates.size() == 1)
+                {
+                    zone = candidates[0];
+                }
+
+                try
+                {
+                    if (zone)
+                    {
+                        AddActiveZone(zone);
+                        virtual_controller->Add(zone);
+                        ui->device_list->UpdateControllerState(zone);
+                        /*---------------------------------*\
+                        | Remove this zone from the list of |
+                        | all zones so that we don't modify |
+                        | its custom name or settings if    |
+                        | there's another collision.        |
+                        \*---------------------------------*/
+                        all_zones.erase(std::find(all_zones.begin(), all_zones.end(), zone));
+                    }
+                }
+                catch (const std::exception&)
+                {
+                    has_failures = true;
                 }
             }
         }
-        else if (candidates.size() == 1)
+
+        QPoint button_pos = ui->main_menu->cursor().pos();
+
+        if(has_failures)
         {
-            zone = candidates[0];
+            QMessageBox msgBox;
+            msgBox.setText("Some of the components could not be loaded, the format is probably out of date.");
+            msgBox.setWindowTitle("Sorry");
+            msgBox.move(button_pos.x(), button_pos.y());
+            msgBox.exec();
         }
 
-        try
+        if(j.contains("grid_settings"))
         {
-            if (zone)
-            {
-                virtual_controller->Add(zone);
-                ui->device_list->UpdateControllerState(zone);
-                /*-------------------------------------------------*\
-                | Remove this zone from the list of all zones so    |
-                | that we don't modify its custom name or settings  |
-                | if there's another collision.                     |
-                \*-------------------------------------------------*/
-                all_zones.erase(std::find(all_zones.begin(), all_zones.end(), zone));
-            }
+            j.at("grid_settings").get_to(settings);
+            active_state["grid_settings"] = j["grid_settings"];
         }
-        catch (const std::exception&)
+
+        ui->gridOptions->SetSettings(settings);
+
+        ui->grid->ResetItems(virtual_controller->GetZones());
+
+        virtual_controller->UpdateSize(settings->w, settings->h);
+
+        if(settings->auto_register)
         {
-            has_failures = true;
+            /*-------------------------------------------------*\
+            | This will auto trigger registering                |
+            \*-------------------------------------------------*/
+            register_controller->setChecked(true);
+            RegisterAction();
         }
+
+        UpdateVirtualControllerDetails();
     }
-
-    QPoint button_pos = ui->main_menu->cursor().pos();
-
-    if(has_failures)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Some of the components could not be loaded, the format is probably out of date.");
-        msgBox.setWindowTitle("Sorry");
-        msgBox.move(button_pos.x(), button_pos.y());
-        msgBox.exec();
-    }
-
-    j.at("grid_settings").get_to(settings);
-
-    ui->gridOptions->SetSettings(settings);
-
-    ui->grid->ResetItems(virtual_controller->GetZones());
-
-    virtual_controller->UpdateSize(settings->w, settings->h);
-
-    if(settings->auto_register)
-    {
-        /*-------------------------------------------------*\
-        | This will auto trigger registering                |
-        \*-------------------------------------------------*/
-        register_controller->setChecked(true);
-        RegisterAction();
-    }
-
-    UpdateVirtualControllerDetails();
 }
 
 void VirtualControllerTab::on_backgroundApplier_BackgroundUpdated(const QImage& image)
@@ -281,8 +302,8 @@ void VirtualControllerTab::Hide()
 
 void VirtualControllerTab::Recreate()
 {
+    Clear();
     InitZoneList();
-
     ReassignZones();
 
     if(register_controller->isChecked())
@@ -293,20 +314,76 @@ void VirtualControllerTab::Recreate()
 
 void VirtualControllerTab::ReassignZones()
 {
-    LoadJson(saved_zones);
+    LoadJson(active_state);
 }
 
-void VirtualControllerTab::BackupZones()
+void VirtualControllerTab::AddActiveZone(ControllerZone* added_zone)
 {
-    saved_zones["ctrl_zones"]       = virtual_controller->GetZones();
-    saved_zones["grid_settings"]    = settings;
+    json added_zone_json    = added_zone;
+    bool found              = false;
+
+    for(std::size_t saved_zone_idx = 0; saved_zone_idx < active_state["ctrl_zones"].size(); saved_zone_idx++)
+    {
+        json saved_zone_json = active_state["ctrl_zones"][saved_zone_idx];
+
+        /*-------------------------------------------------*\
+        | Don't compare location for HID devices, because   |
+        | it constantly changes                             |
+        \*-------------------------------------------------*/
+        bool hid_location = std::string(saved_zone_json["controller"]["location"]).find("HID: ") == 0;
+
+        if((added_zone_json["controller"]["name"] == saved_zone_json["controller"]["name"]) &&
+            (added_zone_json["controller"]["vendor"] == saved_zone_json["controller"]["vendor"]) &&
+            (added_zone_json["controller"]["serial"] == saved_zone_json["controller"]["serial"]) &&
+            ((added_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location))
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        active_state["ctrl_zones"].push_back(added_zone_json);
+    }
+}
+
+void VirtualControllerTab::RemoveActiveZone(ControllerZone* removed_zone)
+{
+    bool        found               = false;
+    json        removed_zone_json   = removed_zone;
+    std::size_t saved_zone_idx      = 0;
+
+    for(/*saved_zone_idx*/; saved_zone_idx < active_state["ctrl_zones"].size(); saved_zone_idx++)
+    {
+        json saved_zone_json = active_state["ctrl_zones"][saved_zone_idx];
+
+        /*-------------------------------------------------*\
+        | Don't compare location for HID devices, because   |
+        | it constantly changes                             |
+        \*-------------------------------------------------*/
+        bool hid_location = std::string(saved_zone_json["controller"]["location"]).find("HID: ") == 0;
+
+        if((removed_zone_json["controller"]["name"] == saved_zone_json["controller"]["name"]) &&
+            (removed_zone_json["controller"]["vendor"] == saved_zone_json["controller"]["vendor"]) &&
+            (removed_zone_json["controller"]["serial"] == saved_zone_json["controller"]["serial"]) &&
+            ((removed_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location))
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(found)
+    {
+        active_state["ctrl_zones"].erase(active_state["ctrl_zones"].begin() + saved_zone_idx);
+    }
 }
 
 void VirtualControllerTab::Clear()
 {
     ui->device_list->Clear();
     ui->grid->Clear();
-    retained_zones.clear();
     selected_ctrl_zone = nullptr;
 }
 
@@ -329,6 +406,7 @@ void VirtualControllerTab::UpdateItemOptions(std::vector<ControllerZone*> select
 \*-------------------------------------------------*/
 void VirtualControllerTab::on_device_list_DeviceAdded(ControllerZone* controller_zone)
 {
+    AddActiveZone(controller_zone);
     virtual_controller->Add(controller_zone);
     UpdateVirtualControllerDetails();
     ui->grid->ResetItems(virtual_controller->GetZones());
@@ -337,6 +415,7 @@ void VirtualControllerTab::on_device_list_DeviceAdded(ControllerZone* controller
 
 void VirtualControllerTab::on_device_list_DeviceRemoved(ControllerZone* controller_zone)
 {
+    RemoveActiveZone(controller_zone);
     virtual_controller->Remove(controller_zone);
     UpdateVirtualControllerDetails();
     ui->grid->ResetItems(virtual_controller->GetZones());
@@ -370,7 +449,7 @@ void VirtualControllerTab::on_itemOptions_ShapeEditRequest(ControllerZone* contr
 {
     if(controller_zone)
     {
-        int result = WidgetEditor::Show(controller_zone, retained_zones);
+        int result = WidgetEditor::Show(controller_zone, OpenRGBVisualMapPlugin::controller_zones);
 
         if(result)
         {

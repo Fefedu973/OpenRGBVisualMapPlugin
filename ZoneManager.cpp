@@ -16,10 +16,10 @@ ZoneManager* ZoneManager::Get()
     return instance;
 }
 
-std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
+void ZoneManager::UpdateControllerZones()
 {
-    std::vector<ControllerZone*> controller_zones;
-
+    OpenRGBVisualMapPlugin::controller_zones.clear();
+    
     /*-----------------------------------------------------*\
     | Create ControllerZones for new controllers            |
     \*-----------------------------------------------------*/
@@ -37,7 +37,7 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
                 {
                     ControllerZone* controller_zone     = new ControllerZone();
 
-                    controller_zone->controller         = controller;
+                    controller_zone->set_controller(controller);
                     controller_zone->zone_idx           = zone_idx;
                     controller_zone->segment_idx        = segment_idx;
                     controller_zone->is_segment         = true;
@@ -49,14 +49,14 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
                         InitMatrixCustomShape(controller_zone);
                     }
 
-                    controller_zones.push_back(controller_zone);
+                    OpenRGBVisualMapPlugin::controller_zones.push_back(controller_zone);
                 }
             }
             else
             {
                 ControllerZone* controller_zone     = new ControllerZone();
 
-                controller_zone->controller         = controller;
+                controller_zone->set_controller(controller);
                 controller_zone->zone_idx           = zone_idx;
                 controller_zone->segment_idx        = 0;
                 controller_zone->is_segment         = false;
@@ -68,12 +68,10 @@ std::vector<ControllerZone*> ZoneManager::GetAvailableZones()
                     InitMatrixCustomShape(controller_zone);
                 }
 
-                controller_zones.push_back(controller_zone);
+                OpenRGBVisualMapPlugin::controller_zones.push_back(controller_zone);
             }
         }
     }
-
-    return controller_zones;
 }
 
 
@@ -81,9 +79,8 @@ void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 {
     // make sure we update the controller only once by using a set
     std::set<RGBControllerInterface*>   controllers;
-    std::vector<ControllerZone*>        available_zones = GetAvailableZones();
 
-    for(ControllerZone* ctrl_zone: available_zones)
+    for(ControllerZone* ctrl_zone: OpenRGBVisualMapPlugin::controller_zones)
     {
         SetControllerZoneColor(ctrl_zone, ctrl_zone->compare(ctrl_zone_to_identify) ? Qt::green : Qt::black);
         controllers.insert(ctrl_zone->controller);

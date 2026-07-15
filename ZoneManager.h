@@ -10,10 +10,10 @@ class ZoneManager
 public:
     static ZoneManager* Get();
 
-    std::vector<ControllerZone*> GetAvailableZones();
-
     void IdentifyZone(ControllerZone*);
     void IdentifyLeds(ControllerZone*, std::vector<unsigned int>);
+
+    void UpdateControllerZones();
 
 private:
     ZoneManager(){};

@@ -20,7 +20,6 @@ public:
 
 public slots:
     void Clear();
-    void Backup();
     void Recreate();
 
 private slots:

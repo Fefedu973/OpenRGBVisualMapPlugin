@@ -2,8 +2,15 @@
 #include "ResourceManagerCallback.h"
 #include "TooltipProxy.h"
 #include "VisualMapSettingsManager.h"
+#include "ZoneManager.h"
 
-OpenRGBPluginAPIInterface* OpenRGBVisualMapPlugin::api = nullptr;
+/*---------------------------------------------------------*\
+| Plugin Global Variables                                   |
+\*---------------------------------------------------------*/
+std::atomic<bool>               OpenRGBVisualMapPlugin::controllers_updating;
+std::vector<ControllerZone*>    OpenRGBVisualMapPlugin::controller_zones;
+std::shared_mutex               OpenRGBVisualMapPlugin::controller_zones_mutex;
+OpenRGBPluginAPIInterface*      OpenRGBVisualMapPlugin::api = nullptr;
 
 OpenRGBPluginInfo OpenRGBVisualMapPlugin::GetPluginInfo()
 {
@@ -47,6 +54,11 @@ void OpenRGBVisualMapPlugin::Load(OpenRGBPluginAPIInterface* plugin_api_ptr)
     | Create settings directory                             |
     \*-----------------------------------------------------*/
     VisualMapSettingsManager::CreateSettingsDirectory();
+
+    /*-----------------------------------------------------*\
+    | Initialize the controller zone list                   |
+    \*-----------------------------------------------------*/
+    ZoneManager::Get()->UpdateControllerZones();
 
     /*-----------------------------------------------------*\
     | Create the main UI widget                             |
@@ -106,17 +118,9 @@ void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
 {
     switch(update_reason)
     {
-        case RESOURCEMANAGER_UPDATE_REASON_DETECTION_STARTED:
-            // immediate backup, don't run this in a thread
-            ui->HideAll();
-            ui->Backup();
-
-            // clear the GUI on the GUI thread
-            QMetaObject::invokeMethod(this, "Clear", Qt::QueuedConnection);
-            break;
-
         case RESOURCEMANAGER_UPDATE_REASON_DEVICE_LIST_UPDATED:
-            QMetaObject::invokeMethod(this, "Recreate", Qt::QueuedConnection);
+            ZoneManager::Get()->UpdateControllerZones();
+            QMetaObject::invokeMethod(ui, "Recreate", Qt::BlockingQueuedConnection);
             break;
     }
 }

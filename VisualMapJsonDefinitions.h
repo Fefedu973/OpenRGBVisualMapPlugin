@@ -54,15 +54,6 @@ void to_json(json& j, const CustomShape* custom_shape) {
     }
 }
 
-void to_json(json& j, RGBControllerInterface* const controller) {
-    j = json{
-    {"name",     controller->GetName()},
-    {"location", controller->GetLocation()},
-    {"serial",   controller->GetSerial()},
-    {"vendor",   controller->GetVendor()}
-};
-}
-
 void to_json(json& j, const ControllerZoneSettings settings) {
     j = json{
     {"shape", settings.shape},
@@ -101,9 +92,20 @@ void from_json(const json& j, ControllerZoneSettings& s) {
     }
 }
 
+void to_json(json& j, const ControllerInfo info) {
+    j = json{
+    {"name", info.name},
+    {"vendor", info.vendor},
+    {"description", info.description},
+    {"version", info.version},
+    {"serial", info.serial},
+    {"location", info.location},
+};
+};
+
 void to_json(json& j, const ControllerZone* ctrl_zone) {
     j = json{
-    {"controller", ctrl_zone->controller},
+    {"controller", ctrl_zone->controller_info},
     {"zone_idx", ctrl_zone->zone_idx},
     {"custom_zone_name", ctrl_zone->custom_zone_name},
     {"settings", ctrl_zone->settings}

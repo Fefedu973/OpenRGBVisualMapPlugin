@@ -18,7 +18,7 @@ public:
     ~DeviceList();
 
     void Clear();
-    void Init(std::vector<ControllerZone*>);
+    void Init();
     void SetSelection(std::vector<ControllerZone*>);
     void UpdateControllerState(ControllerZone*);
 

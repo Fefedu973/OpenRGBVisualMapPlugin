@@ -35,7 +35,6 @@ public:
     void Clear();
     void Hide();
     void Recreate();
-    void BackupZones();
 
 private slots:
     // ui element signals
@@ -66,7 +65,9 @@ signals:
     void ControllerRenamed(std::string);
     void VirtualControllerPostUpdateSignal(const QImage&);
 
-private:    
+private:
+    void AddActiveZone(ControllerZone* added_zone);
+    void RemoveActiveZone(ControllerZone* removed_zone);
     void CreateMainMenu();
     void InitZoneList();
     void UpdateVirtualControllerDetails();
@@ -79,8 +80,7 @@ private:
     ControllerZone* selected_ctrl_zone = nullptr;
     QAction* register_controller;
     QAction* add_background;
-    std::vector<ControllerZone*> retained_zones;
-    json saved_zones;
+    json active_state;
 
 protected:
     void resizeEvent(QResizeEvent*) override;
