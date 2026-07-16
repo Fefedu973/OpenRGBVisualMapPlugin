@@ -1,3 +1,4 @@
+#include <QChar>
 #include "EditorGrid.h"
 #include "ControllerZone.h"
 #include "LedItem.h"

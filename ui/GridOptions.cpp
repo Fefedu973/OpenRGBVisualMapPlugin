@@ -1,3 +1,4 @@
+#include <QChar>
 #include "GridOptions.h"
 #include "ui_GridOptions.h"
 

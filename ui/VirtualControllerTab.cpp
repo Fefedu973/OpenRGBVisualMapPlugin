@@ -147,16 +147,16 @@ void VirtualControllerTab::LoadJson(json j)
 {    
     virtual_controller->Clear();
 
-    auto ctrl_zones = j["ctrl_zones"];
+    json ctrl_zones = j["ctrl_zones"];
     std::vector<ControllerZone*> all_zones = retained_zones;
 
     bool has_failures = false;
 
-    for (auto it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
+    for (json::iterator it = ctrl_zones.begin(); it != ctrl_zones.end(); ++it)
     {
-        auto entry = it.value();
-        auto controller = entry["controller"];
-        auto settings = entry["settings"];
+        json entry = it.value();
+        json controller = entry["controller"];
+        json settings = entry["settings"];
 
         std::vector<ControllerZone*> candidates;
 

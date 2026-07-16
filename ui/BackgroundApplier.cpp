@@ -319,19 +319,19 @@ void BackgroundApplier::on_presets_comboBox_currentIndexChanged(int index)
     ui->x_offset->setValue(preset.x_offset);
     ui->y_offset->setValue(preset.y_offset);
 
-    auto it_spread = std::find(spreads.begin(), spreads.end(), preset.spread);
+    std::vector<QGradient::Spread>::const_iterator it_spread = std::find(spreads.begin(), spreads.end(), preset.spread);
 
     if (it_spread != spreads.end())
     {
-        auto idx = std::distance(spreads.begin(), it_spread);
+        std::size_t idx = std::distance(spreads.begin(), it_spread);
         ui->spread_comboBox->setCurrentIndex(idx);
     }
 
-    auto it_type = std::find(types.begin(), types.end(), preset.type);
+    std::vector<QGradient::Type>::const_iterator it_type = std::find(types.begin(), types.end(), preset.type);
 
     if (it_type != types.end())
     {
-        auto idx = std::distance(types.begin(), it_type);
+        std::size_t idx = std::distance(types.begin(), it_type);
         ui->gradient_type->setCurrentIndex(idx);
     }
 

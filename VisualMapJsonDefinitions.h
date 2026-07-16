@@ -17,7 +17,7 @@ void to_json(json& j, LedPosition* led_position) {
 }
 
 void from_json(const json& j, std::vector<LedPosition*>& led_positions) {
-    for (auto it = j.begin(); it != j.end(); ++it)
+    for (json::const_iterator it = j.begin(); it != j.end(); ++it)
     {
         LedPosition* led_position = new LedPosition();
         led_position->led_num = it.value().at("led_num");
@@ -88,7 +88,7 @@ void from_json(const json& j, ControllerZoneSettings& s) {
     s.shape = static_cast<ZoneShape>(j.at("shape"));
     j.at("reverse").get_to(s.reverse);
 
-    auto custom_shape = j.at("custom_shape");
+    json custom_shape = j.at("custom_shape");
 
     if(!custom_shape.is_null() && s.shape == CUSTOM)
     {
