@@ -1,7 +1,17 @@
-#include "VirtualController.h"
+/*---------------------------------------------------------*\
+| VirtualController.cpp                                     |
+|                                                           |
+|   Virtual controller for visual map plugin                |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <set>
 #include "OpenRGBVisualMapPlugin.h"
 #include "RGBControllerInterface.h"
-#include <set>
+#include "VirtualController.h"
 
 std::string VirtualController::VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
 
@@ -372,7 +382,9 @@ void VirtualController::Add(ControllerZone* ctrl_zone)
     {
         added_zones.push_back(ctrl_zone);
 
-        // make sure to have the correct led size
+        /*-------------------------------------------------*\
+        | Make sure to have the correct LED size            |
+        \*-------------------------------------------------*/
         if(ctrl_zone->isCustomShape() && ctrl_zone->led_count() !=  ctrl_zone->settings.custom_shape->led_positions.size())
         {
             ctrl_zone->settings.custom_shape->resizeCustomShape(ctrl_zone->led_count());
@@ -422,7 +434,9 @@ unsigned int VirtualController::GetTotalLeds()
 
 void VirtualController::ApplyImage(const QImage& original)
 {
-    // Make sure the image only targets the existing LEDs
+    /*-----------------------------------------------------*\
+    | Make sure the image only targets the existing LEDs    |
+    \*-----------------------------------------------------*/
     QImage image(width, height, QImage::Format_ARGB32);
 
     float brightness = virtual_controller->GetModeBrightness(0) / 100.f;
@@ -466,7 +480,10 @@ void VirtualController::ApplyImage(const QImage& original)
 
 void VirtualController::ApplyToDevice(const QImage& image)
 {
-    // make sure we update the controller only once by using a set
+    /*-----------------------------------------------------*\
+    | Make sure we update the controller only once by using |
+    | a set                                                 |
+    \*-----------------------------------------------------*/
     std::set<RGBControllerInterface*> controllers;
 
     for(ControllerZone* ctrl_zone: added_zones)

@@ -1,8 +1,18 @@
-#include "OpenRGBPluginsFont.h"
-#include "OpenRGBVisualMapPlugin.h"
+/*---------------------------------------------------------*\
+| OpenRGBPluginsFont.cpp                                    |
+|                                                           |
+|   OpenRGB Plugins Font                                    |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include <QFontDatabase>
 #include <QList>
 #include <QString>
+#include "OpenRGBPluginsFont.h"
+#include "OpenRGBVisualMapPlugin.h"
 
 OpenRGBPluginsFont* OpenRGBPluginsFont::instance;
 

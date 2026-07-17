@@ -1,12 +1,21 @@
-#ifndef VIRTUALCONTROLLER_H
-#define VIRTUALCONTROLLER_H
+/*---------------------------------------------------------*\
+| VirtualController.h                                       |
+|                                                           |
+|   Virtual controller for visual map plugin                |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #define NA 0xFFFFFFFF
 
 #include <functional>
 #include <QImage>
-#include "RGBControllerInterface.h"
 #include "ControllerZone.h"
+#include "RGBControllerInterface.h"
 
 class VirtualController
 {
@@ -16,10 +25,14 @@ public:
     VirtualController();
     ~VirtualController();
 
-    // Virtual RGBController Functions
+    /*-----------------------------------------------------*\
+    | Virtual RGBController Functions                       |
+    \*-----------------------------------------------------*/
     void                            DeviceUpdateLEDs();
 
-    // Internals
+    /*-----------------------------------------------------*\
+    | Internals                                             |
+    \*-----------------------------------------------------*/
     void                            Add(ControllerZone*);
     void                            ApplyImage(const QImage&);
     void                            ApplyToDevice(const QImage&);
@@ -51,5 +64,3 @@ private:
 
     static void                     DeviceUpdateLEDs_func(void* object_ptr);
 };
-
-#endif // VIRTUALCONTROLLER_H

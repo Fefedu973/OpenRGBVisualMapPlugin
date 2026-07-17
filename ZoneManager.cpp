@@ -1,8 +1,17 @@
-#include "ZoneManager.h"
-#include "OpenRGBVisualMapPlugin.h"
-#include "VirtualController.h"
+/*---------------------------------------------------------*\
+| ZoneManager.cpp                                           |
+|                                                           |
+|   Zone management for Visual Map Plugin                   |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <set>
+#include "OpenRGBVisualMapPlugin.h"
+#include "VirtualController.h"
+#include "ZoneManager.h"
 
 ZoneManager* ZoneManager::instance;
 
@@ -77,7 +86,10 @@ void ZoneManager::UpdateControllerZones()
 
 void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 {
-    // make sure we update the controller only once by using a set
+    /*-----------------------------------------------------*\
+    | Make sure we update the controller only once by using |
+    | a set                                                 |
+    \*-----------------------------------------------------*/
     std::set<RGBControllerInterface*>   controllers;
 
     for(ControllerZone* ctrl_zone: OpenRGBVisualMapPlugin::controller_zones)

@@ -1,23 +1,34 @@
-#ifndef VISUALMAPJSONDEFINITIONS_H
-#define VISUALMAPJSONDEFINITIONS_H
+/*---------------------------------------------------------*\
+| VisualMapJsonDefinitions.cpp                              |
+|                                                           |
+|   Functions for converting various VisualMap objects to   |
+|   and from JSON                                           |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <nlohmann/json.hpp>
 #include "ControllerZone.h"
-#include "RGBControllerInterface.h"
 #include "GridSettings.h"
+#include "RGBControllerInterface.h"
 
 using json = nlohmann::json;
 
-void to_json(json& j, LedPosition* led_position) {
-        j = json{
-        {"led_num",led_position->led_num},
-        {"x", led_position->x()},
-        {"y", led_position->y()}
-    };
+void to_json(json& j, LedPosition* led_position)
+{
+    j = json{
+    {"led_num",led_position->led_num},
+    {"x", led_position->x()},
+    {"y", led_position->y()}};
 }
 
-void from_json(const json& j, std::vector<LedPosition*>& led_positions) {
-    for (json::const_iterator it = j.begin(); it != j.end(); ++it)
+void from_json(const json& j, std::vector<LedPosition*>& led_positions)
+{
+    for(json::const_iterator it = j.begin(); it != j.end(); ++it)
     {
         LedPosition* led_position = new LedPosition();
         led_position->led_num = it.value().at("led_num");
@@ -27,14 +38,16 @@ void from_json(const json& j, std::vector<LedPosition*>& led_positions) {
     }
 }
 
-void to_json(json& j, const std::vector<LedPosition*>& led_positions) {
+void to_json(json& j, const std::vector<LedPosition*>& led_positions)
+{
     for(unsigned int i = 0; i < led_positions.size(); i++)
     {
         j[i]=led_positions[i];
     }
 }
 
-void from_json(const json& j, CustomShape* s) {
+void from_json(const json& j, CustomShape* s)
+{
     if(!j.is_null())
     {
         j.at("w").get_to(s->w);
@@ -43,25 +56,26 @@ void from_json(const json& j, CustomShape* s) {
     }
 }
 
-void to_json(json& j, const CustomShape* custom_shape) {
+void to_json(json& j, const CustomShape* custom_shape)
+{
     if(custom_shape)
     {
         j = json{
         {"w", custom_shape->w},
         {"h", custom_shape->h},
-        {"led_positions", custom_shape->led_positions}
-    };
+        {"led_positions", custom_shape->led_positions}};
     }
 }
 
-void to_json(json& j, const ControllerZoneSettings settings) {
+void to_json(json& j, const ControllerZoneSettings settings)
+{
     j = json{
     {"shape", settings.shape},
     {"x", settings.x},
     {"y", settings.y},
     {"led_spacing", settings.led_spacing},
-    {"reverse", settings.reverse}
-};
+    {"reverse", settings.reverse}};
+
     if(settings.shape == CUSTOM)
     {
         j["custom_shape"] = settings.custom_shape;
@@ -72,7 +86,8 @@ void to_json(json& j, const ControllerZoneSettings settings) {
     }
 }
 
-void from_json(const json& j, ControllerZoneSettings& s) {
+void from_json(const json& j, ControllerZoneSettings& s)
+{
     j.at("x").get_to(s.x);
     j.at("y").get_to(s.y);
     j.at("led_spacing").get_to(s.led_spacing);
@@ -92,27 +107,28 @@ void from_json(const json& j, ControllerZoneSettings& s) {
     }
 }
 
-void to_json(json& j, const ControllerInfo info) {
+void to_json(json& j, const ControllerInfo info)
+{
     j = json{
     {"name", info.name},
     {"vendor", info.vendor},
     {"description", info.description},
     {"version", info.version},
     {"serial", info.serial},
-    {"location", info.location},
-};
+    {"location", info.location},};
 };
 
-void to_json(json& j, const ControllerZone* ctrl_zone) {
+void to_json(json& j, const ControllerZone* ctrl_zone)
+{
     j = json{
     {"controller", ctrl_zone->controller_info},
     {"zone_idx", ctrl_zone->zone_idx},
     {"custom_zone_name", ctrl_zone->custom_zone_name},
-    {"settings", ctrl_zone->settings}
-};
+    {"settings", ctrl_zone->settings}};
 }
 
-void to_json(json& j, const GridSettings* settings) {
+void to_json(json& j, const GridSettings* settings)
+{
     j = json{
     {"h", settings->h},
     {"w", settings->w},
@@ -148,5 +164,3 @@ void from_json(const json& j, GridSettings* s)
         j.at("hide_members").get_to(s->hide_members);
     }
 }
-
-#endif // VISUALMAPJSONDEFINITIONS_H

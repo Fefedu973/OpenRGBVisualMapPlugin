@@ -1,5 +1,14 @@
-#ifndef ZONEMANAGER_H
-#define ZONEMANAGER_H
+/*---------------------------------------------------------*\
+| ZoneManager.h                                             |
+|                                                           |
+|   Zone management for Visual Map Plugin                   |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <QImage>
 #include <vector>
@@ -22,5 +31,3 @@ private:
     void SetControllerZoneColor(ControllerZone*, QColor);
     void InitMatrixCustomShape(ControllerZone*);
 };
-
-#endif // ZONEMANAGER_H

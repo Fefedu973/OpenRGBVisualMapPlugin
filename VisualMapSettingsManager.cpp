@@ -1,9 +1,19 @@
-#include "VisualMapSettingsManager.h"
-#include "OpenRGBVisualMapPlugin.h"
+/*---------------------------------------------------------*\
+| VisualMapSettingsManager.cpp                              |
+|                                                           |
+|   Settings management for Visual Map Plugin               |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <fstream>
+#include <QDir>
 #include <QFile>
 #include <QString>
-#include <QDir>
-#include <fstream>
+#include "OpenRGBVisualMapPlugin.h"
+#include "VisualMapSettingsManager.h"
 
 bool VisualMapSettingsManager::SaveMap(std::string filename, json j)
 {
@@ -166,7 +176,9 @@ std::vector<std::string> VisualMapSettingsManager::list_files(filesystem::path p
         }
     }
 
-    // alphabetical sort
+    /*-----------------------------------------------------*\
+    | Alphabetical sort                                     |
+    \*-----------------------------------------------------*/
     std::sort(filenames.begin(), filenames.end());
 
     return filenames;

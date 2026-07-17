@@ -1,5 +1,14 @@
-#ifndef OPENRGBPLUGINSFONT_H
-#define OPENRGBPLUGINSFONT_H
+/*---------------------------------------------------------*\
+| OpenRGBPluginsFont.h                                      |
+|                                                           |
+|   OpenRGB Plugins Font                                    |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <QFont>
 #include <QString>
@@ -281,4 +290,3 @@ private:
     int fontId = -1;
     QFont font;
 };
-#endif // OPENRGBPLUGINSFONT_H

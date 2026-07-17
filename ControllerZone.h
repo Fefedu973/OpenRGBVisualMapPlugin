@@ -1,10 +1,19 @@
-#ifndef CONTROLLERZONE_H
-#define CONTROLLERZONE_H
+/*---------------------------------------------------------*\
+| ControllerZone.h                                          |
+|                                                           |
+|   OpenRGB Visual Map Plugin Controller Zone               |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "RGBControllerInterface.h"
-#include <vector>
+#pragma once
+
 #include <QPoint>
 #include <QStringList>
+#include <vector>
+#include "RGBControllerInterface.h"
 
 struct LedPosition
 {
@@ -40,24 +49,27 @@ struct LedPosition
 
     LedPosition* clone()
     {
-        LedPosition* clone = new LedPosition();
-        clone->led_num = led_num;
-        clone->point = QPoint(x(), y());
+        LedPosition* clone  = new LedPosition();
+        
+        clone->led_num      = led_num;
+        clone->point        = QPoint(x(), y());
+
         return clone;
     }
 };
 
 struct CustomShape
 {
-    unsigned int w;
-    unsigned int h;
-    std::vector<LedPosition*> led_positions;
+    unsigned int                w;
+    unsigned int                h;
+    std::vector<LedPosition*>   led_positions;
 
     CustomShape* clone()
     {
-        CustomShape* clone = new CustomShape();
-        clone->w = w;
-        clone->h = h;
+        CustomShape* clone  = new CustomShape();
+
+        clone->w            = w;
+        clone->h            = h;
 
         for(LedPosition* led_position: led_positions)
         {
@@ -69,18 +81,22 @@ struct CustomShape
 
     static CustomShape* HorizontalLine(unsigned int led_count)
     {
-        CustomShape* shape = new CustomShape();
-        shape->w = led_count;
-        shape->h = 1;
+        CustomShape* shape  = new CustomShape();
+
+        shape->w            = led_count;
+        shape->h            = 1;
+        
         shape->led_positions.resize(led_count);
 
         for(unsigned int i = 0; i < led_count; i++)
         {
-            LedPosition* led_position = new LedPosition();
-            led_position->led_num = i;
+            LedPosition* led_position   = new LedPosition();
+
+            led_position->led_num       = i;
             led_position->setX(i);
             led_position->setY(0);
-            shape->led_positions[i] = led_position;
+
+            shape->led_positions[i]     = led_position;
         }
 
         return shape;
@@ -148,7 +164,8 @@ struct ControllerInfo
     std::string location;
 };
 
-enum ZoneShape {
+enum ZoneShape
+{
     HORIZONTAL_LINE = 0,
     VERTICAL_LINE = 1,
     CUSTOM = 2
@@ -156,19 +173,18 @@ enum ZoneShape {
 
 struct ControllerZoneSettings
 {
-    ZoneShape shape;
-    CustomShape* custom_shape;
+    ZoneShape       shape;
+    CustomShape*    custom_shape;
 
-    unsigned int x;
-    unsigned int y;
-    unsigned int led_spacing;
+    unsigned int    x;
+    unsigned int    y;
+    unsigned int    led_spacing;
 
-    bool reverse;
+    bool            reverse;
 
-    static ControllerZoneSettings defaults() {
-        return {
-            HORIZONTAL_LINE,  nullptr, 0, 0, 1, false
-        };
+    static ControllerZoneSettings defaults()
+    {
+        return {HORIZONTAL_LINE,  nullptr, 0, 0, 1, false};
     }
 };
 
@@ -182,7 +198,8 @@ struct ControllerZone
     ControllerZoneSettings  settings;
     ControllerInfo          controller_info;
 
-    void set_controller(RGBControllerInterface* new_controller) {
+    void set_controller(RGBControllerInterface* new_controller)
+    {
         this->controller                    = new_controller;
         this->controller_info.name          = this->controller->GetName();
         this->controller_info.vendor        = this->controller->GetVendor();
@@ -192,7 +209,8 @@ struct ControllerZone
         this->controller_info.location      = this->controller->GetLocation();
     }
 
-    bool compare_controller(RGBControllerInterface* other) const {
+    bool compare_controller(RGBControllerInterface* other) const
+    {
         return
                 this->controller_info.name          == other->GetName() &&
                 this->controller_info.vendor        == other->GetVendor() &&
@@ -202,15 +220,18 @@ struct ControllerZone
                 this->controller_info.location      == other->GetLocation() ;
     }
 
-    bool compare(ControllerZone* rhs) const {
+    bool compare(ControllerZone* rhs) const
+    {
         return this->compare_controller(rhs->controller) && this->zone_idx == rhs->zone_idx;
     }
 
-    bool operator==(ControllerZone* rhs) const {
+    bool operator==(ControllerZone* rhs) const
+    {
         return this->compare(rhs);
     }
 
-    unsigned int led_count() const {
+    unsigned int led_count() const
+    {
         if(is_segment)
         {
             return controller->GetZoneSegmentLEDsCount(zone_idx, segment_idx);
@@ -260,13 +281,15 @@ struct ControllerZone
                     this->custom_zone_name;
     }
 
-    bool isCustomShape()  {
+    bool isCustomShape()
+    {
         return this->settings.shape == CUSTOM;
     }
 
     int width () const
     {
-        switch (this->settings.shape) {
+        switch(this->settings.shape)
+        {
             case CUSTOM: return this->settings.custom_shape->w;
             case HORIZONTAL_LINE: return this->led_count() * this->settings.led_spacing - (this->settings.led_spacing - 1);
             case VERTICAL_LINE: return 1;
@@ -277,7 +300,8 @@ struct ControllerZone
 
     int height () const
     {
-        switch (this->settings.shape) {
+        switch(this->settings.shape)
+        {
             case CUSTOM: return this->settings.custom_shape->h;
             case HORIZONTAL_LINE: return 1;
             case VERTICAL_LINE: return  this->led_count() * this->settings.led_spacing - (this->settings.led_spacing - 1);
@@ -286,5 +310,3 @@ struct ControllerZone
         return 0;
     }
 };
-
-#endif // CONTROLLERZONE_H

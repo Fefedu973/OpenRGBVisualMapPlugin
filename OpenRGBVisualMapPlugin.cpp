@@ -1,3 +1,13 @@
+/*---------------------------------------------------------*\
+| OpenRGBVisualMapPlugin.cpp                                |
+|                                                           |
+|   OpenRGB Visual Map Plugin                               |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include "OpenRGBVisualMapPlugin.h"
 #include "ResourceManagerCallback.h"
 #include "TooltipProxy.h"
@@ -80,7 +90,7 @@ QMenu* OpenRGBVisualMapPlugin::GetTrayMenu()
 }
 
 void OpenRGBVisualMapPlugin::Unload()
-{    
+{
     ui->HideAll();
     ui->Clear();
 }
