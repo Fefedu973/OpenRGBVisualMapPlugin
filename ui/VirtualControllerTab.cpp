@@ -1,16 +1,25 @@
-#include "OpenRGBVisualMapPlugin.h"
-#include "VirtualControllerTab.h"
-#include "VisualMapSettingsManager.h"
-#include "ZoneManager.h"
-#include "WidgetEditor.h"
-#include "VisualMapJsonDefinitions.h"
+/*---------------------------------------------------------*\
+| VirtualControllerTab.cpp                                  |
+|                                                           |
+|   Virtual controller tab for visual map plugin            |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include <QInputDialog>
+#include <QMenu>
 #include <QMessageBox>
 #include <QTableWidgetItem>
-#include <set>
-#include <QMenu>
 #include <QWidgetAction>
 #include <QVBoxLayout>
+#include "OpenRGBVisualMapPlugin.h"
+#include "VirtualControllerTab.h"
+#include "VisualMapJsonDefinitions.h"
+#include "VisualMapSettingsManager.h"
+#include "WidgetEditor.h"
+#include "ZoneManager.h"
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -19,9 +28,9 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 {
     ui->setupUi(this);
 
-    /*-------------------------------------------------*\
-    | Default settings for main grid                    |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Default settings for main grid                        |
+    \*-----------------------------------------------------*/
     settings                = new GridSettings();
     settings->w             = 64;
     settings->h             = 64;
@@ -31,44 +40,45 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 
     active_state["ctrl_zones"] = json::array();
 
-    /*-------------------------------------------------*\
-    | Init the grid                                     |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Init the grid                                         |
+    \*-----------------------------------------------------*/
     ui->grid->Init();
     ui->gridOptions->Init(settings);
     ui->grid->ApplySettings(settings);
 
     virtual_controller->UpdateSize(settings->w, settings->h);
 
-    /*-------------------------------------------------*\
-    | Init the grid                                     |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Init the grid                                         |
+    \*-----------------------------------------------------*/
     InitZoneList();
 
-    /*-------------------------------------------------*\
-    | Init other ui parts                               |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Init other ui parts                                   |
+    \*-----------------------------------------------------*/
     ui->itemFrame->hide();
     ui->backgroundApplier->SetSize(settings->w, settings->h);
     ui->backgroundFrame->hide();
 
-    /*-------------------------------------------------*\
-    | Listen for virtual controller updates, redraw     |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Listen for virtual controller updates, redraw         |
+    \*-----------------------------------------------------*/
     connect(this, &VirtualControllerTab::VirtualControllerPostUpdateSignal, this, &VirtualControllerTab::VirtualControllerPostUpdateSlot);
 
-    virtual_controller->SetPostUpdateCallBack([&](const QImage& image){
+    virtual_controller->SetPostUpdateCallBack([&](const QImage& image)
+    {
         emit VirtualControllerPostUpdateSignal(image);
     });
 
-    /*-------------------------------------------------*\
-    | Init other ui parts                               |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Init other ui parts                                   |
+    \*-----------------------------------------------------*/
     UpdateVirtualControllerDetails();
 
-    /*-------------------------------------------------*\
-    | Init Menu                                         |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Init Menu                                             |
+    \*-----------------------------------------------------*/
     CreateMainMenu();
 }
 
@@ -80,7 +90,6 @@ VirtualControllerTab::~VirtualControllerTab()
 
 void VirtualControllerTab::CreateMainMenu()
 {
-    // todo move this to own method
     QMenu* main_menu = new QMenu(ui->main_menu);
     ui->main_menu->setMenu(main_menu);
 
@@ -274,9 +283,9 @@ void VirtualControllerTab::LoadJson(json j)
 
         if(settings->auto_register)
         {
-            /*-------------------------------------------------*\
-            | This will auto trigger registering                |
-            \*-------------------------------------------------*/
+            /*---------------------------------------------*\
+            | This will auto trigger registering            |
+            \*---------------------------------------------*/
             register_controller->setChecked(true);
             RegisterAction();
         }
@@ -401,9 +410,9 @@ void VirtualControllerTab::UpdateItemOptions(std::vector<ControllerZone*> select
     }
 }
 
-/*-------------------------------------------------*\
-| ui element signals                                |
-\*-------------------------------------------------*/
+/*---------------------------------------------------------*\
+| UI element signals                                        |
+\*---------------------------------------------------------*/
 void VirtualControllerTab::on_device_list_DeviceAdded(ControllerZone* controller_zone)
 {
     AddActiveZone(controller_zone);
@@ -467,17 +476,17 @@ void VirtualControllerTab::on_gridOptions_SettingsChanged()
 
 void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
 {
-    /*-------------------------------------------------*\
-    | Do nothing if the controller is empty             |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Do nothing if the controller is empty                 |
+    \*-----------------------------------------------------*/
     if(virtual_controller->IsEmpty())
     {
         return;
     }
 
-    /*-------------------------------------------------*\
-    | Calculate bounds                                  |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Calculate bounds                                      |
+    \*-----------------------------------------------------*/
     int min_x = INT_MAX;
     int min_y = INT_MAX;
     int max_x = INT_MIN;
@@ -492,32 +501,32 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
         max_y = std::max<int>(max_y, controller_zone->settings.y + controller_zone->height());
     }
 
-    /*-------------------------------------------------*\
-    | Shift all controllers                             |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Shift all controllers                                 |
+    \*-----------------------------------------------------*/
     for (ControllerZone* controller_zone: virtual_controller->GetZones())
     {
         controller_zone->settings.x -= min_x;
         controller_zone->settings.y -= min_y;
     }
 
-    /*-------------------------------------------------*\
-    | Resize the map                                    |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Resize the map                                        |
+    \*-----------------------------------------------------*/
     settings->w = max_x - min_x;
     settings->h = max_y - min_y;
 
-    /*-------------------------------------------------*\
-    | Update GUI elements                               |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Update GUI elements                                   |
+    \*-----------------------------------------------------*/
     ui->grid->ApplySettings(settings);
     ui->grid->UpdateItems();
     ui->gridOptions->SetSettings(settings);
 }
 
-/*-------------------------------------------------*\
-| Main menu actions                                 |
-\*-------------------------------------------------*/
+/*---------------------------------------------------------*\
+| Main menu actions                                         |
+\*---------------------------------------------------------*/
 void VirtualControllerTab::RegisterAction()
 {
     virtual_controller->Register(register_controller->isChecked(), settings->hide_members);

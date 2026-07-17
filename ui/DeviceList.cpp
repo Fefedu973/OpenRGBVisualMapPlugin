@@ -1,9 +1,19 @@
-#include "OpenRGBVisualMapPlugin.h"
-#include "DeviceList.h"
-#include "ui_DeviceList.h"
-#include <QVBoxLayout>
+/*---------------------------------------------------------*\
+| DeviceList.cpp                                            |
+|                                                           |
+|   Device list for visual map plugin                       |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include <QFrame>
 #include <QLabel>
+#include <QVBoxLayout>
+#include "DeviceList.h"
+#include "OpenRGBVisualMapPlugin.h"
+#include "ui_DeviceList.h"
 
 DeviceList::DeviceList(QWidget *parent) :
     QWidget(parent),
@@ -12,7 +22,6 @@ DeviceList::DeviceList(QWidget *parent) :
     ui->setupUi(this);
     setLayout(new QVBoxLayout(this));
 }
-
 
 DeviceList::~DeviceList()
 {
@@ -25,7 +34,7 @@ void DeviceList::Clear()
 
     QLayoutItem *child;
 
-    while ((child = layout()->takeAt(0)) != 0)
+    while((child = layout()->takeAt(0)) != 0)
     {
         delete child->widget();
     }
@@ -33,14 +42,14 @@ void DeviceList::Clear()
 
 void DeviceList::Init()
 {
-    /*-------------------------------------------------*\
-    | Group by RGBControllerInterface                   |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Group by RGBControllerInterface                       |
+    \*-----------------------------------------------------*/
     std::map<RGBControllerInterface*,std::vector<ControllerZone*>> groups;
 
     for(ControllerZone* controller_zone: OpenRGBVisualMapPlugin::controller_zones)
     {
-        if (groups.find(controller_zone->controller) == groups.end())
+        if(groups.find(controller_zone->controller) == groups.end())
         {
             std::vector<ControllerZone*> zones;
             groups[controller_zone->controller] = zones;
@@ -49,13 +58,12 @@ void DeviceList::Init()
         groups[controller_zone->controller].push_back(controller_zone);
     }
 
-    /*-------------------------------------------------*\
-    | Iterate groups, add widgets                       |
-    \*-------------------------------------------------*/
-
+    /*-----------------------------------------------------*\
+    | Iterate groups, add widgets                           |
+    \*-----------------------------------------------------*/
     std::vector<RGBControllerInterface*> controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
 
-    for (RGBControllerInterface* controller: controllers)
+    for(RGBControllerInterface* controller: controllers)
     {
         if(controller->GetSerial() == VirtualController::VIRTUAL_CONTROLLER_SERIAL)
         {
@@ -97,7 +105,8 @@ void DeviceList::Init()
 
             _layout->addWidget(widget);
 
-            connect(widget, &DeviceWidget::Enabled, [=](bool state){
+            connect(widget, &DeviceWidget::Enabled, [=](bool state)
+            {
                 if(state)
                 {
                     emit DeviceAdded(controller_zone);
@@ -108,7 +117,8 @@ void DeviceList::Init()
                 }
             });
 
-            connect(widget, &DeviceWidget::Selected, [=](bool){
+            connect(widget, &DeviceWidget::Selected, [=](bool)
+            {
                 std::vector<ControllerZone*> selection;
 
                 for(DeviceWidget* widget: device_widgets)

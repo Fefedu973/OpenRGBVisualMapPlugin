@@ -175,17 +175,17 @@ void VirtualController::UpdateVirtualZone()
         }
     }
 
-    /*-------------------------------------------------*\
-    | Update zone data                                  |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Update zone data                                      |
+    \*-----------------------------------------------------*/
     setup.zones[0].leds_count                       = map_leds_count;
     setup.zones[0].leds_min                         = map_leds_count;
     setup.zones[0].leds_max                         = map_leds_count;
     setup.leds.resize(map_leds_count);
 
-    /*-------------------------------------------------*\
-    | Update LED names and positions in matrix map      |
-    \*-------------------------------------------------*/
+    /*-----------------------------------------------------*\
+    | Update LED names and positions in matrix map          |
+    \*-----------------------------------------------------*/
     int i = 0;
 
     for(unsigned int h = 0; h < height; h++)

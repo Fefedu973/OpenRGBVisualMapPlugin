@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <QImage>
 #include <vector>
+#include <QImage>
 #include "ControllerZone.h"
 
 class ZoneManager

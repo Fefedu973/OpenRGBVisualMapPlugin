@@ -1,18 +1,28 @@
-#include "OpenRGBVisualMapTab.h"
+/*---------------------------------------------------------*\
+| OpenRGBVisualMapTab.cpp                                   |
+|                                                           |
+|   OpenRGB Visual Map tab                                  |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <QAction>
+#include <QDialog>
+#include <QInputDialog>
+#include <QLabel>
+#include <QMenu>
+#include <QString>
+#include <QTimer>
+#include <QToolButton>
+
 #include "OpenRGBVisualMapPlugin.h"
-#include "VirtualControllerTab.h"
-#include "VisualMapSettingsManager.h"
+#include "OpenRGBVisualMapTab.h"
 #include "PluginInfo.h"
 #include "TabHeader.h"
-
-#include <QString>
-#include <QToolButton>
-#include <QLabel>
-#include <QInputDialog>
-#include <QTimer>
-#include <QAction>
-#include <QMenu>
-#include <QDialog>
+#include "VirtualControllerTab.h"
+#include "VisualMapSettingsManager.h"
 
 OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QWidget(parent),
@@ -20,10 +30,14 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
 {
     ui->setupUi(this);
 
-    // remove intial dummy tabs
+    /*-----------------------------------------------------*\
+    | Remove intial dummy tabs                              |
+    \*-----------------------------------------------------*/
     ui->virtual_controller_tabs->clear();
 
-    // define tab style + settings
+    /*-----------------------------------------------------*\
+    | Define tab style + settings                           |
+    \*-----------------------------------------------------*/
     ui->virtual_controller_tabs->setTabsClosable(true);
     ui->virtual_controller_tabs->setStyleSheet("QTabBar::close-button{image:url(:images/close.png);}");
     ui->virtual_controller_tabs->tabBar()->setStyleSheet("QTabBar::tab:hover {text-decoration: underline;}");
@@ -33,7 +47,9 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QLabel* no_map = new QLabel("You have no visual map.\n You can add one by clicking the VMap button.");
     no_map->setAlignment(Qt::AlignCenter);
 
-    // First tab: add button
+    /*-----------------------------------------------------*\
+    | First tab: add button                                 |
+    \*-----------------------------------------------------*/
     QPushButton* main_menu_button = new QPushButton();
     main_menu_button->setText("VMap");
     ui->virtual_controller_tabs->addTab(no_map, QString(""));
@@ -44,7 +60,6 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QAction* new_map = new QAction("New map", this);
     connect(new_map, &QAction::triggered, this, &OpenRGBVisualMapTab::AddTabSlot);
     main_menu->addAction(new_map);
-
 
     QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
     connect(open_vmap_folder, &QAction::triggered, this, &OpenRGBVisualMapTab::OpenVmapsFolder);
@@ -101,7 +116,9 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 {
     int tab_size = ui->virtual_controller_tabs->count();
 
-    // insert at the end
+    /*-----------------------------------------------------*\
+    | Insert at the end                                     |
+    \*-----------------------------------------------------*/
     int tab_position = tab_size;
 
     std::string tab_name = "Untitled";
@@ -117,15 +134,18 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 
     ui->virtual_controller_tabs->setCurrentIndex(tab_position);
 
-    connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string new_name){
+    connect(tab, &VirtualControllerTab::ControllerRenamed, [=](std::string new_name)
+    {
         tab_header->Rename(QString::fromUtf8(new_name.c_str()));
     });
 
-    connect(tab_header, &TabHeader::RenameRequest, [=](QString new_name){
+    connect(tab_header, &TabHeader::RenameRequest, [=](QString new_name)
+    {
         tab->RenameController(new_name.toStdString());
     });
 
-    connect(tab_header, &TabHeader::CloseRequest, [=](){
+    connect(tab_header, &TabHeader::CloseRequest, [=]()
+    {
         int tab_idx = ui->virtual_controller_tabs->indexOf(tab);
 
         ui->virtual_controller_tabs->removeTab(tab_idx);
@@ -142,7 +162,6 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 
     return tab;
 }
-
 
 bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 {

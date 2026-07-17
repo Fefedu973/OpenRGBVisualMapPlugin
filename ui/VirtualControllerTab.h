@@ -1,22 +1,31 @@
-#ifndef VIRTUALCONTROLLERTAB_H
-#define VIRTUALCONTROLLERTAB_H
+/*---------------------------------------------------------*\
+| VirtualControllerTab.h                                    |
+|                                                           |
+|   Virtual controller tab for visual map plugin            |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include <QWidget>
+#pragma once
+
+#include <QDesktopServices>
+#include <QSignalMapper>
 #include <QTabBar>
 #include <QTreeView>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QSignalMapper>
-#include <QDesktopServices>
+#include <QWidget>
 #include <nlohmann/json.hpp>
-
 #include "ui_VirtualControllerTab.h"
 #include "VirtualController.h"
 
 using json = nlohmann::json;
 
-namespace Ui {
-class VirtualControllerTab;
+namespace Ui
+{
+    class VirtualControllerTab;
 }
 
 class VirtualControllerTab : public QWidget
@@ -27,17 +36,19 @@ public:
     explicit VirtualControllerTab(QWidget *parent = nullptr);
     ~VirtualControllerTab();
 
-    void RenameController(std::string);
+    void        RenameController(std::string);
     std::string GetControllerName();
 
-    void LoadFile(std::string);
-    void LoadJson(json);
-    void Clear();
-    void Hide();
-    void Recreate();
+    void        LoadFile(std::string);
+    void        LoadJson(json);
+    void        Clear();
+    void        Hide();
+    void        Recreate();
 
 private slots:
-    // ui element signals
+    /*-----------------------------------------------------*\
+    | UI element signals                                    |
+    \*-----------------------------------------------------*/
     void on_backgroundApplier_BackgroundUpdated(const QImage&);
     void on_gridOptions_SettingsChanged();
     void on_gridOptions_AutoResizeRequest();
@@ -54,7 +65,9 @@ private slots:
 
     void VirtualControllerPostUpdateSlot(const QImage&);
 
-    // Main menu actions
+    /*-----------------------------------------------------*\
+    | Main menu actions                                     |
+    \*-----------------------------------------------------*/
     void SaveVmapAction();
     void LoadVmapAction();
     void ClearVmapAction();
@@ -75,16 +88,14 @@ private:
     void UpdateItemOptions(std::vector<ControllerZone*>);
 
     Ui::VirtualControllerTab*   ui;
-    VirtualController* virtual_controller;
-    GridSettings* settings;
-    ControllerZone* selected_ctrl_zone = nullptr;
-    QAction* register_controller;
-    QAction* add_background;
-    json active_state;
+    VirtualController*          virtual_controller;
+    GridSettings*               settings;
+    ControllerZone*             selected_ctrl_zone = nullptr;
+    QAction*                    register_controller;
+    QAction*                    add_background;
+    json                        active_state;
 
 protected:
     void resizeEvent(QResizeEvent*) override;
 
 };
-
-#endif // VIRTUALCONTROLLERTAB_H

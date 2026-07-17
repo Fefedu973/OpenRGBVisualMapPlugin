@@ -1,12 +1,22 @@
-#ifndef DEVICELIST_H
-#define DEVICELIST_H
+/*---------------------------------------------------------*\
+| DeviceList.h                                              |
+|                                                           |
+|   Device list for visual map plugin                       |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <QWidget>
 #include "ControllerZone.h"
 #include "DeviceWidget.h"
 
-namespace Ui {
-class DeviceList;
+namespace Ui
+{
+    class DeviceList;
 }
 
 class DeviceList : public QWidget
@@ -31,5 +41,3 @@ private:
     Ui::DeviceList *ui;
     std::vector<DeviceWidget*> device_widgets;
 };
-
-#endif // DEVICELIST_H
