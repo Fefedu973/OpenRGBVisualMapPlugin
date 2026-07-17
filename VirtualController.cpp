@@ -389,6 +389,14 @@ void VirtualController::Add(ControllerZone* ctrl_zone)
         {
             ctrl_zone->settings.custom_shape->resizeCustomShape(ctrl_zone->led_count());
         }
+
+        /*-------------------------------------------------*\
+        | Hide controller if necessary                      |
+        \*-------------------------------------------------*/
+        if(registered && members_hidden && !ctrl_zone->controller->GetHidden())
+        {
+            ctrl_zone->controller->SetHidden(true);
+        }
     }
 }
 
