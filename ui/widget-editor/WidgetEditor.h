@@ -1,12 +1,22 @@
-#ifndef WIDGETEDITOR_H
-#define WIDGETEDITOR_H
+/*---------------------------------------------------------*\
+| WidgetEditor.h                                            |
+|                                                           |
+|   OpenRGB Visual Map Plugin Widget Editor                 |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <QWidget>
-#include "GridSettings.h"
 #include "ControllerZone.h"
+#include "GridSettings.h"
 
-namespace Ui {
-class WidgetEditor;
+namespace Ui
+{
+    class WidgetEditor;
 }
 
 class WidgetEditor : public QWidget
@@ -50,19 +60,19 @@ private:
     explicit WidgetEditor(QWidget *parent = nullptr, ControllerZone* ctrl_zone = nullptr);
     ~WidgetEditor();
 
-    CustomShape* temp_shape = nullptr;
+    CustomShape*                    temp_shape = nullptr;
 
-    Ui::WidgetEditor *ui;
-    ControllerZone* ctrl_zone;
-    std::vector<ControllerZone*> other_zones;
-    GridSettings* settings;
+    Ui::WidgetEditor*               ui;
+    ControllerZone*                 ctrl_zone;
+    std::vector<ControllerZone*>    other_zones;
+    GridSettings*                   settings;
 
-    std::vector<CustomShape*> states;
+    std::vector<CustomShape*>       states;
 
-    void UpdateWidgetsValues();
-    void IdentifySelected();
-    void InitShape();
-    void AutoResize();
+    void    UpdateWidgetsValues();
+    void    IdentifySelected();
+    void    InitShape();
+    void    AutoResize();
     QPointF GetCenter(std::vector<LedPosition*>);
 
     bool StateChanged();
@@ -70,5 +80,3 @@ private:
     void Undo();
     void RestoreState(CustomShape* shape);
 };
-
-#endif // WIDGETEDITOR_H

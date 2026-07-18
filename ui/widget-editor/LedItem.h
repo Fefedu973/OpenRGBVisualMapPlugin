@@ -1,15 +1,23 @@
-#ifndef LEDITEM_H
-#define LEDITEM_H
+/*---------------------------------------------------------*\
+| LedItem.h                                                 |
+|                                                           |
+|   OpenRGB Visual Map Plugin LED Item                      |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include <QPainter>
-#include <QPen>
+#pragma once
+
 #include <QGraphicsItem>
-#include <QGraphicsTextItem>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
-
-#include "GridSettings.h"
+#include <QGraphicsTextItem>
+#include <QPainter>
+#include <QPen>
 #include "ControllerZone.h"
+#include "GridSettings.h"
 
 class LedItem: public QObject, public QGraphicsItem
 {
@@ -19,32 +27,30 @@ class LedItem: public QObject, public QGraphicsItem
 public:
     LedItem(LedPosition*, GridSettings*);
 
-    QRectF boundingRect() const;
+    QRectF          boundingRect() const;
 
-    void paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
+    void            paint(QPainter*, const QStyleOptionGraphicsItem*,QWidget*);
 
-    LedPosition* GetLedPosition();
+    LedPosition*    GetLedPosition();
 
-    void Snap();
+    void            Snap();
 
 signals:
       void Released();
       void RectSelectionRequest();
 
 private:
-    LedPosition*  led_position;
-    GridSettings* settings;
+    LedPosition*    led_position;
+    GridSettings*   settings;
 
-    bool hover = false;
-    bool pressed = false;
+    bool            hover           = false;
+    bool            pressed         = false;
 
-    const QBrush default_brush     =  QBrush(QColor("#f2d974"), Qt::BrushStyle::NoBrush);
+    const QBrush    default_brush   =  QBrush(QColor("#f2d974"), Qt::BrushStyle::NoBrush);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent*);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent*);
     void hoverEnterEvent(QGraphicsSceneHoverEvent*);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent*) ;
-
 };
-#endif // LEDITEM_H

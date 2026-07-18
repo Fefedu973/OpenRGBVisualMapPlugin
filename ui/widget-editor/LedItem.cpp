@@ -1,11 +1,20 @@
-#include "LedItem.h"
+/*---------------------------------------------------------*\
+| LedItem.h                                                 |
+|                                                           |
+|   OpenRGB Visual Map Plugin LED Item                      |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "math.h"
-#include <QGraphicsSceneMouseEvent>
-#include <QString>
-#include <QCursor>
-#include <QPalette>
 #include <QApplication>
+#include <QCursor>
+#include <QGraphicsSceneMouseEvent>
+#include <QPalette>
+#include <QString>
+#include "LedItem.h"
 
 LedItem::LedItem(LedPosition* led_position, GridSettings* settings) :
     led_position(led_position),
@@ -61,7 +70,9 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
 
 void LedItem::Snap()
 {
-    // update led position
+    /*-----------------------------------------------------*\
+    | Update LED position                                   |
+    \*-----------------------------------------------------*/
     led_position->setX(round(x()));
     led_position->setY(round(y()));
 
@@ -76,12 +87,14 @@ LedPosition* LedItem::GetLedPosition()
     return led_position;
 }
 
-void LedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+void LedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
     hover = true;
     QGraphicsItem::hoverEnterEvent( event );
 }
 
-void LedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+void LedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
     hover = false;
     QGraphicsItem::hoverLeaveEvent( event );
 }
@@ -119,4 +132,3 @@ void LedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsItem::mouseReleaseEvent(event);
     }
 }
-

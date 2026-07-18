@@ -1,10 +1,20 @@
-#include <QChar>
-#include "EditorGrid.h"
-#include "ControllerZone.h"
-#include "LedItem.h"
-#include "stdlib.h"
+/*---------------------------------------------------------*\
+| EditorGrid.cpp                                            |
+|                                                           |
+|   OpenRGB Visual Map Plugin Editor Grid                   |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent){
+#include "stdlib.h"
+#include "ControllerZone.h"
+#include "EditorGrid.h"
+#include "LedItem.h"
+
+EditorGrid::EditorGrid(QWidget *parent) : QGraphicsView(parent)
+{
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -21,13 +31,14 @@ void EditorGrid::ApplySettings(GridSettings* s)
         setScene(scene);
         resize(settings->w, settings->h);
 
-        // auto scale on first run
+        /*-------------------------------------------------*\
+        | Auto scale on first run                           |
+        \*-------------------------------------------------*/
         if(settings->w > 0 && settings->h > 0)
         {
-            qreal w_factor = width() / settings->w;
-            qreal h_factor = height() / settings->h;
-
-            qreal factor = std::min<qreal>(w_factor, h_factor);
+            qreal w_factor  = width() / settings->w;
+            qreal h_factor  = height() / settings->h;
+            qreal factor    = std::min<qreal>(w_factor, h_factor);
 
             scale(factor, factor);
         }
@@ -64,9 +75,12 @@ void EditorGrid::wheelEvent(QWheelEvent *event)
 
     int angle = event->angleDelta().y();
 
-    if (angle > 0) {
+    if(angle > 0)
+    {
         factor = event->modifiers() == Qt::ControlModifier ? 1.3 : 1.05;
-    } else {
+    }
+    else
+    {
         factor = event->modifiers() == Qt::ControlModifier ? 0.7 : 0.95;
     }
 
@@ -140,7 +154,8 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
 
         scene->addItem(led_item);
 
-        connect(led_item, &LedItem::Released, [=](){
+        connect(led_item, &LedItem::Released, [=]()
+        {
             for(LedItem* item : led_items)
             {
                 item->Snap();
@@ -150,8 +165,8 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
         });
 
 
-        connect(led_item, &LedItem::RectSelectionRequest, [=](){
-
+        connect(led_item, &LedItem::RectSelectionRequest, [=]()
+        {
             std::vector<LedPosition*> items = GetSelection();
             if(items.size() == 1)
             {
@@ -169,7 +184,6 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
             }
 
         });
-
     }
 }
 
@@ -181,13 +195,27 @@ void EditorGrid::Clear()
 
 void EditorGrid::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key()) {
-    case Qt::Key_Left:  MoveSelection(-1,  0); break;
-    case Qt::Key_Right: MoveSelection( 1,  0); break;
-    case Qt::Key_Up:   MoveSelection( 0, -1); break;
-    case Qt::Key_Down:  MoveSelection( 0,  1); break;
+    switch (event->key())
+    {
+        case Qt::Key_Left:
+            MoveSelection(-1,  0);
+            break;
 
-    default: QGraphicsView::keyPressEvent(event); break;
+        case Qt::Key_Right:
+            MoveSelection(1,  0);
+            break;
+
+        case Qt::Key_Up:
+            MoveSelection(0, -1);
+            break;
+
+        case Qt::Key_Down:
+            MoveSelection(0,  1);
+            break;
+
+        default:
+            QGraphicsView::keyPressEvent(event);
+            break;
     }
 }
 
@@ -220,7 +248,3 @@ std::vector<LedPosition*> EditorGrid::GetSelection()
 
     return selection;
 }
-
-
-
-

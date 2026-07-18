@@ -1,17 +1,25 @@
+/*---------------------------------------------------------*\
+| WidgetEditor.cpp                                          |
+|                                                           |
+|   OpenRGB Visual Map Plugin Widget Editor                 |
+|                                                           |
+|   This file is part of the OpenRGB Visual Map Plugin      |
+|   project                                                 |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <QDialog>
+#include <QFile>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QPoint>
+#include <QRect>
+#include <QTransform>
+#include <QVBoxLayout>
+#include "OpenRGBVisualMapPlugin.h"
 #include "WidgetEditor.h"
 #include "ui_WidgetEditor.h"
-
-#include "OpenRGBVisualMapPlugin.h"
 #include "ZoneManager.h"
-
-#include <QMessageBox>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QFile>
-#include <QPoint>
-#include <QInputDialog>
-#include <QTransform>
-#include <QRect>
 
 int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> other_zones)
 {
@@ -33,11 +41,13 @@ int WidgetEditor::Show(ControllerZone* ctrl_zone, std::vector<ControllerZone*> o
 
     editor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    connect(editor, &WidgetEditor::Save, [=](){
+    connect(editor, &WidgetEditor::Save, [=]()
+    {
         dialog->accept();
     });
 
-    connect(editor, &WidgetEditor::Cancel, [=](){
+    connect(editor, &WidgetEditor::Cancel, [=]()
+    {
         dialog->reject();
     });
 
@@ -53,19 +63,20 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
 
     InitShape();
 
-    settings = new GridSettings();
+    settings                = new GridSettings();
 
-    settings->w = temp_shape->w;
-    settings->h = temp_shape->h;
-    settings->show_grid = true;
-    settings->show_bounds = true;
-    settings->grid_size = 1;
+    settings->w             = temp_shape->w;
+    settings->h             = temp_shape->h;
+    settings->show_grid     = true;
+    settings->show_bounds   = true;
+    settings->grid_size     = 1;
 
     ui->grid->ApplySettings(settings);
 
     ui->identify_button->hide();
 
-    connect(ui->grid, &EditorGrid::SelectionChanged, [=](){
+    connect(ui->grid, &EditorGrid::SelectionChanged, [=]()
+    {
         ui->identify_button->setVisible(!ui->grid->GetSelection().empty());
 
         if(ui->auto_identify->isChecked())
@@ -74,7 +85,8 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
         }
     });
 
-    connect(ui->grid, &EditorGrid::Changed, [=](){
+    connect(ui->grid, &EditorGrid::Changed, [=]()
+    {
         SaveState();
     });
 
@@ -83,7 +95,6 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     ui->undo_button->setEnabled(false);
 
     UpdateWidgetsValues();
-
 }
 
 WidgetEditor::~WidgetEditor()
@@ -94,9 +105,10 @@ WidgetEditor::~WidgetEditor()
 
 void WidgetEditor::InitShape()
 {
-    // if custom shape already exists, copy it to temp shape
-    // else, generate one (horizontal line)
-
+    /*-----------------------------------------------------*\
+    | If custom shape already exists, copy it to temp shape |
+    | else, generate one (horizontal line)                  |
+    \*-----------------------------------------------------*/
     if(ctrl_zone->isCustomShape() && ctrl_zone->settings.custom_shape)
     {
         temp_shape = ctrl_zone->settings.custom_shape->clone();
@@ -223,12 +235,16 @@ void WidgetEditor::on_copy_shape_button_clicked()
 
     std::map<QString, ControllerZone*> ctrl_zones_choices;
 
-    // generate choice list
+    /*-----------------------------------------------------*\
+    | Generate choice list                                  |
+    \*-----------------------------------------------------*/
     int i = 0;
 
     for(ControllerZone* ctrl_zone_it : other_zones)
     {
-        // ignore current ctrl_zone
+        /*-------------------------------------------------*\
+        | Ignore current ctrl_zone                          |
+        \*-------------------------------------------------*/
         if(ctrl_zone == ctrl_zone_it)
         {
             continue;
@@ -689,7 +705,10 @@ void WidgetEditor::on_auto_resize_button_clicked()
 
 void WidgetEditor::AutoResize()
 {
-    // 1st shift everything if theres some leds in negative place / or empty row/cols
+    /*-----------------------------------------------------*\
+    | 1st shift everything if theres some leds in negative  |
+    | place / or empty row/cols                             |
+    \*-----------------------------------------------------*/
     int shift_x = 1024;
     int shift_y = 1024;
 
@@ -704,7 +723,9 @@ void WidgetEditor::AutoResize()
         led_position->shift(-shift_x, -shift_y);
     }
 
-    //2nd fit the size
+    /*-----------------------------------------------------*\
+    | 2nd fit the size                                      |
+    \*-----------------------------------------------------*/
     unsigned int w = 1;
     unsigned int h = 1;
 
@@ -744,5 +765,3 @@ QPointF WidgetEditor::GetCenter(std::vector<LedPosition*> led_positions)
 
     return QRectF(QPoint(x_min,y_min), QPoint(x_max,y_max)).center();
 }
-
-
