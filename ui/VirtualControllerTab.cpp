@@ -346,7 +346,8 @@ void VirtualControllerTab::AddActiveZone(ControllerZone* added_zone)
         if((added_zone_json["controller"]["name"] == saved_zone_json["controller"]["name"]) &&
             (added_zone_json["controller"]["vendor"] == saved_zone_json["controller"]["vendor"]) &&
             (added_zone_json["controller"]["serial"] == saved_zone_json["controller"]["serial"]) &&
-            ((added_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location))
+            ((added_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location) &&
+            (added_zone_json["zone_idx"] == saved_zone_json["zone_idx"]))
         {
             found = true;
             break;
@@ -378,7 +379,8 @@ void VirtualControllerTab::RemoveActiveZone(ControllerZone* removed_zone)
         if((removed_zone_json["controller"]["name"] == saved_zone_json["controller"]["name"]) &&
             (removed_zone_json["controller"]["vendor"] == saved_zone_json["controller"]["vendor"]) &&
             (removed_zone_json["controller"]["serial"] == saved_zone_json["controller"]["serial"]) &&
-            ((removed_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location))
+            ((removed_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location) &&
+            (removed_zone_json["zone_idx"] == saved_zone_json["zone_idx"]))
         {
             found = true;
             break;
