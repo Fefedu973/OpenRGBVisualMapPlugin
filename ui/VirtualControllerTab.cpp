@@ -281,16 +281,18 @@ void VirtualControllerTab::LoadJson(json j)
 
         virtual_controller->UpdateSize(settings->w, settings->h);
 
+        UpdateVirtualControllerDetails();
+
         if(settings->auto_register)
         {
             /*---------------------------------------------*\
-            | This will auto trigger registering            |
+            | This will auto trigger registering.           |
+            | Register last so the controller enters the    |
+            | device list fully formed.                     |
             \*---------------------------------------------*/
             register_controller->setChecked(true);
             RegisterAction();
         }
-
-        UpdateVirtualControllerDetails();
     }
 }
 
