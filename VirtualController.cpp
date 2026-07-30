@@ -8,12 +8,16 @@
 |   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
+#include <algorithm>
 #include <set>
 #include "OpenRGBVisualMapPlugin.h"
 #include "RGBControllerInterface.h"
 #include "VirtualController.h"
 
 std::string VirtualController::VIRTUAL_CONTROLLER_SERIAL = "VISUAL_MAP_VISUAL_CONTROLLER_SERIAL";
+
+std::vector<VirtualController*> VirtualController::instances;
+std::mutex                      VirtualController::instances_mutex;
 
 VirtualController::VirtualController()
 {
@@ -68,11 +72,25 @@ VirtualController::VirtualController()
     setup.DeviceUpdateDeviceSpecificZoneConfiguration   = nullptr;
 
     virtual_controller = OpenRGBVisualMapPlugin::api->CreateVirtualRGBController(&setup);
+
+    /*-----------------------------------------------------*\
+    | Track this instance for lifecycle management          |
+    \*-----------------------------------------------------*/
+    {
+        std::lock_guard<std::mutex> lock(instances_mutex);
+        instances.push_back(this);
+    }
 }
 
 VirtualController::~VirtualController()
 {
-    Register(false, false);
+    /*-----------------------------------------------------*\
+    | Remove this instance from the tracking list           |
+    \*-----------------------------------------------------*/
+    {
+        std::lock_guard<std::mutex> lock(instances_mutex);
+        instances.erase(std::remove(instances.begin(), instances.end(), this), instances.end());
+    }
 }
 
 void VirtualController::UpdateVirtualZone()
@@ -316,7 +334,7 @@ void VirtualController::Register(bool state, bool hide_members)
     {
         if(registered)
         {
-            OpenRGBVisualMapPlugin::api->UnregisterVirtualRGBControllerInThread(virtual_controller);
+            OpenRGBVisualMapPlugin::api->UnregisterVirtualRGBController(virtual_controller);
             registered = false;
 
             if(members_hidden)
@@ -606,6 +624,25 @@ void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& ima
         }
 
         break;
+    }
+}
+
+void VirtualController::UnregisterAll()
+{
+    /*-----------------------------------------------------*\
+    | Unregister all registered virtual controllers and     |
+    | unhide any hidden members. This is called during      |
+    | Unload() to ensure all controllers are properly       |
+    | cleaned up before the plugin code is unloaded.        |
+    \*-----------------------------------------------------*/
+    std::lock_guard<std::mutex> lock(instances_mutex);
+
+    for(VirtualController* vc : instances)
+    {
+        if(vc->registered && OpenRGBVisualMapPlugin::api)
+        {
+            vc->Register(false, false);
+        }
     }
 }
 

@@ -33,7 +33,7 @@ class OpenRGBVisualMapPlugin : public QObject, public OpenRGBPluginInterface
     Q_INTERFACES(OpenRGBPluginInterface)
 
 public:
-    ~OpenRGBVisualMapPlugin() {};
+    ~OpenRGBVisualMapPlugin();
 
     /*-----------------------------------------------------*\
     | Plugin Information                                    |
@@ -64,7 +64,7 @@ private:
     /*-----------------------------------------------------*\
     | User interface widget                                 |
     \*-----------------------------------------------------*/
-    OpenRGBVisualMapTab*        ui;
+    OpenRGBVisualMapTab*        ui = nullptr;
 
 private:
     static void DetectionStart(void*);

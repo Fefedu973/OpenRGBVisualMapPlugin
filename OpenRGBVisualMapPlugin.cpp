@@ -91,8 +91,38 @@ QMenu* OpenRGBVisualMapPlugin::GetTrayMenu()
 
 void OpenRGBVisualMapPlugin::Unload()
 {
-    ui->HideAll();
-    ui->Clear();
+    /*-----------------------------------------------------*\
+    | Unregister all virtual controllers synchronously via  |
+    | the static instance list. This ensures the controllers|
+    | are fully removed from OpenRGB's device list before   |
+    | the plugin code is unloaded from memory, preventing   |
+    | stale function pointer references. Also unhides any   |
+    | hidden member controllers.                            |
+    \*-----------------------------------------------------*/
+    VirtualController::UnregisterAll();
+
+    /*-----------------------------------------------------*\
+    | Clear the UI.                                         |
+    \*-----------------------------------------------------*/
+    if(ui)
+    {
+        ui->Clear();
+    }
+}
+
+OpenRGBVisualMapPlugin::~OpenRGBVisualMapPlugin()
+{
+    /*-----------------------------------------------------*\
+    | Clean up the UI widget. The virtual controllers have  |
+    | already been unregistered by Unload() (or the API     |
+    | object may no longer be valid), so we only need to    |
+    | free the memory here.                                 |
+    \*-----------------------------------------------------*/
+    if(ui)
+    {
+        delete ui;
+        ui = nullptr;
+    }
 }
 
 void OpenRGBVisualMapPlugin::OnProfileAboutToLoad()
@@ -126,6 +156,11 @@ void OpenRGBVisualMapPlugin::ProfileManagerUpdated(unsigned int /*update_reason*
 
 void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
 {
+    if(!ui)
+    {
+        return;
+    }
+
     switch(update_reason)
     {
         case RESOURCEMANAGER_UPDATE_REASON_DETECTION_STARTED:

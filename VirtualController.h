@@ -14,6 +14,7 @@
 
 #include <functional>
 #include <mutex>
+#include <vector>
 #include <QImage>
 #include "ControllerZone.h"
 #include "RGBControllerInterface.h"
@@ -50,7 +51,12 @@ public:
     void                            SetPostUpdateCallBack(std::function<void(const QImage&)>);
     void                            UpdateSize(int,int);
     void                            UpdateVirtualZone();
-    
+
+    /*-----------------------------------------------------*\
+    | Static lifecycle management                           |
+    \*-----------------------------------------------------*/
+    static void                     UnregisterAll();
+
 private:
     RGBControllerInterface*         virtual_controller;
     unsigned int                    width;
@@ -65,4 +71,10 @@ private:
     void                            ForceDirectMode();
 
     static void                     DeviceUpdateLEDs_func(void* object_ptr);
+
+    /*-----------------------------------------------------*\
+    | Static instance tracking                              |
+    \*-----------------------------------------------------*/
+    static std::vector<VirtualController*> instances;
+    static std::mutex                    instances_mutex;
 };
