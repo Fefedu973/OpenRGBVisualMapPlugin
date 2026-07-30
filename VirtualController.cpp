@@ -288,11 +288,15 @@ void VirtualController::Register(bool state, bool hide_members)
                 \*-----------------------------------------*/
                 std::vector<RGBControllerInterface*> available_controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
 
-                for(RGBControllerInterface* controller : controllers)
+                for(std::set<RGBControllerInterface*>::iterator it = controllers.begin(); it != controllers.end(); )
                 {
-                    if(std::find(available_controllers.begin(), available_controllers.end(), controller) == available_controllers.end())
+                    if(std::find(available_controllers.begin(), available_controllers.end(), *it) == available_controllers.end())
                     {
-                        controllers.erase(controller);
+                        it = controllers.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
                     }
                 }
 
@@ -331,11 +335,15 @@ void VirtualController::Register(bool state, bool hide_members)
                 \*-----------------------------------------*/
                 std::vector<RGBControllerInterface*> available_controllers = OpenRGBVisualMapPlugin::api->GetRGBControllers();
 
-                for(RGBControllerInterface* controller : controllers)
+                for(std::set<RGBControllerInterface*>::iterator it = controllers.begin(); it != controllers.end(); )
                 {
-                    if(std::find(available_controllers.begin(), available_controllers.end(), controller) == available_controllers.end())
+                    if(std::find(available_controllers.begin(), available_controllers.end(), *it) == available_controllers.end())
                     {
-                        controllers.erase(controller);
+                        it = controllers.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
                     }
                 }
 
