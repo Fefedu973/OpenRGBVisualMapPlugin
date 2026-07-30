@@ -112,6 +112,14 @@ void OpenRGBVisualMapTab::Recreate()
     LOG_INFO("[OpenRGBVisualMapPlugin] Recreate done\n");
 }
 
+void OpenRGBVisualMapTab::PauseForDetection()
+{
+    for(VirtualControllerTab* controller_tab: controller_tabs)
+    {
+        controller_tab->PauseForDetection();
+    }
+}
+
 VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 {
     int tab_size = ui->virtual_controller_tabs->count();

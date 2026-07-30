@@ -378,6 +378,8 @@ bool VirtualController::HasZone(ControllerZone* ctrl_zone)
 
 void VirtualController::Add(ControllerZone* ctrl_zone)
 {
+    std::lock_guard<std::mutex> lock(added_zones_mutex);
+
     if(!HasZone(ctrl_zone))
     {
         added_zones.push_back(ctrl_zone);
@@ -402,6 +404,8 @@ void VirtualController::Add(ControllerZone* ctrl_zone)
 
 void VirtualController::Remove(ControllerZone* ctrl_zone)
 {
+    std::lock_guard<std::mutex> lock(added_zones_mutex);
+
     if(HasZone(ctrl_zone))
     {
         added_zones.erase(std::find(added_zones.begin(), added_zones.end(), ctrl_zone));
@@ -410,6 +414,14 @@ void VirtualController::Remove(ControllerZone* ctrl_zone)
 
 void VirtualController::Clear()
 {
+    /*-----------------------------------------------------*\
+    | Locked so a call in flight on the device thread       |
+    | drains before the zones go away. Clearing here on     |
+    | DETECTION_STARTED stops the device thread touching    |
+    | controllers that are about to be freed.               |
+    \*-----------------------------------------------------*/
+    std::lock_guard<std::mutex> lock(added_zones_mutex);
+
     added_zones.clear();
 }
 
@@ -494,15 +506,24 @@ void VirtualController::ApplyToDevice(const QImage& image)
     \*-----------------------------------------------------*/
     std::set<RGBControllerInterface*> controllers;
 
-    for(ControllerZone* ctrl_zone: added_zones)
+    /*-----------------------------------------------------*\
+    | Held across the apply so the zones (and the           |
+    | controllers they point at) cannot be cleared/freed    |
+    | mid-update by a DETECTION_STARTED on another thread.  |
+    \*-----------------------------------------------------*/
     {
-        ApplyToZone(ctrl_zone, image);
-        controllers.insert(ctrl_zone->controller);
-    }
+        std::lock_guard<std::mutex> lock(added_zones_mutex);
 
-    for(RGBControllerInterface* controller : controllers)
-    {
-        controller->UpdateLEDs();
+        for(ControllerZone* ctrl_zone: added_zones)
+        {
+            ApplyToZone(ctrl_zone, image);
+            controllers.insert(ctrl_zone->controller);
+        }
+
+        for(RGBControllerInterface* controller : controllers)
+        {
+            controller->UpdateLEDs();
+        }
     }
 
     callback(image);

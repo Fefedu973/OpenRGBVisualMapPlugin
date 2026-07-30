@@ -31,6 +31,7 @@ public:
 public slots:
     void Clear();
     void Recreate();
+    void PauseForDetection();
 
 private slots:
     void AddTabSlot();

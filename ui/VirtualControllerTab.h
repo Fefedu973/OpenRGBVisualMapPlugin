@@ -44,6 +44,7 @@ public:
     void        Clear();
     void        Hide();
     void        Recreate();
+    void        PauseForDetection();
 
 private slots:
     /*-----------------------------------------------------*\

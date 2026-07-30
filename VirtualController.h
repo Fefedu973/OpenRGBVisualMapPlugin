@@ -13,6 +13,7 @@
 #define NA 0xFFFFFFFF
 
 #include <functional>
+#include <mutex>
 #include <QImage>
 #include "ControllerZone.h"
 #include "RGBControllerInterface.h"
@@ -58,6 +59,7 @@ private:
     bool                            members_hidden = false;
     std::function<void(QImage)>     callback;
     std::vector<ControllerZone*>    added_zones;
+    std::mutex                      added_zones_mutex;
     RGBController_Setup             setup;
 
     void                            ForceDirectMode();

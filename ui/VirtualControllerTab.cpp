@@ -328,6 +328,11 @@ void VirtualControllerTab::ReassignZones()
     LoadJson(active_state);
 }
 
+void VirtualControllerTab::PauseForDetection()
+{
+    virtual_controller->Clear();
+}
+
 void VirtualControllerTab::AddActiveZone(ControllerZone* added_zone)
 {
     json added_zone_json    = added_zone;

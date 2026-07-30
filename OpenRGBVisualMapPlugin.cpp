@@ -128,6 +128,17 @@ void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
 {
     switch(update_reason)
     {
+        case RESOURCEMANAGER_UPDATE_REASON_DETECTION_STARTED:
+            /*---------------------------------------------*\
+            | Devices are about to be freed. Drop every     |
+            | virtual controller's zones now                |
+            | (synchronously, under the zone lock) so the   |
+            | virtual controller's device thread stops      |
+            | touching controllers before they are deleted. |
+            \*---------------------------------------------*/
+            ui->PauseForDetection();
+            break;
+
         case RESOURCEMANAGER_UPDATE_REASON_DEVICE_LIST_UPDATED:
             ZoneManager::Get()->UpdateControllerZones();
             QMetaObject::invokeMethod(ui, "Recreate", Qt::BlockingQueuedConnection);
