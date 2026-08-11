@@ -85,6 +85,9 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 VirtualControllerTab::~VirtualControllerTab()
 {
     delete virtual_controller;
+
+    ZoneManager::Get()->FreeControllerZones(controller_zones);
+
     delete ui;
 }
 
@@ -142,7 +145,11 @@ void VirtualControllerTab::UpdateVirtualControllerDetails()
 
 void VirtualControllerTab::InitZoneList()
 {
-    ui->device_list->Init();
+    ZoneManager::Get()->FreeControllerZones(controller_zones);
+
+    controller_zones = ZoneManager::Get()->CopyControllerZones();
+
+    ui->device_list->Init(controller_zones);
 }
 
 void VirtualControllerTab::LoadFile(std::string filename)
@@ -161,7 +168,7 @@ void VirtualControllerTab::LoadJson(json j)
     if(j.contains("ctrl_zones"))
     {
         json ctrl_zones = j["ctrl_zones"];
-        std::vector<ControllerZone*> all_zones = OpenRGBVisualMapPlugin::controller_zones;
+        std::vector<ControllerZone*> all_zones = controller_zones;
 
         bool has_failures = false;
 
@@ -311,6 +318,11 @@ void VirtualControllerTab::Hide()
 
 void VirtualControllerTab::Recreate()
 {
+    /*-----------------------------------------------------*\
+    | Drop the zones before InitZoneList frees them         |
+    \*-----------------------------------------------------*/
+    virtual_controller->Clear();
+
     Clear();
     InitZoneList();
     ReassignZones();
@@ -400,6 +412,9 @@ void VirtualControllerTab::Clear()
 {
     ui->device_list->Clear();
     ui->grid->Clear();
+
+    UpdateItemOptions({});
+
     selected_ctrl_zone = nullptr;
 }
 
@@ -465,7 +480,7 @@ void VirtualControllerTab::on_itemOptions_ShapeEditRequest(ControllerZone* contr
 {
     if(controller_zone)
     {
-        int result = WidgetEditor::Show(controller_zone, OpenRGBVisualMapPlugin::controller_zones);
+        int result = WidgetEditor::Show(controller_zone, controller_zones);
 
         if(result)
         {

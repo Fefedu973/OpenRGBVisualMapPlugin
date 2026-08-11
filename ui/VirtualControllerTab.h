@@ -89,13 +89,14 @@ private:
     void ReassignZones();
     void UpdateItemOptions(std::vector<ControllerZone*>);
 
-    Ui::VirtualControllerTab*   ui;
-    VirtualController*          virtual_controller;
-    GridSettings*               settings;
-    ControllerZone*             selected_ctrl_zone = nullptr;
-    QAction*                    register_controller;
-    QAction*                    add_background;
-    json                        active_state;
+    Ui::VirtualControllerTab*       ui;
+    VirtualController*              virtual_controller;
+    GridSettings*                   settings;
+    std::vector<ControllerZone*>    controller_zones;
+    ControllerZone*                 selected_ctrl_zone = nullptr;
+    QAction*                        register_controller;
+    QAction*                        add_background;
+    json                            active_state;
 
 protected:
     void resizeEvent(QResizeEvent*) override;

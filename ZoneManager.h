@@ -24,6 +24,9 @@ public:
 
     void UpdateControllerZones();
 
+    std::vector<ControllerZone*> CopyControllerZones();
+    void FreeControllerZones(std::vector<ControllerZone*>& zones);
+
 private:
     ZoneManager(){};
     static ZoneManager* instance;

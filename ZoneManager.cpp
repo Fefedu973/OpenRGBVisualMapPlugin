@@ -9,6 +9,7 @@
 \*---------------------------------------------------------*/
 
 #include <set>
+#include <shared_mutex>
 #include "OpenRGBVisualMapPlugin.h"
 #include "VirtualController.h"
 #include "ZoneManager.h"
@@ -27,8 +28,15 @@ ZoneManager* ZoneManager::Get()
 
 void ZoneManager::UpdateControllerZones()
 {
-    OpenRGBVisualMapPlugin::controller_zones.clear();
-    
+    /*-----------------------------------------------------*\
+    | The device list can be updated from the detection     |
+    | thread or from a virtual controller register thread   |
+    | while a map is copying the zone list                  |
+    \*-----------------------------------------------------*/
+    std::unique_lock<std::shared_mutex> lock(OpenRGBVisualMapPlugin::controller_zones_mutex);
+
+    FreeControllerZones(OpenRGBVisualMapPlugin::controller_zones);
+
     /*-----------------------------------------------------*\
     | Create ControllerZones for new controllers            |
     \*-----------------------------------------------------*/
@@ -83,6 +91,34 @@ void ZoneManager::UpdateControllerZones()
     }
 }
 
+std::vector<ControllerZone*> ZoneManager::CopyControllerZones()
+{
+    std::shared_lock<std::shared_mutex> lock(OpenRGBVisualMapPlugin::controller_zones_mutex);
+
+    std::vector<ControllerZone*> zones;
+
+    /*-----------------------------------------------------*\
+    | Each map gets its own zones so the settings it        |
+    | applies don't leak into the other maps                |
+    \*-----------------------------------------------------*/
+    for(ControllerZone* controller_zone: OpenRGBVisualMapPlugin::controller_zones)
+    {
+        zones.push_back(controller_zone->clone());
+    }
+
+    return zones;
+}
+
+void ZoneManager::FreeControllerZones(std::vector<ControllerZone*>& zones)
+{
+    for(ControllerZone* controller_zone: zones)
+    {
+        delete controller_zone->settings.custom_shape;
+        delete controller_zone;
+    }
+
+    zones.clear();
+}
 
 void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
 {
@@ -92,10 +128,14 @@ void ZoneManager::IdentifyZone(ControllerZone* ctrl_zone_to_identify)
     \*-----------------------------------------------------*/
     std::set<RGBControllerInterface*>   controllers;
 
-    for(ControllerZone* ctrl_zone: OpenRGBVisualMapPlugin::controller_zones)
     {
-        SetControllerZoneColor(ctrl_zone, ctrl_zone->compare(ctrl_zone_to_identify) ? Qt::green : Qt::black);
-        controllers.insert(ctrl_zone->controller);
+        std::shared_lock<std::shared_mutex> lock(OpenRGBVisualMapPlugin::controller_zones_mutex);
+
+        for(ControllerZone* ctrl_zone: OpenRGBVisualMapPlugin::controller_zones)
+        {
+            SetControllerZoneColor(ctrl_zone, ctrl_zone->compare(ctrl_zone_to_identify) ? Qt::green : Qt::black);
+            controllers.insert(ctrl_zone->controller);
+        }
     }
 
     for(RGBControllerInterface* controller : controllers)

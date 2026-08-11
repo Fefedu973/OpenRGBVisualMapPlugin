@@ -64,6 +64,14 @@ struct CustomShape
     unsigned int                h;
     std::vector<LedPosition*>   led_positions;
 
+    ~CustomShape()
+    {
+        for(LedPosition* led_position: led_positions)
+        {
+            delete led_position;
+        }
+    }
+
     CustomShape* clone()
     {
         CustomShape* clone  = new CustomShape();
@@ -207,6 +215,26 @@ struct ControllerZone
         this->controller_info.version       = this->controller->GetVersion();
         this->controller_info.serial        = this->controller->GetSerial();
         this->controller_info.location      = this->controller->GetLocation();
+    }
+
+    ControllerZone* clone()
+    {
+        ControllerZone* clone           = new ControllerZone();
+
+        clone->controller               = controller;
+        clone->zone_idx                 = zone_idx;
+        clone->segment_idx              = segment_idx;
+        clone->is_segment               = is_segment;
+        clone->custom_zone_name         = custom_zone_name;
+        clone->settings                 = settings;
+        clone->controller_info          = controller_info;
+
+        if(settings.custom_shape)
+        {
+            clone->settings.custom_shape = settings.custom_shape->clone();
+        }
+
+        return clone;
     }
 
     bool compare_controller(RGBControllerInterface* other) const

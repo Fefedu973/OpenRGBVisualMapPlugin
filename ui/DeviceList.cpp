@@ -40,14 +40,14 @@ void DeviceList::Clear()
     }
 }
 
-void DeviceList::Init()
+void DeviceList::Init(std::vector<ControllerZone*> controller_zones)
 {
     /*-----------------------------------------------------*\
     | Group by RGBControllerInterface                       |
     \*-----------------------------------------------------*/
     std::map<RGBControllerInterface*,std::vector<ControllerZone*>> groups;
 
-    for(ControllerZone* controller_zone: OpenRGBVisualMapPlugin::controller_zones)
+    for(ControllerZone* controller_zone: controller_zones)
     {
         if(groups.find(controller_zone->controller) == groups.end())
         {
