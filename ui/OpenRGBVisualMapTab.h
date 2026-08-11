@@ -35,8 +35,6 @@ public slots:
 
 private slots:
     void AddTabSlot();
-    void AboutSlot();
-    void OpenVmapsFolder();
 
 private:
     Ui::OpenRGBVisualMapTab*            ui;

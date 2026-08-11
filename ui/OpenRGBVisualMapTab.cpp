@@ -19,7 +19,6 @@
 
 #include "OpenRGBVisualMapPlugin.h"
 #include "OpenRGBVisualMapTab.h"
-#include "PluginInfo.h"
 #include "TabHeader.h"
 #include "VirtualControllerTab.h"
 #include "VisualMapSettingsManager.h"
@@ -60,14 +59,6 @@ OpenRGBVisualMapTab::OpenRGBVisualMapTab(QWidget *parent):
     QAction* new_map = new QAction("New map", this);
     connect(new_map, &QAction::triggered, this, &OpenRGBVisualMapTab::AddTabSlot);
     main_menu->addAction(new_map);
-
-    QAction* open_vmap_folder = new QAction("Open VMaps folder", this);
-    connect(open_vmap_folder, &QAction::triggered, this, &OpenRGBVisualMapTab::OpenVmapsFolder);
-    main_menu->addAction(open_vmap_folder);
-
-    QAction* about = new QAction("About", this);
-    connect(about, &QAction::triggered, this, &OpenRGBVisualMapTab::AboutSlot);
-    main_menu->addAction(about);
 
     if(!SearchAndAutoLoad())
     {
@@ -207,28 +198,3 @@ void OpenRGBVisualMapTab::AddTabSlot()
     AddTab();
 }
 
-void OpenRGBVisualMapTab::AboutSlot()
-{
-    QDialog* dialog = new QDialog();
-    dialog->setWindowTitle("Visual Map");
-    dialog->setMinimumSize(300,320);
-    dialog->setModal(true);
-
-    QVBoxLayout* dialog_layout = new QVBoxLayout(dialog);
-
-    PluginInfo* plugin_info = new PluginInfo(dialog);
-
-    dialog_layout->addWidget(plugin_info);
-
-    dialog->exec();
-}
-
-void OpenRGBVisualMapTab::OpenVmapsFolder()
-{
-    filesystem::path config_dir = VisualMapSettingsManager::MapsFolder();
-    QUrl url = QUrl::fromLocalFile(QString::fromStdString(config_dir.string()));
-
-    LOG_INFO("[OpenRGBEffectsPlugin] Opening %s\n", url.path().toStdString().c_str());
-
-    QDesktopServices::openUrl(url);
-}

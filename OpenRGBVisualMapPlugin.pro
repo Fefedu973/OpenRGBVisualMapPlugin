@@ -76,8 +76,6 @@ GIT_BRANCH      = $$system(git --git-dir $$_PRO_FILE_PWD_/.git --work-tree $$_PR
 PROJECT_DESC                = "Group and organize your devices on a spatial map"
 PROJECT_NAME                = "OpenRGB Visual Map Plugin"
 PROJECT_URL                 = "https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin"
-win32:LATEST_BUILD_URL="https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Windows 64"
-unix:!macx:LATEST_BUILD_URL="https://gitlab.com/OpenRGBDevelopers/openrgbvisualmapplugin/-/jobs/artifacts/master/download?job=Linux 64"
 
 #-----------------------------------------------------------------------------------------------#
 # Inject vars in defines                                                                        #
@@ -148,7 +146,6 @@ HEADERS +=                                                                      
     ui/EditableLabel.h                                                                          \
     ui/GradientPresets.h                                                                        \
     ui/GridSettings.h                                                                           \
-    ui/PluginInfo.h                                                                             \
     ui/Scene.h                                                                                  \
     ui/TabHeader.h                                                                              \
     ui/TooltipProxy.h                                                                           \
@@ -180,7 +177,6 @@ SOURCES +=                                                                      
     ui/GridOptions.cpp                                                                          \
     ui/ItemOptions.cpp                                                                          \
     ui/OpenRGBVisualMapTab.cpp                                                                  \
-    ui/PluginInfo.cpp                                                                           \
     ui/Scene.cpp                                                                                \
     ui/TabHeader.cpp                                                                            \
     ui/VirtualControllerTab.cpp                                                                 \
@@ -197,7 +193,6 @@ FORMS +=                                                                        
     ui/GridOptions.ui                                                                           \
     ui/ItemOptions.ui                                                                           \
     ui/OpenRGBVisualMapTab.ui                                                                   \
-    ui/PluginInfo.ui                                                                            \
     ui/TabHeader.ui                                                                             \
     ui/VirtualControllerTab.ui                                                                  \
     ui/widget-editor/WidgetEditor.ui                                                            \
