@@ -41,6 +41,7 @@ public:
 
     void        LoadFile(std::string);
     void        LoadJson(json);
+    void        ApplyAutoRegister();
     void        Clear();
     void        Hide();
     void        Recreate();

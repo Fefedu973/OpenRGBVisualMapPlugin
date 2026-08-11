@@ -282,17 +282,15 @@ void VirtualControllerTab::LoadJson(json j)
         virtual_controller->UpdateSize(settings->w, settings->h);
 
         UpdateVirtualControllerDetails();
+    }
+}
 
-        if(settings->auto_register)
-        {
-            /*---------------------------------------------*\
-            | This will auto trigger registering.           |
-            | Register last so the controller enters the    |
-            | device list fully formed.                     |
-            \*---------------------------------------------*/
-            register_controller->setChecked(true);
-            RegisterAction();
-        }
+void VirtualControllerTab::ApplyAutoRegister()
+{
+    if(settings->auto_register)
+    {
+        register_controller->setChecked(true);
+        RegisterAction();
     }
 }
 
@@ -604,4 +602,5 @@ void VirtualControllerTab::LoadVmapAction()
     QString filename = inp->textValue();
 
     LoadFile(filename.toStdString());
+    ApplyAutoRegister();
 }

@@ -164,7 +164,7 @@ VirtualControllerTab* OpenRGBVisualMapTab::AddTab()
 
 bool OpenRGBVisualMapTab::SearchAndAutoLoad()
 {
-    bool has_loaded = false;
+    std::vector<VirtualControllerTab*> loaded_tabs;
 
     std::vector<std::string> filenames = VisualMapSettingsManager::GetMapNames();
 
@@ -181,7 +181,7 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
                 LOG_INFO("[OpenRGBVisualMapPlugin] Auto load: loading file %s\n", filename.c_str());
                 VirtualControllerTab* tab = AddTab();
                 tab->LoadFile(filename);
-                has_loaded = true;
+                loaded_tabs.push_back(tab);
             }
         }
         catch(const std::exception& e)
@@ -190,7 +190,17 @@ bool OpenRGBVisualMapTab::SearchAndAutoLoad()
         }
     }
 
-    return has_loaded;
+    /*-----------------------------------------------------*\
+    | Register only once every map has been loaded, as each |
+    | registration rebuilds the controller zone list the    |
+    | remaining maps still need to match against            |
+    \*-----------------------------------------------------*/
+    for(VirtualControllerTab* tab : loaded_tabs)
+    {
+        tab->ApplyAutoRegister();
+    }
+
+    return !loaded_tabs.empty();
 }
 
 void OpenRGBVisualMapTab::AddTabSlot()
