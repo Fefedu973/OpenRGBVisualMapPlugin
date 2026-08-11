@@ -165,6 +165,8 @@ void VirtualControllerTab::LoadJson(json j)
 {    
     virtual_controller->Clear();
 
+    active_state["ctrl_zones"] = json::array();
+
     if(j.contains("ctrl_zones"))
     {
         json ctrl_zones = j["ctrl_zones"];
@@ -240,6 +242,18 @@ void VirtualControllerTab::LoadJson(json j)
                 else if (candidates.size() == 1)
                 {
                     zone = candidates[0];
+                }
+
+                /*-----------------------------------------*\
+                | An entry with no identity can never bind  |
+                \*-----------------------------------------*/
+                if(!zone
+                && controller.contains("name")
+                && controller.contains("vendor")
+                && controller.contains("serial")
+                && controller.contains("location"))
+                {
+                    AddActiveEntry(entry);
                 }
 
                 try
@@ -345,8 +359,12 @@ void VirtualControllerTab::PauseForDetection()
 
 void VirtualControllerTab::AddActiveZone(ControllerZone* added_zone)
 {
-    json added_zone_json    = added_zone;
-    bool found              = false;
+    AddActiveEntry(json(added_zone));
+}
+
+void VirtualControllerTab::AddActiveEntry(json added_zone_json)
+{
+    bool found = false;
 
     for(std::size_t saved_zone_idx = 0; saved_zone_idx < active_state["ctrl_zones"].size(); saved_zone_idx++)
     {

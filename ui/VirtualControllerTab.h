@@ -82,6 +82,7 @@ signals:
 
 private:
     void AddActiveZone(ControllerZone* added_zone);
+    void AddActiveEntry(json added_zone_json);
     void RemoveActiveZone(ControllerZone* removed_zone);
     void CreateMainMenu();
     void InitZoneList();
