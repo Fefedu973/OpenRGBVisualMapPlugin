@@ -17,7 +17,7 @@ modules:
     post-install:
       - mv ${FLATPAK_DEST}/lib/openrgb/plugins/libOpenRGBVisualMapPlugin.so ${FLATPAK_DEST}/libOpenRGBVisualMapPlugin.so
       - rm -rf ${FLATPAK_DEST}/lib
+      - install -Dm644 images/OpenRGBVisualMapPlugin.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/openrgb-visual-map-plugin.png
     sources:
-      - type: git
-        url: https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin
-        branch: master
+      - type: dir
+        path: ../

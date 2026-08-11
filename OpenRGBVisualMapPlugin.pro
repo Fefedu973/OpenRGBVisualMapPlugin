@@ -244,8 +244,14 @@ win32:DEFINES +=                                                                
 #-----------------------------------------------------------------------------------------------#
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++17 -Wno-psabi
+
+    #-------------------------------------------------------------------------------------------#
+    # Add static files to installation                                                          #
+    #-------------------------------------------------------------------------------------------#
     target.path=$$PREFIX/lib/openrgb/plugins/
-    INSTALLS += target
+    metainfo.path=$$PREFIX/share/metainfo/
+    metainfo.files+=org.openrgb.OpenRGB.Plugin.VisualMap.metainfo.xml
+    INSTALLS += target metainfo
 }
 
 #-----------------------------------------------------------------------------------------------#
