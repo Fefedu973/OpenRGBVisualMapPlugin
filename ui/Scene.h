@@ -8,6 +8,7 @@
 #define GRID_LINE_WIDTH   0.1
 #define GRID_LINE_ALPHA   0x40
 #define BOUNDS_LINE_WIDTH 0.2
+#define GRID_MIN_SPACING  2
 
 class Scene: public QGraphicsScene
 {

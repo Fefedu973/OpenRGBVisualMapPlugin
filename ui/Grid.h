@@ -12,6 +12,12 @@
 #include "Scene.h"
 #include "GridSettings.h"
 
+/*---------------------------------------------------------*\
+| Stop zooming out where the grid stops being drawn, so it  |
+| never blinks out at the end of the range                  |
+\*---------------------------------------------------------*/
+#define GRID_MIN_ZOOM GRID_MIN_SPACING
+
 class Grid : public QGraphicsView
 {
     Q_OBJECT
@@ -38,6 +44,8 @@ signals:
     void Changed();
 
 protected:
+    void showEvent(QShowEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -49,6 +57,9 @@ private:
     Scene* scene = nullptr;
     bool left_button_pressed = false;
     bool right_button_pressed = false;
+    bool fitted = false;
+
+    void FitToView();
 
     QGraphicsPixmapItem* preview;
     QPixmap preview_pixmap;

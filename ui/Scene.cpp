@@ -14,11 +14,20 @@ void Scene::drawBackground(QPainter *painter, const QRectF &rect)
 {    
     painter->setRenderHints(QPainter::Antialiasing);
 
-    qreal left = int(rect.left()) - (int(rect.left()) % (settings->grid_size));
-    qreal top = int(rect.top()) - (int(rect.top()) % (settings->grid_size));
+    /*-----------------------------------------------------*\
+    | Zooming out grows the line count without limit, so    |
+    | drop the grid once the steps are a couple of pixels   |
+    | apart                                                 |
+    \*-----------------------------------------------------*/
+    bool draw_grid = settings->show_grid
+                  && (settings->grid_size > 0)
+                  && ((settings->grid_size * painter->worldTransform().m11()) >= GRID_MIN_SPACING);
 
-    if(settings->show_grid)
+    if(draw_grid)
     {
+        qreal left = int(rect.left()) - (int(rect.left()) % (settings->grid_size));
+        qreal top = int(rect.top()) - (int(rect.top()) % (settings->grid_size));
+
         QPalette pal = QApplication::palette();
         QColor col = pal.color(QPalette::Text);
         col.setAlpha(GRID_LINE_ALPHA);

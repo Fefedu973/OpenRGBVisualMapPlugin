@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Grid.h"
 #include "math.h"
 #include "ControllerZoneItem.h"
@@ -29,17 +30,54 @@ void Grid::ApplySettings(GridSettings* s)
                  settings->w * 2,
                  settings->h * 2);
 
+    scene->ApplySettings(settings);
+
+    FitToView();
+
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+    update();
+}
+
+void Grid::FitToView()
+{
+    /*-----------------------------------------------------*\
+    | The tab is not laid out yet while it is being built,  |
+    | and fitting to that placeholder size zooms right out  |
+    \*-----------------------------------------------------*/
+    if(!isVisible() || (viewport()->width() <= 1) || (viewport()->height() <= 1))
+    {
+        return;
+    }
+
     QRect view(- (settings->w) ,
                  - (settings->h),
                  settings->w*2 ,
                  settings->h*2);
 
-    scene->ApplySettings(settings);
     fitInView(view,Qt::KeepAspectRatio);
 
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    fitted = true;
+}
 
-    update();
+void Grid::showEvent(QShowEvent *event)
+{
+    QGraphicsView::showEvent(event);
+
+    if(!fitted && scene)
+    {
+        FitToView();
+    }
+}
+
+void Grid::resizeEvent(QResizeEvent *event)
+{
+    QGraphicsView::resizeEvent(event);
+
+    if(!fitted && scene)
+    {
+        FitToView();
+    }
 }
 
 void Grid::Clear()
@@ -148,6 +186,30 @@ void Grid::wheelEvent(QWheelEvent *event)
         factor = event->modifiers() == Qt::ControlModifier ? 1.3 : 1.05;
     } else {
         factor = event->modifiers() == Qt::ControlModifier ? 0.7 : 0.95;
+    }
+
+    /*-----------------------------------------------------*\
+    | A grid square is one led, so hold the zoom between a  |
+    | square still showing its grid line and one square     |
+    | filling the view                                      |
+    \*-----------------------------------------------------*/
+    qreal current  = transform().m11();
+    qreal max_zoom = std::max<qreal>(GRID_MIN_ZOOM, std::min(viewport()->width(), viewport()->height()));
+
+    if(((factor < 1) && (current <= GRID_MIN_ZOOM))
+    || ((factor > 1) && (current >= max_zoom)))
+    {
+        event->accept();
+        return;
+    }
+
+    if((current * factor) < GRID_MIN_ZOOM)
+    {
+        factor = GRID_MIN_ZOOM / current;
+    }
+    else if((current * factor) > max_zoom)
+    {
+        factor = max_zoom / current;
     }
 
     scale(factor, factor);
