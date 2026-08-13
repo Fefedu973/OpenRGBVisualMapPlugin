@@ -204,12 +204,12 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
     if(ctrl_zone->is_segment)
     {
         ctrl_zone->settings.custom_shape->w     = controller->GetZoneSegmentMatrixMapWidth(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
-        ctrl_zone->settings.custom_shape->h     = controller->GetZoneSegmentMatrixMapWidth(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
+        ctrl_zone->settings.custom_shape->h     = controller->GetZoneSegmentMatrixMapHeight(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
     }
     else
     {
         ctrl_zone->settings.custom_shape->w     = controller->GetZoneMatrixMapWidth(ctrl_zone->zone_idx);
-        ctrl_zone->settings.custom_shape->h     = controller->GetZoneMatrixMapWidth(ctrl_zone->zone_idx);
+        ctrl_zone->settings.custom_shape->h     = controller->GetZoneMatrixMapHeight(ctrl_zone->zone_idx);
     }
 
     for(unsigned int h = 0; h < ctrl_zone->settings.custom_shape->h; h++)
