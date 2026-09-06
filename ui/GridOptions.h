@@ -28,6 +28,7 @@ private slots:
     void on_w_spinBox_valueChanged(int);
     void on_h_spinBox_valueChanged(int);
     void on_grid_checkBox_stateChanged(int);
+    void on_snap_to_grid_checkBox_stateChanged(int);
     void on_bounds_checkBox_stateChanged(int);
     void on_auto_load_checkBox_stateChanged(int);
     void on_auto_register_checkBox_stateChanged(int);

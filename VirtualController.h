@@ -14,9 +14,11 @@
 
 #include <functional>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 #include <QImage>
 #include "ControllerZone.h"
+#include "LedRouting.h"
 #include "RGBControllerInterface.h"
 
 class VirtualController
@@ -65,6 +67,7 @@ private:
     bool                            members_hidden = false;
     std::function<void(QImage)>     callback;
     std::vector<ControllerZone*>    added_zones;
+    std::unordered_map<ControllerZone*, std::vector<LedRouting::LedRoute>> led_routes;
     std::mutex                      added_zones_mutex;
     RGBController_Setup             setup;
 

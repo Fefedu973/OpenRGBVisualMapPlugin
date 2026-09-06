@@ -1,8 +1,6 @@
 #include <algorithm>
 #include "Grid.h"
-#include "math.h"
 #include "ControllerZoneItem.h"
-#include "OpenRGBVisualMapPlugin.h"
 
 void Grid::Init()
 {
@@ -19,10 +17,9 @@ void Grid::ApplySettings(GridSettings* s)
     if(!scene)
     {
         scene = new Scene(settings);
+        scene->setItemIndexMethod(QGraphicsScene::NoIndex);
         setScene(scene);
         resize(settings->w, settings->h);
-
-        preview = scene->addPixmap(preview_pixmap);
     }
 
     setSceneRect(- (settings->w) / 2,
@@ -90,8 +87,7 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
 {
     Clear();
 
-    preview = scene->addPixmap(preview_pixmap);
-    UpdatePreview(QImage(0, 0, QImage::Format_RGB32));
+    preview_image = QImage();
 
     for(ControllerZone* ctrl_zone: ctrl_zones)
     {
@@ -103,9 +99,10 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
         connect(ctrl_zone_item, &ControllerZoneItem::Released, [=](){
             for(ControllerZoneItem* item : ctrl_zone_items)
             {
-                item->Snap();
+                item->CommitPosition();
             }
 
+            UpdatePreview(preview_image);
             emit Changed();
         });
 
@@ -118,7 +115,8 @@ void Grid::ResetItems(std::vector<ControllerZone*> ctrl_zones)
                 ControllerZoneItem* start = items.front();
                 ControllerZoneItem* end = ctrl_zone_item;
 
-                QRect selection_rect(start->point(), end->point());
+                QRectF selection_rect(start->point(), end->point());
+                selection_rect = selection_rect.normalized();
 
                 for(ControllerZoneItem* item : ctrl_zone_items)
                 {
@@ -156,9 +154,8 @@ void Grid::UpdateItems()
 {
     for(ControllerZoneItem* item: ctrl_zone_items)
     {
-        item->setX(item->GetControllerZone()->settings.x);
-        item->setY(item->GetControllerZone()->settings.y);
-        item->update();
+        item->SyncFromSettings();
+        item->UpdatePreview(preview_image);
     }
 
     scene->update();
@@ -168,9 +165,17 @@ void Grid::UpdateItems()
 
 void Grid::UpdatePreview(QImage image)
 {
-    preview_pixmap.convertFromImage(image);
-    preview->setPixmap(preview_pixmap);
-    preview->update();
+    preview_image = image;
+
+    if(left_button_pressed)
+    {
+        return;
+    }
+
+    for(ControllerZoneItem* item : ctrl_zone_items)
+    {
+        item->UpdatePreview(preview_image);
+    }
 }
 
 
@@ -262,6 +267,8 @@ void Grid::mouseReleaseEvent(QMouseEvent *event)
 
     QGraphicsView::mouseReleaseEvent(event);
 
+    const bool refresh_preview = left_button_pressed;
+
     if(left_button_pressed)
     {
         emit SelectionChanged(GetSelection());
@@ -269,6 +276,11 @@ void Grid::mouseReleaseEvent(QMouseEvent *event)
 
     left_button_pressed = false;
     right_button_pressed = false;
+
+    if(refresh_preview)
+    {
+        UpdatePreview(preview_image);
+    }
 }
 
 
@@ -292,11 +304,12 @@ void Grid::MoveSelection(int delta_x, int delta_y)
         {
             ctrl_zone_item->setX(ctrl_zone_item->x() + delta_x);
             ctrl_zone_item->setY(ctrl_zone_item->y() + delta_y);
-            ctrl_zone_item->Snap();
+            ctrl_zone_item->CommitPosition();
         }
     }
 
     UpdateItems();
+    emit Changed();
 }
 
 std::vector<ControllerZone*> Grid::GetSelection()

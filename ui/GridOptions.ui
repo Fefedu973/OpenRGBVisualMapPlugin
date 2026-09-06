@@ -20,7 +20,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0">
-   <item row="6" column="1">
+   <item row="7" column="1">
     <widget class="QSpinBox" name="w_spinBox">
      <property name="minimum">
       <number>1</number>
@@ -47,10 +47,17 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="6" column="0" colspan="2">
     <widget class="QCheckBox" name="bounds_checkBox">
      <property name="text">
       <string>Show bounds</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QCheckBox" name="snap_to_grid_checkBox">
+     <property name="text">
+      <string>Snap to grid</string>
      </property>
     </widget>
    </item>
@@ -68,7 +75,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="QSpinBox" name="h_spinBox">
      <property name="minimum">
       <number>1</number>
@@ -95,14 +102,14 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0">
     <widget class="QLabel" name="height">
      <property name="text">
       <string>Height</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="width">
      <property name="text">
       <string>Width</string>

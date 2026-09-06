@@ -119,78 +119,34 @@ void VirtualController::UpdateVirtualZone()
     \*-----------------------------------------------------*/
     unsigned int    map_leds_count                      = 0;
 
+    led_routes.clear();
+
     for(ControllerZone* ctrl_zone: added_zones)
     {
-        RGBControllerInterface*         controller      = ctrl_zone->controller;
-        const ControllerZoneSettings&   settings        = ctrl_zone->settings;
-        unsigned int                    leds_count      = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
+        RGBControllerInterface* controller = ctrl_zone->controller;
+        std::vector<LedRouting::LedRoute> routes = LedRouting::BuildRoutes(
+            ctrl_zone,
+            QPointF(ctrl_zone->settings.x, ctrl_zone->settings.y),
+            QSize(width, height));
 
-        switch(ctrl_zone->settings.shape)
+        for(const LedRouting::LedRoute& route : routes)
         {
-            case HORIZONTAL_LINE:
-                for(unsigned int i = 0; i < leds_count; i++)
+            const std::string led_name = controller->GetLEDName(route.led_index);
+
+            for(const LedRouting::PixelWeight& overlap : route.overlaps)
+            {
+                const unsigned int xy = overlap.pixel.y() * width + overlap.pixel.x();
+
+                if(real_leds[xy].empty())
                 {
-                    unsigned int        idx             = settings.reverse ? leds_count - 1 - i : i;
-                    unsigned int        x               = idx * settings.led_spacing + settings.x;
-                    unsigned int        y               = settings.y;
-
-                    if(y < height && x < width)
-                    {
-                        unsigned int    xy              = y * width + x;
-
-                        if(real_leds[xy].empty())
-                        {
-                            map_leds_count++;
-                        }
-
-                        real_leds[xy].push_back(controller->GetLEDName(i));
-                    }
+                    map_leds_count++;
                 }
-                break;
 
-            case VERTICAL_LINE:
-                for(unsigned int i = 0; i < leds_count; i++)
-                {
-                    unsigned int        idx             = settings.reverse ? leds_count - 1 - i : i;
-                    unsigned int        x               = settings.x;
-                    unsigned int        y               = idx * settings.led_spacing + settings.y;
-
-                    if(y < height && x < width)
-                    {
-                        unsigned int    xy              = y * width + x;
-
-                        if(real_leds[xy].empty())
-                        {
-                            map_leds_count++;
-                        }
-
-                        real_leds[xy].push_back(controller->GetLEDName(i));
-                    }
-                }
-                break;
-
-            case CUSTOM:
-                std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
-
-                for(unsigned int i = 0; i < led_positions.size(); i++)
-                {
-                    unsigned int        x               = settings.x + led_positions[i]->x();
-                    unsigned int        y               = settings.y + led_positions[i]->y();
-
-                    if(y < height && x < width)
-                    {
-                        unsigned int    xy              = y * width + x;
-
-                        if(real_leds[xy].empty())
-                        {
-                            map_leds_count++;
-                        }
-
-                        real_leds[xy].push_back(controller->GetLEDName(led_positions[i]->led_num));
-                    }
-                }
-                break;
+                real_leds[xy].push_back(led_name);
+            }
         }
+
+        led_routes[ctrl_zone] = std::move(routes);
     }
 
     /*-----------------------------------------------------*\
@@ -558,72 +514,29 @@ void VirtualController::ApplyToDevice(const QImage& image)
 void VirtualController::ApplyToZone(ControllerZone* ctrl_zone, const QImage& image)
 {
     RGBControllerInterface* controller  = ctrl_zone->controller;
-    ControllerZoneSettings  settings    = ctrl_zone->settings;
-    unsigned int            leds_count;
     unsigned int            start_idx;
 
     if(ctrl_zone->is_segment)
     {
-        leds_count                      = controller->GetZoneSegmentLEDsCount(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
         start_idx                       = controller->GetZoneSegmentStartIndex(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
     }
     else
     {
-        leds_count                      = controller->GetZoneLEDsCount(ctrl_zone->zone_idx);
         start_idx                       = controller->GetZoneStartIndex(ctrl_zone->zone_idx);
     }
-    
-    switch(ctrl_zone->settings.shape)
+
+    const auto routes = led_routes.find(ctrl_zone);
+
+    if(routes == led_routes.end())
     {
-    case HORIZONTAL_LINE:
-        for(int i = 0; i < (int)leds_count; i++)
-        {
-            int idx = settings.reverse ? (int)leds_count - 1 - i : i;
+        return;
+    }
 
-            unsigned int x = idx * settings.led_spacing + settings.x;
-            unsigned int y = settings.y;
-
-            if(image.valid(x,y))
-            {
-                QColor color = image.pixelColor(x, y);
-                controller->SetColor(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-
-        }
-        break;
-
-    case VERTICAL_LINE:
-        for(int i = 0; i < (int)leds_count; i++)
-        {
-            int idx = settings.reverse ? (int)leds_count - 1 - i : i;
-
-            unsigned int x = settings.x;
-            unsigned int y = idx * settings.led_spacing + settings.y;
-
-            if(image.valid(x,y))
-            {
-                QColor color = image.pixelColor(x, y);
-                controller->SetColor(start_idx + i, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-        }
-        break;
-
-    case CUSTOM:
-        std::vector<LedPosition*> led_positions = ctrl_zone->settings.custom_shape->led_positions;
-
-        for(unsigned int i = 0; i < led_positions.size(); i++)
-        {
-            unsigned int x = settings.x + led_positions[i]->x();
-            unsigned int y = settings.y + led_positions[i]->y();
-
-            if(image.valid(x,y))
-            {
-                QColor color = image.pixelColor(x, y);
-                controller->SetColor(start_idx + led_positions[i]->led_num, ToRGBColor(color.red(), color.green(), color.blue()));
-            }
-        }
-
-        break;
+    for(const LedRouting::LedRoute& route : routes->second)
+    {
+        const QColor color = LedRouting::MixColor(image, route);
+        controller->SetColor(start_idx + route.led_index,
+                             ToRGBColor(color.red(), color.green(), color.blue()));
     }
 }
 

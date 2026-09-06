@@ -5,7 +5,6 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QImage>
-#include <QPixmap>
 #include <QWheelEvent>
 
 #include "ControllerZoneItem.h"
@@ -61,8 +60,7 @@ private:
 
     void FitToView();
 
-    QGraphicsPixmapItem* preview;
-    QPixmap preview_pixmap;
+    QImage preview_image;
 
 };
 

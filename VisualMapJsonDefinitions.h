@@ -73,6 +73,7 @@ void to_json(json& j, const ControllerZoneSettings settings)
     {"shape", settings.shape},
     {"x", settings.x},
     {"y", settings.y},
+    {"scale", settings.scale},
     {"led_spacing", settings.led_spacing},
     {"reverse", settings.reverse}};
 
@@ -90,6 +91,7 @@ void from_json(const json& j, ControllerZoneSettings& s)
 {
     j.at("x").get_to(s.x);
     j.at("y").get_to(s.y);
+    s.scale = j.value("scale", 1.0);
     j.at("led_spacing").get_to(s.led_spacing);
     s.shape = static_cast<ZoneShape>(j.at("shape"));
     j.at("reverse").get_to(s.reverse);
@@ -135,6 +137,7 @@ void to_json(json& j, const GridSettings* settings)
     {"show_grid", settings->show_grid},
     {"show_bounds", settings->show_bounds},
     {"grid_size", settings->grid_size},
+    {"snap_to_grid", settings->snap_to_grid},
     {"auto_load", settings->auto_load},
     {"auto_register", settings->auto_register},
     {"hide_members", settings->hide_members},
@@ -148,6 +151,8 @@ void from_json(const json& j, GridSettings* s)
     j.at("show_grid").get_to(s->show_grid);
     j.at("show_bounds").get_to(s->show_bounds);
     j.at("grid_size").get_to(s->grid_size);
+
+    s->snap_to_grid = j.value("snap_to_grid", false);
 
     if(j.contains("auto_load"))
     {

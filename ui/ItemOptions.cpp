@@ -34,18 +34,21 @@ void ItemOptions::Update()
     {        
         ui->x_spinBox->blockSignals(true);
         ui->y_spinBox->blockSignals(true);
+        ui->scale_spinBox->blockSignals(true);
         ui->led_spacing_spinBox->blockSignals(true);
         ui->shape_comboBox->blockSignals(true);
         ui->reverse_checkBox->blockSignals(true);
 
         ui->x_spinBox->setValue(ctrl_zone->settings.x);
         ui->y_spinBox->setValue(ctrl_zone->settings.y);
+        ui->scale_spinBox->setValue(ctrl_zone->settings.scale);
         ui->led_spacing_spinBox->setValue(ctrl_zone->settings.led_spacing);
         ui->shape_comboBox->setCurrentIndex(ctrl_zone->settings.shape);
         ui->reverse_checkBox->setChecked(ctrl_zone->settings.reverse);
 
         ui->x_spinBox->blockSignals(false);
         ui->y_spinBox->blockSignals(false);
+        ui->scale_spinBox->blockSignals(false);
         ui->led_spacing_spinBox->blockSignals(false);
         ui->shape_comboBox->blockSignals(false);
         ui->reverse_checkBox->blockSignals(false);
@@ -54,7 +57,7 @@ void ItemOptions::Update()
     }
 }
 
-void ItemOptions::on_x_spinBox_valueChanged(int x)
+void ItemOptions::on_x_spinBox_valueChanged(double x)
 {
     if(ctrl_zone)
     {
@@ -63,11 +66,20 @@ void ItemOptions::on_x_spinBox_valueChanged(int x)
     }
 }
 
-void ItemOptions::on_y_spinBox_valueChanged(int y)
+void ItemOptions::on_y_spinBox_valueChanged(double y)
 {
     if(ctrl_zone)
     {
         ctrl_zone->settings.y = y;
+        emit ItemOptionsChanged();
+    }
+}
+
+void ItemOptions::on_scale_spinBox_valueChanged(double scale)
+{
+    if(ctrl_zone)
+    {
+        ctrl_zone->settings.scale = scale;
         emit ItemOptionsChanged();
     }
 }

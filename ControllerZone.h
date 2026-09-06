@@ -184,15 +184,16 @@ struct ControllerZoneSettings
     ZoneShape       shape;
     CustomShape*    custom_shape;
 
-    unsigned int    x;
-    unsigned int    y;
+    qreal           x;
+    qreal           y;
+    qreal           scale;
     unsigned int    led_spacing;
 
     bool            reverse;
 
     static ControllerZoneSettings defaults()
     {
-        return {HORIZONTAL_LINE,  nullptr, 0, 0, 1, false};
+        return {HORIZONTAL_LINE, nullptr, 0.0, 0.0, 1.0, 1, false};
     }
 };
 
@@ -314,25 +315,25 @@ struct ControllerZone
         return this->settings.shape == CUSTOM;
     }
 
-    int width () const
+    qreal width () const
     {
         switch(this->settings.shape)
         {
-            case CUSTOM: return this->settings.custom_shape->w;
-            case HORIZONTAL_LINE: return this->led_count() * this->settings.led_spacing - (this->settings.led_spacing - 1);
-            case VERTICAL_LINE: return 1;
+            case CUSTOM: return this->settings.custom_shape->w * this->settings.scale;
+            case HORIZONTAL_LINE: return (this->led_count() > 0 ? (this->led_count() - 1) * this->settings.led_spacing + 1 : 1) * this->settings.scale;
+            case VERTICAL_LINE: return this->settings.scale;
         }
 
         return 0;
     }
 
-    int height () const
+    qreal height () const
     {
         switch(this->settings.shape)
         {
-            case CUSTOM: return this->settings.custom_shape->h;
-            case HORIZONTAL_LINE: return 1;
-            case VERTICAL_LINE: return  this->led_count() * this->settings.led_spacing - (this->settings.led_spacing - 1);
+            case CUSTOM: return this->settings.custom_shape->h * this->settings.scale;
+            case HORIZONTAL_LINE: return this->settings.scale;
+            case VERTICAL_LINE: return (this->led_count() > 0 ? (this->led_count() - 1) * this->settings.led_spacing + 1 : 1) * this->settings.scale;
         }
 
         return 0;

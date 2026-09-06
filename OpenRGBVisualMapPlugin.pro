@@ -133,6 +133,7 @@ HEADERS +=                                                                      
     OpenRGBPluginsFont.h                                                                        \
     OpenRGBVisualMapPlugin.h                                                                    \
     ZoneManager.h                                                                               \
+    LedRouting.h                                                                                \
     VirtualController.h                                                                         \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
@@ -165,6 +166,7 @@ SOURCES +=                                                                      
     VirtualController.cpp                                                                       \
     VisualMapSettingsManager.cpp                                                                \
     ZoneManager.cpp                                                                             \
+    LedRouting.cpp                                                                              \
     ui/BackgroundApplier.cpp                                                                    \
     ui/ClickableLabel.cpp                                                                       \
     ui/ColorPicker.cpp                                                                          \

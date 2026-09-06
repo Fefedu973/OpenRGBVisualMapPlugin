@@ -8,6 +8,8 @@
 |   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
+#include <cmath>
+#include <limits>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -37,6 +39,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     settings->show_bounds   = true;
     settings->show_grid     = true;
     settings->grid_size     = 1;
+    settings->snap_to_grid  = false;
 
     active_state["ctrl_zones"] = json::array();
 
@@ -527,34 +530,37 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
     /*-----------------------------------------------------*\
     | Calculate bounds                                      |
     \*-----------------------------------------------------*/
-    int min_x = INT_MAX;
-    int min_y = INT_MAX;
-    int max_x = INT_MIN;
-    int max_y = INT_MIN;
+    qreal min_x = std::numeric_limits<qreal>::max();
+    qreal min_y = std::numeric_limits<qreal>::max();
+    qreal max_x = std::numeric_limits<qreal>::lowest();
+    qreal max_y = std::numeric_limits<qreal>::lowest();
 
     for (ControllerZone* controller_zone: virtual_controller->GetZones())
     {
-        min_x = std::min<int>(min_x, controller_zone->settings.x);
-        min_y = std::min<int>(min_y, controller_zone->settings.y);
+        min_x = std::min(min_x, controller_zone->settings.x);
+        min_y = std::min(min_y, controller_zone->settings.y);
 
-        max_x = std::max<int>(max_x, controller_zone->settings.x + controller_zone->width());
-        max_y = std::max<int>(max_y, controller_zone->settings.y + controller_zone->height());
+        max_x = std::max(max_x, controller_zone->settings.x + controller_zone->width());
+        max_y = std::max(max_y, controller_zone->settings.y + controller_zone->height());
     }
+
+    const qreal origin_x = std::floor(min_x);
+    const qreal origin_y = std::floor(min_y);
 
     /*-----------------------------------------------------*\
     | Shift all controllers                                 |
     \*-----------------------------------------------------*/
     for (ControllerZone* controller_zone: virtual_controller->GetZones())
     {
-        controller_zone->settings.x -= min_x;
-        controller_zone->settings.y -= min_y;
+        controller_zone->settings.x -= origin_x;
+        controller_zone->settings.y -= origin_y;
     }
 
     /*-----------------------------------------------------*\
     | Resize the map                                        |
     \*-----------------------------------------------------*/
-    settings->w = max_x - min_x;
-    settings->h = max_y - min_y;
+    settings->w = std::ceil(max_x) - origin_x;
+    settings->h = std::ceil(max_y) - origin_y;
 
     /*-----------------------------------------------------*\
     | Update GUI elements                                   |

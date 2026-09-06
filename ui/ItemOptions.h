@@ -30,8 +30,9 @@ private:
     void UpdateWidgetsVisibility();
 
 private slots:
-    void on_x_spinBox_valueChanged(int);
-    void on_y_spinBox_valueChanged(int);
+    void on_x_spinBox_valueChanged(double);
+    void on_y_spinBox_valueChanged(double);
+    void on_scale_spinBox_valueChanged(double);
     void on_led_spacing_spinBox_valueChanged(int);
     void on_shape_comboBox_currentIndexChanged(int);
     void on_reverse_checkBox_stateChanged(int);

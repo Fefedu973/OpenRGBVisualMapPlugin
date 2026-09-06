@@ -70,6 +70,7 @@ WidgetEditor::WidgetEditor(QWidget *parent, ControllerZone* ctrl_zone):
     settings->show_grid     = true;
     settings->show_bounds   = true;
     settings->grid_size     = 1;
+    settings->snap_to_grid  = true;
 
     ui->grid->ApplySettings(settings);
 

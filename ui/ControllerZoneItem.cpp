@@ -1,20 +1,26 @@
 #include "ControllerZoneItem.h"
-#include "math.h"
-#include <QString>
+
+#include <algorithm>
+#include <cmath>
+#include <QApplication>
 #include <QCursor>
 #include <QPalette>
-#include <QApplication>
-#include "OpenRGBVisualMapPlugin.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QString>
+#include <utility>
 
 ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone, GridSettings* settings) :
     ctrl_zone(ctrl_zone),
     settings(settings)
 {
+    RefreshGeometry();
     setFlags(ItemIsMovable | ItemIsSelectable | ItemSendsScenePositionChanges | ItemAcceptsInputMethod);
     setAcceptHoverEvents(true);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
     setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
+    UpdateZValue(false);
 
     std::string tooltip =
             "<div style=\"display:inline-block; padding:10px; font-weight:bold; background-color:#ffffff; color: #000000\">"
@@ -22,105 +28,293 @@ ControllerZoneItem::ControllerZoneItem(ControllerZone* ctrl_zone, GridSettings* 
             + "</div>";
 
     setToolTip(QString::fromUtf8(tooltip.c_str()));
-
     setCursor(Qt::OpenHandCursor);
+}
+
+const QRectF& ControllerZoneItem::DeviceRect() const
+{
+    return device_rect;
+}
+
+qreal ControllerZoneItem::ResizeHandleSize(qreal pixels, qreal maximum) const
+{
+    qreal view_scale = 1.0;
+
+    if(scene() && !scene()->views().isEmpty())
+    {
+        view_scale = std::abs(scene()->views().front()->transform().m11());
+    }
+
+    return std::min(maximum, pixels / std::max<qreal>(view_scale, 0.01));
+}
+
+QRectF ControllerZoneItem::ResizeHandleRect(ResizeCorner corner, qreal size) const
+{
+    const QRectF rect = DeviceRect();
+    QPointF center;
+
+    switch(corner)
+    {
+    case ResizeCorner::TopLeft:     center = rect.topLeft(); break;
+    case ResizeCorner::TopRight:    center = rect.topRight(); break;
+    case ResizeCorner::BottomLeft:  center = rect.bottomLeft(); break;
+    case ResizeCorner::BottomRight: center = rect.bottomRight(); break;
+    case ResizeCorner::None:        return QRectF();
+    }
+
+    return QRectF(center.x() - size / 2.0,
+                  center.y() - size / 2.0,
+                  size,
+                  size);
 }
 
 QRectF ControllerZoneItem::boundingRect() const
 {
-    switch(ctrl_zone->settings.shape)
+    const qreal margin = RESIZE_HANDLE_MAX_HIT_SIZE / 2.0 + ITEM_BORDER_WIDTH;
+    return DeviceRect().adjusted(-margin, -margin, margin, margin);
+}
+
+QPainterPath ControllerZoneItem::shape() const
+{
+    QPainterPath path;
+    path.addRect(DeviceRect());
+
+    if(isSelected())
     {
-    case HORIZONTAL_LINE :
-        return QRectF(-0.1, -0.1, 0.1 + ctrl_zone->led_count() * ctrl_zone->settings.led_spacing, 1.1);
-    case VERTICAL_LINE :
-        return QRectF(-0.1, -0.1, 1.1, 0.1 + ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
-    case CUSTOM:
-        return QRectF(-0.1, -0.1, 0.1 + ctrl_zone->settings.custom_shape->w, 0.1 + ctrl_zone->settings.custom_shape->h);
+        const qreal hit_size = ResizeHandleSize(RESIZE_HANDLE_HIT_PX, RESIZE_HANDLE_MAX_HIT_SIZE);
+        path.addRect(ResizeHandleRect(ResizeCorner::TopLeft, hit_size));
+        path.addRect(ResizeHandleRect(ResizeCorner::TopRight, hit_size));
+        path.addRect(ResizeHandleRect(ResizeCorner::BottomLeft, hit_size));
+        path.addRect(ResizeHandleRect(ResizeCorner::BottomRight, hit_size));
     }
 
-    return QRectF(-0.1, -0.1, 1.1, 1.1);
+    return path;
 }
 
 void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
-    setZValue(ctrl_zone->isCustomShape() ? -ctrl_zone->settings.custom_shape->h * ctrl_zone->settings.custom_shape->w :
-                                           -ctrl_zone->led_count() * ctrl_zone->settings.led_spacing);
-
+    const QRectF device_rect = DeviceRect();
 
     QPalette pal = QApplication::palette();
-    QColor col = pal.color(QPalette::Highlight);
-    QColor txt_col = pal.color(QPalette::Text);
-    QColor inv_col = QColor(0xff - col.red(),0xff - col.green(),0xff - col.blue());
+    QColor highlight = pal.color(QPalette::Highlight);
+    QColor text = pal.color(QPalette::Text);
 
-    QBrush brush =  isSelected() ?
-                QBrush(inv_col, Qt::BrushStyle::SolidPattern) : hover ?
-                    QBrush(col, Qt::BrushStyle::SolidPattern) : default_brush;
-
-    painter->setBrush(brush);
-
-    QPen pen(txt_col, ITEM_BORDER_WIDTH);
-
-    painter->setPen(pen);
+    painter->setPen(QPen(text, ITEM_BORDER_WIDTH));
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setCompositionMode(QPainter::CompositionMode_Source);
 
-    if(ctrl_zone->isCustomShape())
+    for(const LedRouting::LedCell& cell : led_cells)
     {
-        for(LedPosition* point : ctrl_zone->settings.custom_shape->led_positions)
-        {
-            QRectF rect = QRectF(point->x(), point->y(), 1, 1);
-            painter->drawRect(rect);
-        }
-    }
-    else if(ctrl_zone->settings.shape == HORIZONTAL_LINE)
-    {
-        int led_count = ctrl_zone->led_count();
-        int interval = ctrl_zone->settings.led_spacing;
+        QBrush brush = default_brush;
 
-        for (int i = 0; i < led_count; i++)
+        if(cell.led_index < preview_colors.size() && preview_colors[cell.led_index].alpha() > 0)
         {
-            QRectF rect = QRectF(i * interval, 0, 1, 1);
-            painter->drawRect(rect);
+            brush = QBrush(preview_colors[cell.led_index], Qt::SolidPattern);
         }
-    }
-    else if(ctrl_zone->settings.shape == VERTICAL_LINE)
-    {
-        int led_count = ctrl_zone->led_count();
-        int interval = ctrl_zone->settings.led_spacing;
 
-        for (int i = 0; i < led_count; i++)
+        painter->setBrush(brush);
+        painter->drawRect(cell.local_rect);
+    }
+
+    if(isSelected())
+    {
+        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+        QPen selection_pen(highlight);
+        selection_pen.setCosmetic(true);
+        selection_pen.setWidth(2);
+        painter->setPen(selection_pen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRect(device_rect);
+
+        QPen handle_pen(pal.color(QPalette::Base));
+        handle_pen.setCosmetic(true);
+        painter->setPen(handle_pen);
+        painter->setBrush(highlight);
+        const qreal handle_size = ResizeHandleSize(RESIZE_HANDLE_PX, RESIZE_HANDLE_MAX_SIZE);
+        painter->drawRect(ResizeHandleRect(ResizeCorner::TopLeft, handle_size));
+        painter->drawRect(ResizeHandleRect(ResizeCorner::TopRight, handle_size));
+        painter->drawRect(ResizeHandleRect(ResizeCorner::BottomLeft, handle_size));
+        painter->drawRect(ResizeHandleRect(ResizeCorner::BottomRight, handle_size));
+    }
+}
+
+ControllerZoneItem::ResizeCorner ControllerZoneItem::ResizeCornerAt(const QPointF& position) const
+{
+    const qreal hit_size = ResizeHandleSize(RESIZE_HANDLE_HIT_PX, RESIZE_HANDLE_MAX_HIT_SIZE);
+    const ResizeCorner corners[] = {
+        ResizeCorner::TopLeft,
+        ResizeCorner::TopRight,
+        ResizeCorner::BottomLeft,
+        ResizeCorner::BottomRight
+    };
+
+    for(ResizeCorner corner : corners)
+    {
+        if(ResizeHandleRect(corner, hit_size).contains(position))
         {
-            QRectF rect = QRectF(0, i * interval, 1, 1);
-            painter->drawRect(rect);
+            return corner;
         }
     }
-    else
+
+    return ResizeCorner::None;
+}
+
+qreal ControllerZoneItem::SnapValue(qreal value) const
+{
+    const qreal step = std::max(1, settings->grid_size);
+    return std::round(value / step) * step;
+}
+
+void ControllerZoneItem::RefreshGeometry()
+{
+    unscaled_size = LedRouting::UnscaledSize(ctrl_zone);
+    device_rect = QRectF(QPointF(0.0, 0.0), unscaled_size * ctrl_zone->settings.scale);
+    led_cells = LedRouting::BuildCells(ctrl_zone);
+}
+
+void ControllerZoneItem::ResizeTo(const QPointF& scene_position)
+{
+    const qreal horizontal_scale = std::abs(scene_position.x() - resize_anchor.x()) / unscaled_size.width();
+    const qreal vertical_scale = std::abs(scene_position.y() - resize_anchor.y()) / unscaled_size.height();
+    qreal new_scale = std::max(MIN_ITEM_SCALE, std::max(horizontal_scale, vertical_scale));
+
+    if(settings->snap_to_grid)
     {
-        LOG_ERROR("[OpenRGBVisualMapPlugin] Unsupported shape\n");
+        const qreal step = std::max(1, settings->grid_size);
+        const bool width_is_dominant = horizontal_scale >= vertical_scale;
+        const qreal base_length = width_is_dominant ? unscaled_size.width() : unscaled_size.height();
+        const qreal snapped_length = std::max(step, std::round(base_length * new_scale / step) * step);
+        new_scale = std::max<qreal>(MIN_ITEM_SCALE, snapped_length / base_length);
     }
+
+    const QSizeF new_size = unscaled_size * new_scale;
+    QPointF new_position;
+
+    switch(resize_corner)
+    {
+    case ResizeCorner::TopLeft:
+        new_position = resize_anchor - QPointF(new_size.width(), new_size.height());
+        break;
+    case ResizeCorner::TopRight:
+        new_position = resize_anchor - QPointF(0.0, new_size.height());
+        break;
+    case ResizeCorner::BottomLeft:
+        new_position = resize_anchor - QPointF(new_size.width(), 0.0);
+        break;
+    case ResizeCorner::BottomRight:
+        new_position = resize_anchor;
+        break;
+    case ResizeCorner::None:
+        return;
+    }
+
+    prepareGeometryChange();
+    preview_routes_dirty = true;
+    ctrl_zone->settings.scale = new_scale;
+    RefreshGeometry();
+    UpdateZValue(isSelected());
+    ctrl_zone->settings.x = new_position.x();
+    ctrl_zone->settings.y = new_position.y();
+    setPos(new_position);
+    update();
+}
+
+void ControllerZoneItem::UpdateCursor(const QPointF& position)
+{
+    if(!isSelected())
+    {
+        setCursor(Qt::OpenHandCursor);
+        return;
+    }
+
+    switch(ResizeCornerAt(position))
+    {
+    case ResizeCorner::TopLeft:
+    case ResizeCorner::BottomRight:
+        setCursor(Qt::SizeFDiagCursor);
+        break;
+    case ResizeCorner::TopRight:
+    case ResizeCorner::BottomLeft:
+        setCursor(Qt::SizeBDiagCursor);
+        break;
+    case ResizeCorner::None:
+        setCursor(Qt::OpenHandCursor);
+        break;
+    }
+}
+
+void ControllerZoneItem::UpdateZValue(bool selected)
+{
+    setZValue(selected ? 1.0 : -device_rect.width() * device_rect.height());
 }
 
 void ControllerZoneItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     pressed = true;
-    setCursor(Qt::ClosedHandCursor);
 
     if(event->modifiers() == Qt::ShiftModifier)
     {
         event->accept();
+        return;
     }
-    else
+
+    if(event->button() == Qt::LeftButton && isSelected())
     {
-        QGraphicsItem::mousePressEvent(event);
+        resize_corner = ResizeCornerAt(event->pos());
+
+        if(resize_corner != ResizeCorner::None)
+        {
+            const QRectF rect = DeviceRect();
+            QPointF anchor;
+
+            switch(resize_corner)
+            {
+            case ResizeCorner::TopLeft:     anchor = rect.bottomRight(); break;
+            case ResizeCorner::TopRight:    anchor = rect.bottomLeft(); break;
+            case ResizeCorner::BottomLeft:  anchor = rect.topRight(); break;
+            case ResizeCorner::BottomRight: anchor = rect.topLeft(); break;
+            case ResizeCorner::None: break;
+            }
+
+            resizing = true;
+            resize_anchor = mapToScene(anchor);
+            event->accept();
+            return;
+        }
     }
+
+    setCursor(Qt::ClosedHandCursor);
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void ControllerZoneItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(resizing)
+    {
+        ResizeTo(event->scenePos());
+        event->accept();
+        return;
+    }
+
+    QGraphicsItem::mouseMoveEvent(event);
 }
 
 void ControllerZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     pressed = false;
-    setCursor(Qt::OpenHandCursor);
 
-    emit Released();
+    if(resizing)
+    {
+        resizing = false;
+        resize_corner = ResizeCorner::None;
+        UpdateCursor(event->pos());
+        event->accept();
+        emit Released();
+        return;
+    }
+
+    setCursor(Qt::OpenHandCursor);
 
     if(event->modifiers() == Qt::ShiftModifier)
     {
@@ -131,43 +325,105 @@ void ControllerZoneItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
         QGraphicsItem::mouseReleaseEvent(event);
     }
+
+    emit Released();
 }
 
-void ControllerZoneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    hover = true;
-    QGraphicsItem::hoverEnterEvent( event );
-}
-
-void ControllerZoneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-    hover = false;
-    QGraphicsItem::hoverLeaveEvent( event );
-}
-
-void ControllerZoneItem::Snap()
+void ControllerZoneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    int new_x = 10 * x();
-    int new_y = 10 * y();
+    UpdateCursor(event->pos());
+    QGraphicsItem::hoverEnterEvent(event);
+}
 
-    // ease moves
-    if(new_x % 10 >= 5)
+void ControllerZoneItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    if(!pressed)
     {
-        new_x += 5;
+        UpdateCursor(event->pos());
     }
 
-    if(new_y % 10 >= 5)
+    QGraphicsItem::hoverMoveEvent(event);
+}
+
+void ControllerZoneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    if(!pressed)
     {
-        new_y += 5;
+        setCursor(Qt::OpenHandCursor);
     }
 
-    // Snap to grid
-    new_x /= 10;
-    new_y /= 10;
+    QGraphicsItem::hoverLeaveEvent(event);
+}
 
-    setX(new_x);
-    setY(new_y);
+void ControllerZoneItem::CommitPosition()
+{
+    QPointF new_position = pos();
+    const QPointF saved_position(ctrl_zone->settings.x, ctrl_zone->settings.y);
 
-    ctrl_zone->settings.x = new_x;
-    ctrl_zone->settings.y = new_y;
+    if(settings->snap_to_grid && new_position != saved_position)
+    {
+        new_position.setX(SnapValue(new_position.x()));
+        new_position.setY(SnapValue(new_position.y()));
+        setPos(new_position);
+    }
+
+    ctrl_zone->settings.x = new_position.x();
+    ctrl_zone->settings.y = new_position.y();
+}
+
+void ControllerZoneItem::SyncFromSettings()
+{
+    prepareGeometryChange();
+    preview_routes_dirty = true;
+    RefreshGeometry();
+    UpdateZValue(isSelected());
+    setPos(ctrl_zone->settings.x, ctrl_zone->settings.y);
+    update();
+}
+
+void ControllerZoneItem::UpdatePreview(const QImage& image)
+{
+    if(pressed)
+    {
+        return;
+    }
+
+    if(preview_routes_dirty || preview_canvas_size != image.size())
+    {
+        preview_routes = LedRouting::BuildRoutes(ctrl_zone, pos(), image.size());
+        preview_canvas_size = image.size();
+        preview_routes_dirty = false;
+    }
+
+    std::vector<QColor> next_colors(ctrl_zone->led_count(), QColor(0, 0, 0, 0));
+
+    for(const LedRouting::LedRoute& route : preview_routes)
+    {
+        if(route.led_index < next_colors.size())
+        {
+            next_colors[route.led_index] = LedRouting::MixColor(image, route);
+        }
+    }
+
+    if(next_colors != preview_colors)
+    {
+        preview_colors = std::move(next_colors);
+        update();
+    }
+}
+
+QVariant ControllerZoneItem::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+    if(change == ItemPositionHasChanged)
+    {
+        preview_routes_dirty = true;
+    }
+    else if(change == ItemSelectedHasChanged)
+    {
+        UpdateZValue(value.toBool());
+    }
+
+    return QGraphicsItem::itemChange(change, value);
 }
 
 ControllerZone* ControllerZoneItem::GetControllerZone()
@@ -175,8 +431,7 @@ ControllerZone* ControllerZoneItem::GetControllerZone()
     return ctrl_zone;
 }
 
-QPoint ControllerZoneItem::point()
+QPointF ControllerZoneItem::point() const
 {
-    //return QPoint(ctrl_zone->settings.x, ctrl_zone->settings.y);
-    return QPoint(x(),y());
+    return pos();
 }

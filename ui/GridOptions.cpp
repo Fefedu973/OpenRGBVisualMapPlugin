@@ -37,6 +37,12 @@ void GridOptions::on_grid_checkBox_stateChanged(int value)
     emit SettingsChanged();
 }
 
+void GridOptions::on_snap_to_grid_checkBox_stateChanged(int value)
+{
+    settings->snap_to_grid = value;
+    emit SettingsChanged();
+}
+
 void GridOptions::on_bounds_checkBox_stateChanged(int value)
 {
     settings->show_bounds = value;
@@ -70,6 +76,7 @@ void GridOptions::Update()
 {
     ui->bounds_checkBox->setChecked(settings->show_bounds);
     ui->grid_checkBox->setChecked(settings->show_grid);
+    ui->snap_to_grid_checkBox->setChecked(settings->snap_to_grid);
     ui->auto_load_checkBox->setChecked(settings->auto_load);
     ui->auto_register_checkBox->setChecked(settings->auto_register);
     ui->hide_members_checkBox->setChecked(settings->hide_members);
