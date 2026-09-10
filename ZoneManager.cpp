@@ -61,7 +61,9 @@ void ZoneManager::UpdateControllerZones()
                     controller_zone->settings           = ControllerZoneSettings::defaults();
                     controller_zone->custom_zone_name   = "";
 
-                    if(controller_zone->controller->GetZoneSegmentType(controller_zone->zone_idx, controller_zone->segment_idx) == ZONE_TYPE_MATRIX)
+                    if((controller_zone->controller->GetZoneSegmentType(controller_zone->zone_idx, controller_zone->segment_idx) == ZONE_TYPE_MATRIX)
+                    || (controller_zone->controller->GetZoneSegmentType(controller_zone->zone_idx, controller_zone->segment_idx) == ZONE_TYPE_MATRIX_LOOP_X)
+                    || (controller_zone->controller->GetZoneSegmentType(controller_zone->zone_idx, controller_zone->segment_idx) == ZONE_TYPE_MATRIX_LOOP_Y))
                     {
                         InitMatrixCustomShape(controller_zone);
                     }
@@ -80,7 +82,9 @@ void ZoneManager::UpdateControllerZones()
                 controller_zone->settings           = ControllerZoneSettings::defaults();
                 controller_zone->custom_zone_name   = "";
 
-                if(controller_zone->controller->GetZoneType(controller_zone->zone_idx) == ZONE_TYPE_MATRIX)
+                if((controller_zone->controller->GetZoneType(controller_zone->zone_idx) == ZONE_TYPE_MATRIX)
+                || (controller_zone->controller->GetZoneType(controller_zone->zone_idx) == ZONE_TYPE_MATRIX_LOOP_X)
+                || (controller_zone->controller->GetZoneType(controller_zone->zone_idx) == ZONE_TYPE_MATRIX_LOOP_Y))
                 {
                     InitMatrixCustomShape(controller_zone);
                 }
