@@ -10,3 +10,13 @@ OpenRGB-x86_64.AppImage
 build
 Ship
 www/*
+.build*/
+tests/room-image-routing/.build/
+*.obj
+*.pdb
+*.ilk
+*.dll
+*.lib
+*.exp
+_intermediate_*/
+.*-output.txt

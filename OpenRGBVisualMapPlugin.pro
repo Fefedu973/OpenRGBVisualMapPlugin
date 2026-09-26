@@ -113,14 +113,17 @@ PRE_TARGETDEPS         += prebuild_json_target
 #-----------------------------------------------------------------------------------------------#
 # OpenRGB Plugin SDK                                                                            #
 #-----------------------------------------------------------------------------------------------#
+isEmpty(OPENRGB_CORE_DIR):!isEmpty(OPENRGB_ROOM_ROOT): OPENRGB_CORE_DIR = $$OPENRGB_ROOM_ROOT
+isEmpty(OPENRGB_CORE_DIR): OPENRGB_CORE_DIR = $$PWD/OpenRGB
+!exists($$OPENRGB_CORE_DIR/FrameRouting/OpenRGBImagePluginAPI.h): error("Use OPENRGB_CORE_DIR pointing to an image-capable OpenRGB core")
 INCLUDEPATH +=                                                                                  \
-    OpenRGB/                                                                                    \
-    OpenRGB/dependencies/json                                                                   \
-    OpenRGB/RGBController                                                                       \
-    OpenRGB/qt                                                                                  \
+    $$OPENRGB_CORE_DIR/                                                                         \
+    $$OPENRGB_CORE_DIR/dependencies/json                                                        \
+    $$OPENRGB_CORE_DIR/RGBController                                                            \
+    $$OPENRGB_CORE_DIR/qt                                                                       \
 
 SOURCES +=                                                                                      \
-    OpenRGB/qt/hsv.cpp
+    $$OPENRGB_CORE_DIR/qt/hsv.cpp
 
 #-------------------------------------------------------------------#
 # Includes                                                          #
@@ -134,6 +137,7 @@ HEADERS +=                                                                      
     OpenRGBVisualMapPlugin.h                                                                    \
     ZoneManager.h                                                                               \
     LedRouting.h                                                                                \
+    ImageRouting.h                                                                              \
     VirtualController.h                                                                         \
     VisualMapSettingsManager.h                                                                  \
     VisualMapJsonDefinitions.h                                                                  \
@@ -167,6 +171,7 @@ SOURCES +=                                                                      
     VisualMapSettingsManager.cpp                                                                \
     ZoneManager.cpp                                                                             \
     LedRouting.cpp                                                                              \
+    ImageRouting.cpp                                                                            \
     ui/BackgroundApplier.cpp                                                                    \
     ui/ClickableLabel.cpp                                                                       \
     ui/ColorPicker.cpp                                                                          \

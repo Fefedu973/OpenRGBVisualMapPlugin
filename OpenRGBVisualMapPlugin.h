@@ -23,8 +23,10 @@
 #include <QWidget>
 #include "LogManager.h"
 #include "OpenRGBPluginInterface.h"
-#include "OpenRGBVisualMapTab.h"
 #include "ResourceManagerCallback.h"
+
+class OpenRGBVisualMapTab;
+struct ControllerZone;
 
 class OpenRGBVisualMapPlugin : public QObject, public OpenRGBPluginInterface
 {
@@ -65,6 +67,7 @@ private:
     | User interface widget                                 |
     \*-----------------------------------------------------*/
     OpenRGBVisualMapTab*        ui = nullptr;
+    std::atomic<bool>           unloading{false};
 
 private:
     static void DetectionStart(void*);

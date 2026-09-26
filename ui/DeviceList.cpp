@@ -13,6 +13,7 @@
 #include <QVBoxLayout>
 #include "DeviceList.h"
 #include "OpenRGBVisualMapPlugin.h"
+#include "VirtualController.h"
 #include "ui_DeviceList.h"
 
 DeviceList::DeviceList(QWidget *parent) :

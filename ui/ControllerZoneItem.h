@@ -64,6 +64,7 @@ private:
     std::vector<QColor> preview_colors;
     std::vector<LedRouting::LedRoute> preview_routes;
     QSize preview_canvas_size;
+    QSize preview_scene_size;
     bool preview_routes_dirty = true;
 
     const QBrush default_brush = QBrush(QColor("#f2d974"), Qt::BrushStyle::NoBrush);

@@ -35,6 +35,7 @@ QSizeF UnscaledSize(const ControllerZone* ctrl_zone);
 std::vector<LedCell> BuildCells(const ControllerZone* ctrl_zone);
 std::vector<LedRoute> BuildRoutes(const ControllerZone* ctrl_zone,
                                   const QPointF& origin,
-                                  const QSize& canvas_size);
+                                  const QSize& canvas_size,
+                                  const QSizeF& scene_size = QSizeF());
 QColor MixColor(const QImage& image, const LedRoute& route);
 }

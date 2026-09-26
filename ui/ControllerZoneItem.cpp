@@ -388,10 +388,12 @@ void ControllerZoneItem::UpdatePreview(const QImage& image)
         return;
     }
 
-    if(preview_routes_dirty || preview_canvas_size != image.size())
+    const QSize scene_size(settings->w, settings->h);
+    if(preview_routes_dirty || preview_canvas_size != image.size() || preview_scene_size != scene_size)
     {
-        preview_routes = LedRouting::BuildRoutes(ctrl_zone, pos(), image.size());
+        preview_routes = LedRouting::BuildRoutes(ctrl_zone, pos(), image.size(), QSizeF(settings->w, settings->h));
         preview_canvas_size = image.size();
+        preview_scene_size = scene_size;
         preview_routes_dirty = false;
     }
 

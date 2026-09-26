@@ -310,7 +310,7 @@ struct ControllerZone
                     this->custom_zone_name;
     }
 
-    bool isCustomShape()
+    bool isCustomShape() const
     {
         return this->settings.shape == CUSTOM;
     }

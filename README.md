@@ -1,5 +1,7 @@
 # <img src="images/OpenRGBVisualMapPlugin.png" width="48" height="48" style="vertical-align: middle;"/> OpenRGB Visual Map Plugin
 
+This fork adds generic high-resolution image routing for the matching OpenRGB Room core, while retaining the upstream map editor and LED compatibility. See [Room image routing, build instructions and validation limits](ROOM-IMAGE-ROUTING.md). Upstream downloads mentioned below do not include these fork changes.
+
 [![pipeline status](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/badges/master/pipeline.svg)](https://gitlab.com/OpenRGBDevelopers/OpenRGBVisualMapPlugin/-/commits/master)
 
 This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that allows you to organize your real devices on a map and create a virtual devices (or many). You can then apply gradients (presets or custom), and expose it to an other plugin (eg. Effect Engine plugin).

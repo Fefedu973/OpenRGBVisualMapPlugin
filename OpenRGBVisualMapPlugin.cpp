@@ -9,6 +9,8 @@
 \*---------------------------------------------------------*/
 
 #include "OpenRGBVisualMapPlugin.h"
+#include "OpenRGBVisualMapTab.h"
+#include <QThread>
 #include "ResourceManagerCallback.h"
 #include "TooltipProxy.h"
 #include "VisualMapSettingsManager.h"
@@ -50,6 +52,7 @@ unsigned int OpenRGBVisualMapPlugin::GetPluginAPIVersion()
 \*---------------------------------------------------------*/
 void OpenRGBVisualMapPlugin::Load(OpenRGBPluginAPIInterface* plugin_api_ptr)
 {
+    unloading.store(false);
     /*-----------------------------------------------------*\
     | Store API interface pointer                           |
     \*-----------------------------------------------------*/
@@ -91,6 +94,9 @@ QMenu* OpenRGBVisualMapPlugin::GetTrayMenu()
 
 void OpenRGBVisualMapPlugin::Unload()
 {
+    // Removing one wrapper signals a device-list change. Do not recreate maps
+    // while all their wrappers and image workers are being torn down.
+    unloading.store(true);
     /*-----------------------------------------------------*\
     | Unregister all virtual controllers synchronously via  |
     | the static instance list. This ensures the controllers|
@@ -156,6 +162,7 @@ void OpenRGBVisualMapPlugin::ProfileManagerUpdated(unsigned int /*update_reason*
 
 void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
 {
+    if(unloading.load()) return;
     if(!ui)
     {
         return;
@@ -176,7 +183,8 @@ void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
 
         case RESOURCEMANAGER_UPDATE_REASON_DEVICE_LIST_UPDATED:
             ZoneManager::Get()->UpdateControllerZones();
-            QMetaObject::invokeMethod(ui, "Recreate", Qt::BlockingQueuedConnection);
+        QMetaObject::invokeMethod(ui, "Recreate", QThread::currentThread() == ui->thread()
+                                  ? Qt::DirectConnection : Qt::BlockingQueuedConnection);
             break;
     }
 }

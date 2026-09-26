@@ -1,0 +1,28 @@
+{
+  "date": "2026-09-27",
+  "platform": "Windows x64",
+  "compiler": "MSVC 14.44",
+  "qt": "6.8.3",
+  "source_groups": ["geometry", "legacy sampling", "actual core wrapper and image pipeline", "legacy host"],
+  "result": "pass",
+  "scene_example": [800, 600],
+  "led_compatibility_example": [127, 95],
+  "native_frame_example": [800, 600],
+  "native_frame_shared_allocation": true,
+  "devices_used": "synthetic only",
+  "hardware_access": false,
+  "screen_capture": false,
+  "plugin_dll_loading": {
+    "result": "pass, separate core integration harness",
+    "harness": "OpenRGB-Room/tests/room-plugin-images",
+    "visualmap_synthetic_sink_count": 1,
+    "synthetic_sink_matrix": [32, 18],
+    "declared_output": [800, 600],
+    "shared_frame_identity_preserved": true,
+    "mapping_origin": [0.1, 0.1],
+    "mapping_size": [0.4, 0.3],
+    "led_updates": 0,
+    "effects_active": false
+  },
+  "core_registry_async_lifecycle": "separate core lifecycle result; this harness uses a synchronous fake registry"
+}
