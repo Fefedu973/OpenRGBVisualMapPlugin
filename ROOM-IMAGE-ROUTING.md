@@ -16,6 +16,8 @@ Un plan 800×600 utilise ainsi une grille de compatibilité de 127×95 cellules 
 
 Les contrôles existants de taille, placement, échelle, inversion et forme personnalisée sont conservés. La plage du plan reste 1…1024 par axe. Les valeurs importées hors plage sont bornées en mémoire.
 
+Les placements prennent aussi en charge échelles X/Y indépendantes, rotation autour du centre, miroirs et luminosité par membre, avec coordonnées personnalisées décimales et positions superposées conservées. Le [schéma affine et sa convention d'échantillonnage](ROOM-AFFINE-LAYOUTS.md) décrit l'import compatible avec les anciens JSON.
+
 ## Routage géométrique
 
 Chaque nouvelle image est conservée sous forme d’un `Frame` BGRA opaque immuable, partagé entre les destinataires. Le producteur fournit un `Mapping` affine vers sa scène ; Visual Map compose ce mapping avec le placement de chaque membre. Il n’existe aucune exception fondée sur un nom ou modèle d’appareil.

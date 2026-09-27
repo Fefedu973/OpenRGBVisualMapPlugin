@@ -173,7 +173,7 @@ void EditorGrid::CreateLEDItems(CustomShape* shape)
 
                 LedPosition* start = items.front();
                 LedPosition* end = led_item->GetLedPosition();
-                QRect selection_rect(start->point, end->point);
+                QRectF selection_rect(start->point, end->point);
 
                 for(LedItem* item : led_items)
                 {

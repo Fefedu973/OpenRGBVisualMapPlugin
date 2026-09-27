@@ -70,6 +70,9 @@ void LedItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*
 
 void LedItem::Snap()
 {
+    // Merely opening an imported fractional layout or dragging another LED
+    // must not quantize every untouched point in the editor.
+    if(pos()==led_position->point)return;
     /*-----------------------------------------------------*\
     | Update LED position                                   |
     \*-----------------------------------------------------*/

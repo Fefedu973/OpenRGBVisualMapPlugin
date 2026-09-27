@@ -31,9 +31,8 @@ room_image::Mapping Compose(const room_image::Mapping& a, const room_image::Mapp
 Plan BuildPlan(const ControllerZone* zone, unsigned sw, unsigned sh)
 {
     Plan result;
-    if(!zone || !zone->controller || !sw || !sh || !std::isfinite(zone->settings.scale)
-       || zone->settings.scale <= 0 || !std::isfinite(zone->settings.x) || !std::isfinite(zone->settings.y)
-       || (zone->isCustomShape() && !zone->settings.custom_shape)) return result;
+    if(!sw || !sh || !LedRouting::ValidGeometry(zone))return result;
+    result.brightness=zone->settings.brightness;
     const unsigned count = zone->led_count();
     const auto cells = LedRouting::BuildCells(zone);
     for(const auto& cell : cells)
@@ -52,19 +51,22 @@ Plan BuildPlan(const ControllerZone* zone, unsigned sw, unsigned sh)
     const auto* map = controller->GetZoneMatrixMapData(zone->zone_idx);
     const auto* shape = zone->settings.custom_shape;
     if(!map || mw < 2 || mh < 2 || uint64_t(mw)*mh != count || count > 1024u*1024u
-       || uint64_t(shape->w)*shape->h != count) return result;
+       || shape->w*shape->h != count) return result;
     std::vector<QPointF> placed(count);
     std::vector<bool> known(count, false), source_known(count, false);
-    std::set<std::pair<int,int>> occupied;
+    std::set<std::pair<qreal,qreal>> occupied;
+    const auto transform=LedRouting::LocalTransform(zone);
+    const qreal sample_offset=zone->settings.point_is_center?0.0:0.5;
     for(const auto* point : shape->led_positions)
     {
         if(!point || point->led_num >= count || known[point->led_num]
            || point->point.x() < 0 || point->point.y() < 0
-           || unsigned(point->point.x()) >= shape->w || unsigned(point->point.y()) >= shape->h
+           || !std::isfinite(point->point.x()) || !std::isfinite(point->point.y())
+           || point->point.x() >= shape->w || point->point.y() >= shape->h
            || !occupied.emplace(point->point.x(), point->point.y()).second) return result;
         known[point->led_num] = true;
-        placed[point->led_num] = QPointF((point->point.x()+0.5)*zone->settings.scale + zone->settings.x,
-                                        (point->point.y()+0.5)*zone->settings.scale + zone->settings.y);
+        placed[point->led_num] = transform.map(point->point+QPointF(sample_offset,sample_offset))
+                              +QPointF(zone->settings.x,zone->settings.y);
     }
     for(unsigned i=0; i<count; ++i)
     {
@@ -84,6 +86,7 @@ Plan BuildPlan(const ControllerZone* zone, unsigned sw, unsigned sh)
     m.origin_x = origin.x()/sw; m.origin_y = origin.y()/sh;
     m.u_x = du.x()*mw/sw; m.u_y = du.y()*mw/sh;
     m.v_x = dv.x()*mh/sw; m.v_y = dv.y()*mh/sh;
+    m.brightness=result.brightness;
     result.affine_surface = m.Valid();
     return result;
 }

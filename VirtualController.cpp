@@ -146,9 +146,7 @@ void VirtualController::UpdateVirtualZone()
             ctrl_zone,
             QPointF(ctrl_zone->settings.x, ctrl_zone->settings.y),
             grid, QSizeF(width.load(), height.load()));
-        const unsigned start = ctrl_zone->is_segment
-            ? controller->GetZoneSegmentStartIndex(ctrl_zone->zone_idx, ctrl_zone->segment_idx)
-            : controller->GetZoneStartIndex(ctrl_zone->zone_idx);
+        const unsigned start = ctrl_zone->start_idx();
         image_routes.push_back({ctrl_zone, controller, ctrl_zone->zone_idx, start,
             visual_image::BuildPlan(ctrl_zone, width.load(), height.load())});
 
@@ -723,9 +721,10 @@ bool VirtualController::RouteImage(const std::shared_ptr<const room_image::Frame
                 }
             }
         }
+        auto led_mapping=mapping;led_mapping.brightness*=route.plan.brightness;
         for(const auto& sample : route.plan.samples)
         {
-            const uint32_t c = room_image::SampleBGRA(*frame,mapping,sample.u,sample.v);
+            const uint32_t c = room_image::SampleBGRA(*frame,led_mapping,sample.u,sample.v);
             route.controller->SetColor(route.start+sample.led,ToRGBColor(qRed(c),qGreen(c),qBlue(c)));
         }
         if(!route.plan.samples.empty()) led_controllers.insert(route.controller);

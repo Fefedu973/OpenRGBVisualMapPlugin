@@ -2,6 +2,8 @@
 #define ITEMOPTIONS_H
 
 #include <QWidget>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
 #include "ControllerZone.h"
 
 namespace Ui {
@@ -26,6 +28,8 @@ signals:
 private:
     Ui::ItemOptions *ui;
     ControllerZone* ctrl_zone = nullptr;
+    QDoubleSpinBox* affine_values[4]{};
+    QCheckBox* affine_flips[2]{};
 
     void UpdateWidgetsVisibility();
 

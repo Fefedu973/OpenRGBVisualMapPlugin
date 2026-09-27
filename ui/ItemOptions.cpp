@@ -1,6 +1,8 @@
 #include "ItemOptions.h"
 #include "ui_ItemOptions.h"
 #include "ZoneManager.h"
+#include <QLabel>
+#include <QSignalBlocker>
 
 ItemOptions::ItemOptions(QWidget *parent) :
     QWidget(parent),
@@ -15,6 +17,30 @@ ItemOptions::ItemOptions(QWidget *parent) :
     };
 
     ui->shape_comboBox->addItems(ZONE_SHAPES);
+    const QString labels[]={tr("Scale X factor"),tr("Scale Y factor"),tr("Rotation (degrees)"),tr("Brightness (%)")};
+    int row=ui->gridLayout->rowCount();
+    for(unsigned i=0;i<4;++i) {
+        auto* spin=affine_values[i]=new QDoubleSpinBox(this);
+        spin->setObjectName(QString("affine_%1").arg(i));spin->setDecimals(6);
+        spin->setRange(i==2?-360000.0:i==3?0.0:0.000001,i==3?100.0:360000.0);
+        spin->setSingleStep(i<2?0.1:1.0);
+        ui->gridLayout->addWidget(new QLabel(labels[i],this),row,0);ui->gridLayout->addWidget(spin,row++,1);
+        connect(spin,qOverload<double>(&QDoubleSpinBox::valueChanged),this,[this,i](double value){
+            if(!ctrl_zone)return;
+            auto& s=ctrl_zone->settings;
+            if(i==0)s.scale_x=value;else if(i==1)s.scale_y=value;else if(i==2)s.rotation=value;else s.brightness=value/100.0;
+            emit ItemOptionsChanged();
+        });
+    }
+    for(unsigned i=0;i<2;++i) {
+        auto* check=affine_flips[i]=new QCheckBox(i?tr("Mirror vertically"):tr("Mirror horizontally"),this);
+        ui->gridLayout->addWidget(check,row++,0,1,2);
+        connect(check,&QCheckBox::toggled,this,[this,i](bool value){
+            if(!ctrl_zone)return;
+            if(i)ctrl_zone->settings.flip_y=value;else ctrl_zone->settings.flip_x=value;
+            emit ItemOptionsChanged();
+        });
+    }
 }
 
 ItemOptions::~ItemOptions()
@@ -32,6 +58,10 @@ void ItemOptions::Update()
 {
     if(ctrl_zone)
     {        
+        const auto& s=ctrl_zone->settings;
+        const double values[]={s.scale_x,s.scale_y,s.rotation,s.brightness*100.0};
+        for(unsigned i=0;i<4;++i){QSignalBlocker block(affine_values[i]);affine_values[i]->setValue(values[i]);}
+        for(unsigned i=0;i<2;++i){QSignalBlocker block(affine_flips[i]);affine_flips[i]->setChecked(i?s.flip_y:s.flip_x);}
         ui->x_spinBox->blockSignals(true);
         ui->y_spinBox->blockSignals(true);
         ui->scale_spinBox->blockSignals(true);

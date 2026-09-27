@@ -11,6 +11,7 @@
 #pragma once
 
 #include <QPoint>
+#include <QPointF>
 #include <QStringList>
 #include <vector>
 #include "RGBControllerInterface.h"
@@ -19,29 +20,29 @@ struct LedPosition
 {
     unsigned int led_num;
 
-    QPoint point;
+    QPointF point;
 
-    int x()
+    qreal x() const
     {
         return point.x();
     }
 
-    int y()
+    qreal y() const
     {
         return point.y();
     }
 
-    void setX(int x)
+    void setX(qreal x)
     {
         point.setX(x);
     }
 
-    void setY(int y)
+    void setY(qreal y)
     {
         point.setY(y);
     }
 
-    void shift(int shift_x, int shift_y)
+    void shift(qreal shift_x, qreal shift_y)
     {
         setX(x() + shift_x);
         setY(y() + shift_y);
@@ -52,7 +53,7 @@ struct LedPosition
         LedPosition* clone  = new LedPosition();
         
         clone->led_num      = led_num;
-        clone->point        = QPoint(x(), y());
+        clone->point        = point;
 
         return clone;
     }
@@ -60,8 +61,8 @@ struct LedPosition
 
 struct CustomShape
 {
-    unsigned int                w;
-    unsigned int                h;
+    qreal                       w;
+    qreal                       h;
     std::vector<LedPosition*>   led_positions;
 
     ~CustomShape()
@@ -190,6 +191,13 @@ struct ControllerZoneSettings
     unsigned int    led_spacing;
 
     bool            reverse;
+    qreal           scale_x = 1.0;
+    qreal           scale_y = 1.0;
+    qreal           rotation = 0.0;
+    bool            flip_x = false;
+    bool            flip_y = false;
+    bool            point_is_center = false; // Old JSON uses the top-left of a unit LED cell.
+    qreal           brightness = 1.0;
 
     static ControllerZoneSettings defaults()
     {
@@ -200,9 +208,9 @@ struct ControllerZoneSettings
 struct ControllerZone
 {
     RGBControllerInterface* controller;
-    unsigned int            zone_idx;
-    unsigned int            segment_idx;
-    bool                    is_segment;
+    unsigned int            zone_idx = 0;
+    unsigned int            segment_idx = 0;
+    bool                    is_segment = false;
     std::string             custom_zone_name;
     ControllerZoneSettings  settings;
     ControllerInfo          controller_info;
@@ -251,7 +259,9 @@ struct ControllerZone
 
     bool compare(ControllerZone* rhs) const
     {
-        return this->compare_controller(rhs->controller) && this->zone_idx == rhs->zone_idx;
+        return this->compare_controller(rhs->controller) && this->zone_idx == rhs->zone_idx
+            && this->is_segment == rhs->is_segment
+            && (!this->is_segment || this->segment_idx == rhs->segment_idx);
     }
 
     bool operator==(ControllerZone* rhs) const
@@ -269,6 +279,12 @@ struct ControllerZone
         {
             return controller->GetZoneLEDsCount(zone_idx);
         }
+    }
+
+    unsigned int start_idx() const
+    {
+        return controller->GetZoneStartIndex(zone_idx)
+            + (is_segment ? controller->GetZoneSegmentStartIndex(zone_idx,segment_idx) : 0);
     }
 
     std::string full_display_name()

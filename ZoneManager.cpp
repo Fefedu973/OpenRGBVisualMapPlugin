@@ -157,7 +157,7 @@ void ZoneManager::SetControllerZoneColor(ControllerZone* ctrl_zone, QColor color
     if(ctrl_zone->is_segment)
     {
         leds_count                      = controller->GetZoneSegmentLEDsCount(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
-        start_idx                       = controller->GetZoneSegmentStartIndex(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
+        start_idx                       = ctrl_zone->start_idx();
     }
     else
     {
@@ -180,7 +180,7 @@ void ZoneManager::IdentifyLeds(ControllerZone* ctrl_zone, std::vector<unsigned i
     if(ctrl_zone->is_segment)
     {
         leds_count                      = controller->GetZoneSegmentLEDsCount(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
-        start_idx                       = controller->GetZoneSegmentStartIndex(ctrl_zone->zone_idx, ctrl_zone->segment_idx);
+        start_idx                       = ctrl_zone->start_idx();
     }
     else
     {
@@ -224,11 +224,11 @@ void ZoneManager::InitMatrixCustomShape(ControllerZone* ctrl_zone)
             
             if(ctrl_zone->is_segment)
             {
-                led_num                         = controller->GetZoneSegmentMatrixMapData(ctrl_zone->zone_idx, ctrl_zone->segment_idx)[h * ctrl_zone->settings.custom_shape->w + w];
+                led_num                         = controller->GetZoneSegmentMatrixMapData(ctrl_zone->zone_idx, ctrl_zone->segment_idx)[h * static_cast<unsigned>(ctrl_zone->settings.custom_shape->w) + w];
             }
             else
             {
-                led_num                         = controller->GetZoneMatrixMapData(ctrl_zone->zone_idx)[h * ctrl_zone->settings.custom_shape->w + w];
+                led_num                         = controller->GetZoneMatrixMapData(ctrl_zone->zone_idx)[h * static_cast<unsigned>(ctrl_zone->settings.custom_shape->w) + w];
             }
 
             if(led_num != NA)

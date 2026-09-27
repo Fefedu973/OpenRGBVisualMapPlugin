@@ -7,6 +7,8 @@
 #include <QRectF>
 #include <QSize>
 #include <QSizeF>
+#include <QPolygonF>
+#include <QTransform>
 #include <vector>
 #include "ControllerZone.h"
 
@@ -16,6 +18,7 @@ struct LedCell
 {
     unsigned int led_index;
     QRectF local_rect;
+    QPolygonF local_polygon;
 };
 
 struct PixelWeight
@@ -29,9 +32,13 @@ struct LedRoute
     unsigned int led_index;
     QRectF local_rect;
     std::vector<PixelWeight> overlaps;
+    qreal brightness = 1.0;
 };
 
 QSizeF UnscaledSize(const ControllerZone* ctrl_zone);
+bool ValidGeometry(const ControllerZone* ctrl_zone);
+QTransform LocalTransform(const ControllerZone* ctrl_zone);
+QRectF LocalBounds(const ControllerZone* ctrl_zone);
 std::vector<LedCell> BuildCells(const ControllerZone* ctrl_zone);
 std::vector<LedRoute> BuildRoutes(const ControllerZone* ctrl_zone,
                                   const QPointF& origin,

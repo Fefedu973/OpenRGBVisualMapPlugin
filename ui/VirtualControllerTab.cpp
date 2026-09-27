@@ -18,10 +18,12 @@
 #include <QVBoxLayout>
 #include "OpenRGBVisualMapPlugin.h"
 #include "VirtualControllerTab.h"
+#include "ZoneIdentity.h"
 #include "VisualMapJsonDefinitions.h"
 #include "VisualMapSettingsManager.h"
 #include "WidgetEditor.h"
 #include "ZoneManager.h"
+#include "LedRouting.h"
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -204,7 +206,7 @@ void VirtualControllerTab::LoadJson(json j)
                             ctrl_zone->controller->GetVendor() == controller["vendor"] &&
                             ctrl_zone->controller->GetSerial() == controller["serial"] &&
                             (ctrl_zone->controller->GetLocation() == controller["location"] || hid_location) &&
-                            ctrl_zone->zone_idx == entry["zone_idx"])
+                            visual_identity::Matches(entry,ctrl_zone->zone_idx,ctrl_zone->is_segment,ctrl_zone->segment_idx))
                         {
                             if(entry.contains("custom_zone_name"))
                             {
@@ -383,7 +385,7 @@ void VirtualControllerTab::AddActiveEntry(json added_zone_json)
             (added_zone_json["controller"]["vendor"] == saved_zone_json["controller"]["vendor"]) &&
             (added_zone_json["controller"]["serial"] == saved_zone_json["controller"]["serial"]) &&
             ((added_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location) &&
-            (added_zone_json["zone_idx"] == saved_zone_json["zone_idx"]))
+            visual_identity::SameZone(added_zone_json,saved_zone_json))
         {
             found = true;
             break;
@@ -416,7 +418,7 @@ void VirtualControllerTab::RemoveActiveZone(ControllerZone* removed_zone)
             (removed_zone_json["controller"]["vendor"] == saved_zone_json["controller"]["vendor"]) &&
             (removed_zone_json["controller"]["serial"] == saved_zone_json["controller"]["serial"]) &&
             ((removed_zone_json["controller"]["location"] == saved_zone_json["controller"]["location"]) || hid_location) &&
-            (removed_zone_json["zone_idx"] == saved_zone_json["zone_idx"]))
+            visual_identity::SameZone(removed_zone_json,saved_zone_json))
         {
             found = true;
             break;
@@ -537,11 +539,9 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
 
     for (ControllerZone* controller_zone: virtual_controller->GetZones())
     {
-        min_x = std::min(min_x, controller_zone->settings.x);
-        min_y = std::min(min_y, controller_zone->settings.y);
-
-        max_x = std::max(max_x, controller_zone->settings.x + controller_zone->width());
-        max_y = std::max(max_y, controller_zone->settings.y + controller_zone->height());
+        const auto bounds=LedRouting::LocalBounds(controller_zone).translated(controller_zone->settings.x,controller_zone->settings.y);
+        min_x = std::min(min_x,bounds.left());min_y = std::min(min_y,bounds.top());
+        max_x = std::max(max_x,bounds.right());max_y = std::max(max_y,bounds.bottom());
     }
 
     const qreal origin_x = std::floor(min_x);

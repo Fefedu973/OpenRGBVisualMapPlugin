@@ -71,13 +71,17 @@ QRectF ControllerZoneItem::ResizeHandleRect(ResizeCorner corner, qreal size) con
 QRectF ControllerZoneItem::boundingRect() const
 {
     const qreal margin = RESIZE_HANDLE_MAX_HIT_SIZE / 2.0 + ITEM_BORDER_WIDTH;
-    return DeviceRect().adjusted(-margin, -margin, margin, margin);
+    auto bounds=DeviceRect();
+    // Centre-origin cells may extend half a unit beyond the declared surface.
+    for(const auto& cell:led_cells)bounds=bounds.united(cell.local_rect);
+    return bounds.adjusted(-margin, -margin, margin, margin);
 }
 
 QPainterPath ControllerZoneItem::shape() const
 {
     QPainterPath path;
     path.addRect(DeviceRect());
+    for(const auto& cell:led_cells)path.addPolygon(cell.local_polygon);
 
     if(isSelected())
     {
@@ -113,7 +117,7 @@ void ControllerZoneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
         }
 
         painter->setBrush(brush);
-        painter->drawRect(cell.local_rect);
+        painter->drawPolygon(cell.local_polygon);
     }
 
     if(isSelected())
@@ -168,8 +172,8 @@ qreal ControllerZoneItem::SnapValue(qreal value) const
 
 void ControllerZoneItem::RefreshGeometry()
 {
-    unscaled_size = LedRouting::UnscaledSize(ctrl_zone);
-    device_rect = QRectF(QPointF(0.0, 0.0), unscaled_size * ctrl_zone->settings.scale);
+    device_rect = LedRouting::LocalBounds(ctrl_zone);
+    unscaled_size = device_rect.size()/ctrl_zone->settings.scale;
     led_cells = LedRouting::BuildCells(ctrl_zone);
 }
 
@@ -188,22 +192,23 @@ void ControllerZoneItem::ResizeTo(const QPointF& scene_position)
         new_scale = std::max<qreal>(MIN_ITEM_SCALE, snapped_length / base_length);
     }
 
-    const QSizeF new_size = unscaled_size * new_scale;
+    const qreal ratio=new_scale/ctrl_zone->settings.scale;
+    const QRectF new_rect(device_rect.topLeft()*ratio,device_rect.size()*ratio);
     QPointF new_position;
 
     switch(resize_corner)
     {
     case ResizeCorner::TopLeft:
-        new_position = resize_anchor - QPointF(new_size.width(), new_size.height());
+        new_position = resize_anchor - new_rect.bottomRight();
         break;
     case ResizeCorner::TopRight:
-        new_position = resize_anchor - QPointF(0.0, new_size.height());
+        new_position = resize_anchor - new_rect.bottomLeft();
         break;
     case ResizeCorner::BottomLeft:
-        new_position = resize_anchor - QPointF(new_size.width(), 0.0);
+        new_position = resize_anchor - new_rect.topRight();
         break;
     case ResizeCorner::BottomRight:
-        new_position = resize_anchor;
+        new_position = resize_anchor - new_rect.topLeft();
         break;
     case ResizeCorner::None:
         return;

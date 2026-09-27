@@ -155,8 +155,8 @@ void WidgetEditor::RestoreState(CustomShape* shape)
 {    
     temp_shape = shape->clone();
 
-    settings->w = temp_shape->w;
-    settings->h = temp_shape->h;
+    settings->w = std::ceil(temp_shape->w);
+    settings->h = std::ceil(temp_shape->h);
 
     UpdateWidgetsValues();
 
@@ -219,8 +219,8 @@ void WidgetEditor::on_reset_button_clicked()
 
     states.push_back(temp_shape->clone());
 
-    settings->w = temp_shape->w;
-    settings->h = temp_shape->h;
+    settings->w = std::ceil(temp_shape->w);
+    settings->h = std::ceil(temp_shape->h);
 
     UpdateWidgetsValues();
 
@@ -319,7 +319,7 @@ void WidgetEditor::on_save_button_clicked()
     emit Save();
 }
 
-void WidgetEditor::on_w_spinBox_valueChanged(int value)
+void WidgetEditor::on_w_spinBox_valueChanged(double value)
 {
     settings->w = value;
     temp_shape->w = value;
@@ -329,7 +329,7 @@ void WidgetEditor::on_w_spinBox_valueChanged(int value)
     ui->grid->ApplySettings(settings);
 }
 
-void WidgetEditor::on_h_spinBox_valueChanged(int value)
+void WidgetEditor::on_h_spinBox_valueChanged(double value)
 {
     settings->h = value;
     temp_shape->h = value;
@@ -357,7 +357,7 @@ void WidgetEditor::on_rotate_button_clicked()
         return;
     }
 
-    QPoint start_position = led_positions.front()->point;
+    QPointF start_position = led_positions.front()->point;
 
     QTransform t = QTransform()
             .translate(start_position.x(), start_position.y())
@@ -366,7 +366,7 @@ void WidgetEditor::on_rotate_button_clicked()
 
     for(LedPosition* led_position : led_positions)
     {
-        QPoint new_pos = t.map(led_position->point);
+        QPointF new_pos = t.map(led_position->point);
         led_position->setX(new_pos.x());
         led_position->setY(new_pos.y());
     }
@@ -388,11 +388,11 @@ void WidgetEditor::on_v_flip_button_clicked()
         return;
     }
 
-    float cy = GetCenter(led_positions).y();
+    qreal cy = GetCenter(led_positions).y();
 
     for(LedPosition* led_position : led_positions)
     {
-        float distance = cy - led_position->point.y();
+        qreal distance = cy - led_position->point.y();
         led_position->setY(cy + distance);
     }
 
@@ -413,11 +413,11 @@ void WidgetEditor::on_h_flip_button_clicked()
         return;
     }
 
-    float cx = GetCenter(led_positions).x();
+    qreal cx = GetCenter(led_positions).x();
 
     for(LedPosition* led_position : led_positions)
     {
-        float distance = cx - led_position->point.x();
+        qreal distance = cx - led_position->point.x();
         led_position->setX(cx + distance);
     }
 
@@ -438,7 +438,7 @@ void WidgetEditor::on_h_line_button_clicked()
         return;
     }
 
-    QPoint start_position = led_positions.front()->point;
+    QPointF start_position = led_positions.front()->point;
 
     unsigned int i = 0;
 
@@ -467,7 +467,7 @@ void WidgetEditor::on_v_line_button_clicked()
         return;
     }
 
-    QPoint start_position = led_positions.front()->point;
+    QPointF start_position = led_positions.front()->point;
 
     unsigned int i = 0;
 
@@ -495,7 +495,7 @@ void WidgetEditor::on_grow_button_clicked()
 
     for(LedPosition* led_position : led_positions)
     {
-        QPoint new_pos = t.map(led_position->point);
+        QPointF new_pos = t.map(led_position->point);
         led_position->setX(new_pos.x());
         led_position->setY(new_pos.y());
     }
@@ -516,7 +516,7 @@ void WidgetEditor::on_shrink_button_clicked()
 
     for(LedPosition* led_position : led_positions)
     {
-        QPoint new_pos = t.map(led_position->point);
+        QPointF new_pos = t.map(led_position->point);
         led_position->setX(new_pos.x());
         led_position->setY(new_pos.y());
     }
@@ -532,7 +532,7 @@ void WidgetEditor::on_circle_button_clicked()
 {
     std::vector<LedPosition*> selection = ui->grid->GetSelection();
     std::vector<LedPosition*> led_positions = selection.empty() ? temp_shape->led_positions : selection;
-    QPoint start_position = led_positions.front()->point;
+    QPointF start_position = led_positions.front()->point;
 
     double PI = 3.14159265359l;
 
@@ -568,7 +568,7 @@ void WidgetEditor::on_square_button_clicked()
 
     int side = led_positions.size() / 4 ;
 
-    QPoint start_position = led_positions.front()->point;
+    QPointF start_position = led_positions.front()->point;
 
     for(int i = 0; i < side; i++)
     {
@@ -624,7 +624,7 @@ void WidgetEditor::on_zigzag_button_clicked()
 
     if (size >= 2)
     {
-        QPoint start_position = led_positions.front()->point;
+        QPointF start_position = led_positions.front()->point;
 
         int start_x = start_position.x();
         int start_y = start_position.y();
@@ -662,7 +662,7 @@ void WidgetEditor::on_sawtooth_button_clicked()
 
     if (size > 0)
     {
-        QPoint start_position = led_positions.front()->point;
+        QPointF start_position = led_positions.front()->point;
 
         int start_x = start_position.x();
         int start_y = start_position.y();
@@ -710,13 +710,13 @@ void WidgetEditor::AutoResize()
     | 1st shift everything if theres some leds in negative  |
     | place / or empty row/cols                             |
     \*-----------------------------------------------------*/
-    int shift_x = 1024;
-    int shift_y = 1024;
+    qreal shift_x = 1024;
+    qreal shift_y = 1024;
 
     for(LedPosition* led_position : temp_shape->led_positions)
     {
-        shift_x = std::min<int>(shift_x, led_position->x());
-        shift_y = std::min<int>(shift_y, led_position->y());
+        shift_x = std::min(shift_x, led_position->x());
+        shift_y = std::min(shift_y, led_position->y());
     }
 
     for(LedPosition* led_position : temp_shape->led_positions)
@@ -727,13 +727,13 @@ void WidgetEditor::AutoResize()
     /*-----------------------------------------------------*\
     | 2nd fit the size                                      |
     \*-----------------------------------------------------*/
-    unsigned int w = 1;
-    unsigned int h = 1;
+    qreal w = 1;
+    qreal h = 1;
 
     for(LedPosition* led_position : temp_shape->led_positions)
     {
-        w = std::max<int>(w, led_position->x() + 1 );
-        h = std::max<int>(h, led_position->y() + 1 );
+        w = std::max(w, led_position->x() + 1 );
+        h = std::max(h, led_position->y() + 1 );
     }
 
     temp_shape->w = w;
@@ -749,20 +749,20 @@ void WidgetEditor::AutoResize()
 
 QPointF WidgetEditor::GetCenter(std::vector<LedPosition*> led_positions)
 {
-    int x_min = INT_MAX;
-    int y_min = INT_MAX;
+    qreal x_min = std::numeric_limits<qreal>::max();
+    qreal y_min = std::numeric_limits<qreal>::max();
 
-    int x_max = INT_MIN;
-    int y_max = INT_MIN;
+    qreal x_max = std::numeric_limits<qreal>::lowest();
+    qreal y_max = std::numeric_limits<qreal>::lowest();
 
     for(LedPosition* led_position: led_positions)
     {
-        x_min = std::min<int>(x_min, led_position->x());
-        y_min = std::min<int>(y_min, led_position->y());
+        x_min = std::min(x_min, led_position->x());
+        y_min = std::min(y_min, led_position->y());
 
-        x_max = std::max<int>(x_max, led_position->x());
-        y_max = std::max<int>(y_max, led_position->y());
+        x_max = std::max(x_max, led_position->x());
+        y_max = std::max(y_max, led_position->y());
     }
 
-    return QRectF(QPoint(x_min,y_min), QPoint(x_max,y_max)).center();
+    return QRectF(QPointF(x_min,y_min), QPointF(x_max,y_max)).center();
 }

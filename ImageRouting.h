@@ -17,6 +17,7 @@ struct Plan
     std::vector<Sample> samples;
     bool affine_surface = false;
     room_image::Mapping surface;
+    double brightness = 1.0;
 };
 Plan BuildPlan(const ControllerZone* zone, unsigned scene_width, unsigned scene_height);
 std::shared_ptr<const room_image::Frame> FromImage(const QImage& image, uint64_t sequence);

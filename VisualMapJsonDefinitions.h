@@ -15,6 +15,9 @@
 #include "ControllerZone.h"
 #include "GridSettings.h"
 #include "RGBControllerInterface.h"
+#include <cmath>
+#include <memory>
+#include <stdexcept>
 
 using json = nlohmann::json;
 
@@ -30,11 +33,14 @@ void from_json(const json& j, std::vector<LedPosition*>& led_positions)
 {
     for(json::const_iterator it = j.begin(); it != j.end(); ++it)
     {
-        LedPosition* led_position = new LedPosition();
+        auto owner = std::make_unique<LedPosition>();
+        LedPosition* led_position = owner.get();
         led_position->led_num = it.value().at("led_num");
         led_position->setX(it.value().at("x"));
         led_position->setY(it.value().at("y"));
-        led_positions.push_back(led_position);
+        if(!std::isfinite(led_position->x()) || !std::isfinite(led_position->y()))
+            throw std::invalid_argument("LED coordinates must be finite");
+        led_positions.push_back(owner.release());
     }
 }
 
@@ -52,6 +58,8 @@ void from_json(const json& j, CustomShape* s)
     {
         j.at("w").get_to(s->w);
         j.at("h").get_to(s->h);
+        if(!std::isfinite(s->w) || !std::isfinite(s->h) || s->w<=0 || s->h<=0)
+            throw std::invalid_argument("Custom shape dimensions must be positive and finite");
         j.at("led_positions").get_to(s->led_positions);
     }
 }
@@ -76,6 +84,10 @@ void to_json(json& j, const ControllerZoneSettings settings)
     {"scale", settings.scale},
     {"led_spacing", settings.led_spacing},
     {"reverse", settings.reverse}};
+    j["affine"]={{"scale_x",settings.scale_x},{"scale_y",settings.scale_y},{"rotation",settings.rotation},
+                 {"flip_x",settings.flip_x},{"flip_y",settings.flip_y}};
+    j["point_origin"]=settings.point_is_center?"center":"cell";
+    j["brightness"]=settings.brightness;
 
     if(settings.shape == CUSTOM)
     {
@@ -92,6 +104,17 @@ void from_json(const json& j, ControllerZoneSettings& s)
     j.at("x").get_to(s.x);
     j.at("y").get_to(s.y);
     s.scale = j.value("scale", 1.0);
+    const auto affine=j.value("affine",json::object());
+    if(!affine.is_object())throw std::invalid_argument("affine must be an object");
+    s.scale_x=affine.value("scale_x",1.0);s.scale_y=affine.value("scale_y",1.0);
+    s.rotation=affine.value("rotation",0.0);s.flip_x=affine.value("flip_x",false);s.flip_y=affine.value("flip_y",false);
+    const auto origin=j.value("point_origin",std::string("cell"));
+    if(origin!="cell" && origin!="center")throw std::invalid_argument("point_origin must be cell or center");
+    s.point_is_center=origin=="center";s.brightness=j.value("brightness",1.0);
+    if(!std::isfinite(s.x) || !std::isfinite(s.y) || !std::isfinite(s.scale) || s.scale<=0
+       || !std::isfinite(s.scale_x) || !std::isfinite(s.scale_y) || s.scale_x<=0 || s.scale_y<=0
+       || !std::isfinite(s.rotation) || !std::isfinite(s.brightness) || s.brightness<0 || s.brightness>1)
+        throw std::invalid_argument("Invalid affine placement or brightness");
     j.at("led_spacing").get_to(s.led_spacing);
     s.shape = static_cast<ZoneShape>(j.at("shape"));
     j.at("reverse").get_to(s.reverse);
@@ -100,8 +123,9 @@ void from_json(const json& j, ControllerZoneSettings& s)
 
     if(!custom_shape.is_null() && s.shape == CUSTOM)
     {
-        s.custom_shape = new CustomShape();
-        j.at("custom_shape").get_to(s.custom_shape);
+        auto shape=std::make_unique<CustomShape>();
+        auto* pointer=shape.get();j.at("custom_shape").get_to(pointer);
+        s.custom_shape = shape.release();
     }
     else
     {
@@ -125,6 +149,8 @@ void to_json(json& j, const ControllerZone* ctrl_zone)
     j = json{
     {"controller", ctrl_zone->controller_info},
     {"zone_idx", ctrl_zone->zone_idx},
+    {"is_segment", ctrl_zone->is_segment},
+    {"segment_idx", ctrl_zone->is_segment ? ctrl_zone->segment_idx : 0},
     {"custom_zone_name", ctrl_zone->custom_zone_name},
     {"settings", ctrl_zone->settings}};
 }

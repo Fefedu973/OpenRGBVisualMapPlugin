@@ -1,10 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
-#include <QCoreApplication>
+#include <QApplication>
+#include <QGraphicsScene>
+#include <QPainter>
 #include <QElapsedTimer>
 #include <atomic>
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <fstream>
+#include <set>
 #include <numeric>
 #include <stdexcept>
 #include <thread>
@@ -12,6 +16,9 @@
 #include "ImageRouting.h"
 #include "VirtualController.h"
 #include "OpenRGBVisualMapPlugin.h"
+#include "VisualMapJsonDefinitions.h"
+#include "ControllerZoneItem.h"
+#include "ZoneIdentity.h"
 
 OpenRGBPluginAPIInterface* OpenRGBVisualMapPlugin::api = nullptr;
 #define CHECK(x) do { if(!(x)) throw std::runtime_error(#x); } while(0)
@@ -59,7 +66,7 @@ struct Member
         s->w=c->GetZoneMatrixMapWidth(0);s->h=c->GetZoneMatrixMapHeight(0);
         const auto* m=c->GetZoneMatrixMapData(0);
         for(unsigned y=0;y<s->h;++y) for(unsigned x=0;x<s->w;++x)
-            if(m[size_t(y)*s->w+x] != NA) s->led_positions.push_back(new LedPosition{m[size_t(y)*s->w+x],QPoint(x,y)});
+            if(m[size_t(y)*unsigned(s->w)+x] != NA) s->led_positions.push_back(new LedPosition{m[size_t(y)*unsigned(s->w)+x],QPointF(x,y)});
     }
     ~Member(){delete zone.settings.custom_shape;}
 };
@@ -113,6 +120,81 @@ void LegacySampling()
     CHECK(scaled.size()==4);
 }
 
+void AffineGeometryAndJson()
+{
+    FakeDevice device(3,2);Member member(&device);auto& s=member.zone.settings;
+    s.x=10;s.y=20;s.scale_x=2;s.scale_y=3;s.rotation=90;s.flip_x=true;s.brightness=.4;
+    const auto plan=visual_image::BuildPlan(&member.zone,100,100);
+    CHECK(plan.affine_surface&&plan.samples.size()==6);
+    CHECK(close(plan.samples[0].u,.145)&&close(plan.samples[0].v,.25));
+    CHECK(close(plan.surface.origin_x,.16)&&close(plan.surface.origin_y,.26));
+    CHECK(close(plan.surface.u_x,0)&&close(plan.surface.u_y,-.06));
+    CHECK(close(plan.surface.v_x,-.06)&&close(plan.surface.v_y,0)&&close(plan.surface.brightness,.4));
+    const auto cells=LedRouting::BuildCells(&member.zone);
+    CHECK(close(cells[0].local_rect.width(),3)&&close(cells[0].local_rect.height(),2));
+    CHECK(close(cells[0].local_rect.center().x(),4.5)&&close(cells[0].local_rect.center().y(),5));
+    s.rotation=37;s.flip_y=true;
+    const auto rotated=LedRouting::BuildRoutes(&member.zone,QPointF(s.x,s.y),QSize(100,100));
+    CHECK(rotated.size()==6);
+    for(const auto& route:rotated){double total=0;for(const auto& p:route.overlaps)total+=p.weight;CHECK(close(total,1));}
+    {
+        FakeDevice one(1,1);Member diamond(&one);diamond.zone.settings.scale=2;diamond.zone.settings.rotation=45;
+        const auto routes=LedRouting::BuildRoutes(&diamond.zone,QPointF(2,2),QSize(8,8));CHECK(routes.size()==1);
+        for(const auto& p:routes[0].overlaps)CHECK(p.pixel!=QPoint(1,1)); // Inside bounding box, outside actual diamond.
+        QImage corners(8,8,QImage::Format_RGB32);corners.fill(Qt::black);corners.setPixel(1,1,qRgb(255,0,0));
+        CHECK(LedRouting::MixColor(corners,routes[0]).red()==0);
+    }
+    s.custom_shape->w=16.25;s.custom_shape->h=6.5;
+    s.custom_shape->led_positions[0]->point=QPointF(.125,1.875);
+    s.custom_shape->led_positions[1]->point=QPointF(.125,1.875); // Independent physical LEDs can overlap.
+    json serialized=s;ControllerZoneSettings loaded=ControllerZoneSettings::defaults();serialized.get_to(loaded);
+    CHECK(loaded.scale_x==2&&loaded.scale_y==3&&loaded.rotation==37&&loaded.flip_x&&loaded.flip_y);
+    CHECK(loaded.custom_shape->w==16.25&&loaded.custom_shape->h==6.5);
+    CHECK(loaded.custom_shape->led_positions[0]->point==QPointF(.125,1.875));
+    CHECK(loaded.custom_shape->led_positions[1]->point==QPointF(.125,1.875));
+    CHECK(loaded.custom_shape->led_positions[0]->led_num!=loaded.custom_shape->led_positions[1]->led_num);
+    const auto dup=visual_image::BuildPlan(&member.zone,100,100);
+    CHECK(dup.samples.size()==6&&close(dup.samples[0].u,dup.samples[1].u)&&close(dup.samples[0].v,dup.samples[1].v));
+    CHECK(!dup.affine_surface);delete loaded.custom_shape;
+    serialized.erase("affine");serialized.erase("point_origin");serialized.erase("brightness");
+    serialized.get_to(loaded);CHECK(loaded.scale_x==1&&loaded.scale_y==1&&loaded.rotation==0&&!loaded.flip_x&&!loaded.flip_y&&!loaded.point_is_center&&loaded.brightness==1);delete loaded.custom_shape;
+    serialized["affine"]={{"scale_x",0}};bool failed=false;try{serialized.get_to(loaded);}catch(...){failed=true;}CHECK(failed);
+    s.point_is_center=true;
+    const auto exact=visual_image::BuildPlan(&member.zone,100,100);
+    const auto expected=LedRouting::LocalTransform(&member.zone).map(QPointF(.125,1.875))+QPointF(s.x,s.y);
+    CHECK(close(exact.samples[0].u,expected.x()/100)&&close(exact.samples[0].v,expected.y()/100));
+    // Render the production scene item, using the same rotated polygons as routing.
+    GridSettings grid{100,100,false,true,1,false,false,false,false};
+    QGraphicsScene scene;scene.setSceneRect(0,0,100,100);
+    auto* item=new ControllerZoneItem(&member.zone,&grid);scene.addItem(item);
+    QImage source(100,100,QImage::Format_RGB32);source.fill(qRgb(200,100,50));item->UpdatePreview(source);
+    QImage painted(100,100,QImage::Format_ARGB32);painted.fill(Qt::transparent);
+    {QPainter painter(&painted);scene.render(&painter);}
+    unsigned visible=0;for(int y=0;y<100;++y)for(int x=0;x<100;++x)if(qAlpha(painted.pixel(x,y)))++visible;
+    CHECK(visible>0);CHECK(item->sceneBoundingRect().contains(item->mapToScene(LedRouting::BuildCells(&member.zone)[0].local_rect.center())));
+}
+
+void AffineNativePipeline()
+{
+    FakeAPI api;OpenRGBVisualMapPlugin::api=&api;FakeDevice device(3,2);api.physical={&device};Member member(&device);
+    auto& s=member.zone.settings;s.x=10;s.y=20;s.scale_x=2;s.scale_y=3;s.rotation=37;s.flip_x=true;s.brightness=.5;
+    QImage image(100,100,QImage::Format_RGB32);image.fill(qRgb(160,80,40));
+    const auto frame=visual_image::FromImage(image,700);auto outer=room_image::Mapping::Rectangle(.1,.2,.7,.5,13,false,true);outer.brightness=.4;
+    const auto expected=visual_image::Compose(outer,visual_image::BuildPlan(&member.zone,100,100).surface);
+    {
+        VirtualController map;map.Add(&member.zone);map.UpdateSize(100,100);
+        auto* sink=dynamic_cast<room_image::RGBControllerImageInterface*>(api.created.back());CHECK(sink);
+        CHECK(sink->SubmitImage(0,frame,outer,500)==room_image::SubmitResult::Accepted);
+        Await([&]{return device.submits>0;});CHECK(device.led_updates==0);
+        std::lock_guard<std::mutex> lock(device.seen_mutex);
+        CHECK(device.seen==frame&&close(device.seen_mapping.brightness,.2));
+        for(const auto p:{QPointF(0,0),QPointF(.3,.7),QPointF(1,1)}) {
+            double ax,ay,bx,by;expected.Point(p.x(),p.y(),ax,ay);device.seen_mapping.Point(p.x(),p.y(),bx,by);CHECK(close(ax,bx)&&close(ay,by));
+        }
+    }
+    OpenRGBVisualMapPlugin::api=nullptr;
+}
+
 void Pipeline()
 {
     FakeAPI api;OpenRGBVisualMapPlugin::api=&api;
@@ -152,7 +234,8 @@ void Pipeline()
         map.DeviceUpdateLEDs();CHECK(ordinary.led_updates==physical_updates); // active lease suppresses legacy
         std::this_thread::sleep_for(std::chrono::milliseconds(170));
         CHECK(!sink->GetImagePreview(0,preview,mapping));
-        map.DeviceUpdateLEDs();Await([&]{return ordinary.led_updates>physical_updates;});
+        const unsigned native_before_fallback=native.led_updates;
+        map.DeviceUpdateLEDs();Await([&]{return ordinary.led_updates>physical_updates && native.led_updates>native_before_fallback;});
         const unsigned before=native.led_updates;
         native.result=room_image::SubmitResult::Busy;
         CHECK(sink->SubmitImage(0,frame,{},150)==room_image::SubmitResult::Accepted);
@@ -198,9 +281,54 @@ void LegacyHost()
     OpenRGBVisualMapPlugin::api=nullptr;
 }
 
+void SegmentIdentity()
+{
+    FakeDevice device(4,1);
+    ControllerZone first{},second{},whole{};
+    for(auto* z:{&first,&second,&whole}) {z->set_controller(&device);z->settings=ControllerZoneSettings::defaults();}
+    first.is_segment=second.is_segment=true;first.segment_idx=0;second.segment_idx=1;
+    CHECK(first.compare(&first));CHECK(!first.compare(&second));CHECK(!first.compare(&whole));
+    json a=&first,b=&second,c=&whole;
+    CHECK(a["is_segment"]==true&&a["segment_idx"]==0&&b["segment_idx"]==1);
+    CHECK(visual_identity::Matches(a,0,true,0));CHECK(!visual_identity::Matches(a,0,true,1));
+    CHECK(!visual_identity::SameZone(a,b));CHECK(visual_identity::SameZone(a,a));
+    CHECK(!visual_identity::SameZone(a,c));
+    json legacy=c;legacy.erase("is_segment");legacy.erase("segment_idx");
+    CHECK(visual_identity::SameZone(legacy,c));CHECK(visual_identity::Matches(legacy,0,false,99));
+    CHECK(!visual_identity::Matches(legacy,0,true,0));
+    json invalid=a;invalid.erase("segment_idx");CHECK(!visual_identity::SameZone(invalid,a));
+    invalid=a;invalid["segment_idx"]=-1;CHECK(!visual_identity::Matches(invalid,0,true,0));
+    invalid=a;invalid["segment_idx"]=UINT64_MAX;CHECK(!visual_identity::Matches(invalid,0,true,0));
+    invalid=a;invalid["is_segment"]=1;CHECK(!visual_identity::Matches(invalid,0,true,0));
+    // Exercise the exact add/remove identity predicate used by the editor.
+    std::vector<json> active;
+    for(const auto& entry:{a,b,a})
+        if(std::none_of(active.begin(),active.end(),[&](const json& saved){return visual_identity::SameZone(entry,saved);})) active.push_back(entry);
+    CHECK(active.size()==2);
+    active.erase(std::remove_if(active.begin(),active.end(),[&](const json& saved){return visual_identity::SameZone(a,saved);}),active.end());
+    CHECK(active.size()==1&&active[0]["segment_idx"]==1);
+}
+
 int main(int argc,char** argv)
 {
-    QCoreApplication app(argc,argv);
-    try{Geometry();LegacySampling();Pipeline();LegacyHost();std::cout<<"PASS geometry, legacy sampling, actual wrapper/mailbox/lease/cycle/lifetime pipeline, legacy host\n";return 0;}
+    QApplication app(argc,argv);
+    try{
+        Geometry();LegacySampling();AffineGeometryAndJson();AffineNativePipeline();Pipeline();LegacyHost();SegmentIdentity();
+        if(argc==3&&std::string(argv[1])=="--validate-map")
+        {
+            std::ifstream file(argv[2]);CHECK(file.good());json map;file>>map;
+            std::set<std::string> identities;unsigned points=0;
+            for(const auto& entry:map.at("ctrl_zones"))
+            {
+                visual_identity::Zone identity;CHECK(visual_identity::Read(entry,identity));
+                const std::string key=entry.at("controller").dump()+":"+std::to_string(identity.index)+":"+std::to_string(identity.segment)+":"+std::to_string(identity.segment_index);
+                CHECK(identities.insert(key).second);
+                ControllerZoneSettings settings=entry.at("settings").get<ControllerZoneSettings>();
+                if(settings.custom_shape){points+=unsigned(settings.custom_shape->led_positions.size());delete settings.custom_shape;}
+            }
+            std::cout<<"Map parser: "<<identities.size()<<" distinct members, "<<points<<" preserved LED points; no device binding\n";
+        }
+        std::cout<<"PASS geometry, affine JSON/fractional/duplicate/rotation/flips/polygon rendering, native affine pipeline, legacy sampling, actual wrapper/mailbox/lease/cycle/lifetime pipeline, legacy host, segment identity/JSON compatibility\n";return 0;
+    }
     catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<"\n";return 1;}
 }
