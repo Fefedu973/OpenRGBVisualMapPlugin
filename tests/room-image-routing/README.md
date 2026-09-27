@@ -16,6 +16,7 @@ Cas couverts :
 - Affine d’une matrice entière, rotation enregistrée de 90°, composition avec rotation de 37°/miroir/brightness de la scène.
 - Rejet du routage natif pour permutations non affines, masque incomplet et géométrie invalide ; positions physiques conservées.
 - Inversion et espacement de LED ; pondération historique inchangée à basse résolution et projection dans une image d’aperçu réduite.
+- Arche générique à deux brins, coordonnées fractionnaires et câblage serpentin : ordre `led_num` conservé après JSON, rotation et échelles indépendantes ; équivalence des origines `cell` et `center`, et offsets de segment inchangés. Une forme courbée reste un ensemble de points LED, pas une surface image affine.
 - Image 800×600 réellement spatiale et partagée à l’identique entre producteur/sink ; indépendance du `QImage` source mutable.
 - Couleur attendue d’une LED réelle d’après ses coordonnées dans le plan.
 - Wrapper core attaché, sortie déclarée, entrée invalide, zone non prise en charge et bail invalide.

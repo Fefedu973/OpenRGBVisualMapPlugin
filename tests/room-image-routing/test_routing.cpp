@@ -408,12 +408,71 @@ void SegmentIdentity()
     CHECK(active.size()==1&&active[0]["segment_idx"]==1);
 }
 
+// Existing CUSTOM JSON supports a curved, multi-lane cable without altering
+// physical LED numbers. This is a generic shape fixture, not a device driver.
+void CurvedCustomGeometry()
+{
+    class CurvedDevice : public FakeDevice {
+    public:
+        CurvedDevice():FakeDevice(6,2) {
+            segment s;s.start_idx=5;s.leds_count=7;s.type=ZONE_TYPE_LINEAR;zones[0].segments.push_back(s);
+        }
+    } device;
+    Member member(&device);auto& settings=member.zone.settings;
+    settings.point_is_center=true;settings.x=31.25;settings.y=18.75;
+    settings.scale_x=1.4;settings.scale_y=.8;settings.rotation=37;settings.flip_x=true;
+    auto* shape=settings.custom_shape;
+    const double pi=std::acos(-1.0);double min_x=1e9,min_y=1e9,max_x=-1e9,max_y=-1e9;
+    for(unsigned lane=0;lane<2;++lane)for(unsigned along=0;along<6;++along)
+    {
+        auto* point=shape->led_positions[lane*6+along];
+        // Serpentine wire numbering: geometry and wire order remain distinct.
+        point->led_num=lane?11-along:along;
+        const double theta=(-60+120*along/5.0)*pi/180,radius=10+2*lane;
+        point->point=QPointF(radius*std::sin(theta),-radius*std::cos(theta));
+        min_x=std::min(min_x,point->x());min_y=std::min(min_y,point->y());
+        max_x=std::max(max_x,point->x());max_y=std::max(max_y,point->y());
+    }
+    for(auto* point:shape->led_positions)point->shift(.5-min_x,.5-min_y);
+    shape->w=max_x-min_x+1;shape->h=max_y-min_y+1;
+    const auto plan=visual_image::BuildPlan(&member.zone,160,100);
+    CHECK(plan.samples.size()==12&&!plan.affine_surface);
+    const double angle=37*pi/180,half_x=shape->w*.5,half_y=shape->h*.5;
+    for(unsigned i=0;i<12;++i)
+    {
+        const auto* point=shape->led_positions[i];
+        // Independent scalar affine calculation, clockwise in screen space.
+        const double dx=-(point->x()-half_x)*1.4,dy=(point->y()-half_y)*.8;
+        const double x=settings.x+half_x*1.4+std::cos(angle)*dx-std::sin(angle)*dy;
+        const double y=settings.y+half_y*.8+std::sin(angle)*dx+std::cos(angle)*dy;
+        CHECK(plan.samples[i].led==point->led_num);
+        CHECK(close(plan.samples[i].u,x/160)&&close(plan.samples[i].v,y/100));
+    }
+    json encoded=settings;ControllerZoneSettings decoded=encoded.get<ControllerZoneSettings>();
+    ControllerZone clone=member.zone;clone.settings=decoded;
+    const auto restored=visual_image::BuildPlan(&clone,160,100);
+    CHECK(restored.samples.size()==12&&!restored.affine_surface);
+    for(unsigned i=0;i<12;++i)CHECK(restored.samples[i].led==plan.samples[i].led&&close(restored.samples[i].u,plan.samples[i].u)&&close(restored.samples[i].v,plan.samples[i].v));
+    // The legacy cell origin represents precisely the same points after -.5.
+    clone.settings.point_is_center=false;
+    for(auto* point:clone.settings.custom_shape->led_positions)point->shift(-.5,-.5);
+    const auto cells=visual_image::BuildPlan(&clone,160,100);
+    for(unsigned i=0;i<12;++i)CHECK(cells.samples[i].led==plan.samples[i].led&&close(cells.samples[i].u,plan.samples[i].u)&&close(cells.samples[i].v,plan.samples[i].v));
+    delete decoded.custom_shape;
+    // An offset segment still uses segment-local LED numbers, never positions.
+    member.zone.is_segment=true;member.zone.segment_idx=0;
+    CHECK(member.zone.start_idx()==5);
+    const auto clipped=visual_image::BuildPlan(&member.zone,160,100);
+    CHECK(clipped.samples.size()==7&&!clipped.affine_surface);
+    for(const auto& point:clipped.samples)CHECK(member.zone.start_idx()+point.led<12);
+}
+
 void TestRoutingPerformance();
 int main(int argc,char** argv)
 {
     QApplication app(argc,argv);
     try{
-        Geometry();LegacySampling();AffineGeometryAndJson();AffineNativePipeline();Pipeline();LegacyHost();SegmentIdentity();ColorBatches();TestRoutingPerformance();
+        Geometry();LegacySampling();AffineGeometryAndJson();AffineNativePipeline();Pipeline();LegacyHost();SegmentIdentity();CurvedCustomGeometry();ColorBatches();TestRoutingPerformance();
         if(argc==3&&std::string(argv[1])=="--validate-map")
         {
             std::ifstream file(argv[2]);CHECK(file.good());json map;file>>map;
@@ -428,7 +487,7 @@ int main(int argc,char** argv)
             }
             std::cout<<"Map parser: "<<identities.size()<<" distinct members, "<<points<<" preserved LED points; no device binding\n";
         }
-        std::cout<<"PASS geometry, affine JSON/fractional/duplicate/rotation/flips/polygon rendering, native affine pipeline, legacy sampling, actual wrapper/mailbox/lease/cycle/lifetime pipeline, legacy host, segment identity/JSON compatibility, grouped color frames across two zones and six segments, cached topology/refusals/legacy fallback\n";return 0;
+        std::cout<<"PASS geometry, affine JSON/fractional/duplicate/rotation/flips/polygon rendering, curved multi-lane custom shape/wire order/round-trip, native affine pipeline, legacy sampling, actual wrapper/mailbox/lease/cycle/lifetime pipeline, legacy host, segment identity/JSON compatibility, grouped color frames across two zones and six segments, cached topology/refusals/legacy fallback\n";return 0;
     }
     catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<"\n";return 1;}
 }
