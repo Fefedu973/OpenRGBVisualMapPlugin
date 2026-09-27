@@ -9,6 +9,7 @@
 \*---------------------------------------------------------*/
 
 #include <algorithm>
+#include <cmath>
 #include <map>
 #include <set>
 #include "OpenRGBVisualMapPlugin.h"
@@ -139,6 +140,8 @@ void VirtualController::UpdateVirtualZone()
 
     led_routes.clear();
     image_routes.clear();
+    std::vector<room_input::InputPoint> next_input_points;
+    bool input_overflow = false;
 
     for(ControllerZone* ctrl_zone: added_zones)
     {
@@ -153,6 +156,21 @@ void VirtualController::UpdateVirtualZone()
         auto& image_route=image_routes.back();
         image_route.color_sink=dynamic_cast<room_color::RGBControllerColorFrameInterface*>(controller);
         if(image_route.color_sink) image_route.color_topology=image_route.color_sink->GetColorTopology();
+        if(controller->GetDeviceType() == DEVICE_TYPE_KEYBOARD && !input_overflow)
+        {
+            // Reuse the exact forward samples: segment offsets, floating-point
+            // custom cells, flips and rotation have already been resolved.
+            const auto location=controller->GetLocation(), serial=controller->GetSerial(), name=controller->GetName();
+            for(const auto& sample : image_route.plan.samples)
+            {
+                if(!std::isfinite(sample.u) || !std::isfinite(sample.v)) continue;
+                if(next_input_points.size() == room_input::MaxInputPoints)
+                { input_overflow=true; next_input_points.clear(); break; }
+                const unsigned global_led=start+sample.led;
+                next_input_points.push_back({location,serial,name,controller->GetLEDName(global_led),
+                    global_led,sample.u,sample.v,0});
+            }
+        }
 
         for(const LedRouting::LedRoute& route : routes)
         {
@@ -211,6 +229,12 @@ void VirtualController::UpdateVirtualZone()
         }
     }
 
+    {
+        std::lock_guard<std::mutex> input_lock(input_mutex);
+        ++input_generation;
+        for(auto& point : next_input_points) point.generation=input_generation;
+        input_points=std::move(next_input_points);
+    }
     OpenRGBVisualMapPlugin::api->UpdateVirtualRGBController(virtual_controller, &setup);
 }
 
@@ -411,6 +435,7 @@ void VirtualController::Add(ControllerZone* ctrl_zone)
     if(!HasZone(ctrl_zone))
     {
         added_zones.push_back(ctrl_zone);
+        InvalidateInputPoints();
         graph_targets.insert(ctrl_zone->controller);
 
         /*-------------------------------------------------*\
@@ -444,6 +469,7 @@ void VirtualController::Remove(ControllerZone* ctrl_zone)
         // No retained raw controller pointers survive membership removal.
         image_routes.clear();
         led_routes.clear();
+        InvalidateInputPoints();
     }
 }
 
@@ -462,6 +488,23 @@ void VirtualController::Clear()
     graph_targets.clear();
     image_routes.clear();
     led_routes.clear();
+    InvalidateInputPoints();
+}
+
+void VirtualController::InvalidateInputPoints()
+{
+    std::lock_guard<std::mutex> lock(input_mutex);
+    ++input_generation;
+    input_points.clear();
+}
+
+bool VirtualController::GetInputPoints(unsigned zone, std::vector<room_input::InputPoint>& points) const
+{
+    std::lock_guard<std::mutex> lock(input_mutex);
+    points.clear();
+    if(zone != 0 || !image_attached.load() || !routing_enabled.load() || input_points.empty()) return false;
+    points=input_points;
+    return true;
 }
 
 std::vector<ControllerZone*> VirtualController::GetZones()
@@ -677,6 +720,11 @@ void VirtualController::SetRoutingEnabled(bool enabled)
     }
     // Drain a frame already routing before another map is allowed to emit.
     { std::lock_guard<std::mutex> lock(added_zones_mutex); }
+    {
+        std::lock_guard<std::mutex> lock(input_mutex);
+        ++input_generation;
+        for(auto& point : input_points) point.generation=input_generation;
+    }
     routing_enabled.store(enabled);
 }
 

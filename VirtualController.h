@@ -28,8 +28,10 @@
 #include "RoutingPerformance.h"
 #include <FrameRouting/OpenRGBImagePluginAPI.h>
 #include <FrameRouting/RGBControllerColorFrameInterface.h>
+#include <FrameRouting/RGBControllerInputMappingInterface.h>
 
-class VirtualController : public room_image::RGBControllerImageInterface
+class VirtualController : public room_image::RGBControllerImageInterface,
+                          public room_input::RGBControllerInputMappingInterface
 {
 public:
     static std::string VIRTUAL_CONTROLLER_SERIAL;
@@ -67,6 +69,7 @@ public:
                                          const room_image::Mapping&, unsigned lease_ms) override;
     bool GetImagePreview(unsigned, std::shared_ptr<const room_image::Frame>&,
                          room_image::Mapping&) const override;
+    bool GetInputPoints(unsigned, std::vector<room_input::InputPoint>&) const override;
 
     /*-----------------------------------------------------*\
     | Static lifecycle management                           |
@@ -94,6 +97,11 @@ private:
     std::vector<ImageRoute>          image_routes;
     visual_performance::Routing    routing_performance;
     std::mutex                      added_zones_mutex;
+    // Value-only inverse geometry; readers never dereference physical devices.
+    mutable std::mutex              input_mutex;
+    std::vector<room_input::InputPoint> input_points;
+    uint64_t                        input_generation = 0;
+    void                            InvalidateInputPoints();
     // Cached settings are rebuilt on the GUI thread. Workers never read mutable
     // ControllerZoneSettings while the editor is dragging/resizing a member.
     mutable std::mutex              image_mutex;
