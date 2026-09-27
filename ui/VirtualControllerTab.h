@@ -17,6 +17,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QWidget>
+#include <QTimer>
 #include <nlohmann/json.hpp>
 #include "ui_VirtualControllerTab.h"
 #include "VirtualController.h"
@@ -46,6 +47,12 @@ public:
     void        Hide();
     void        Recreate();
     void        PauseForDetection();
+    json        CaptureState();
+    bool        FlushSave();
+    std::string CanonicalFile() const { return canonical_file; }
+    void        SetActive(bool);
+    void        SuspendOutput();
+    bool        IsActive() const { return active; }
 
 private slots:
     /*-----------------------------------------------------*\
@@ -79,6 +86,7 @@ private slots:
 signals:
     void ControllerRenamed(std::string);
     void VirtualControllerPostUpdateSignal(const QImage&);
+    void ActivationRequested(VirtualControllerTab*, bool);
 
 private:
     void AddActiveZone(ControllerZone* added_zone);
@@ -98,6 +106,10 @@ private:
     QAction*                        register_controller;
     QAction*                        add_background;
     json                            active_state;
+    std::string                     canonical_file;
+    QTimer                          save_timer;
+    bool                            loading = false, dirty = false, active = false;
+    void                            StateChanged();
 
 protected:
     void resizeEvent(QResizeEvent*) override;

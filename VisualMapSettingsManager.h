@@ -21,6 +21,8 @@ public:
     static bool                     SaveMap(std::string, json);
     static json                     LoadMap(std::string);
     static std::vector<std::string> GetMapNames();
+    static bool                     SaveWorkspace(json);
+    static json                     LoadWorkspace();
 
     static bool                     SaveGradient(std::string, json);
     static json                     LoadGradient(std::string);

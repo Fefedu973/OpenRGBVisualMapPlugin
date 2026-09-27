@@ -12,11 +12,14 @@
 #include <QDir>
 #include <QFile>
 #include <QString>
+#include <QSaveFile>
+#include "MapPersistence.h"
 #include "OpenRGBVisualMapPlugin.h"
 #include "VisualMapSettingsManager.h"
 
 bool VisualMapSettingsManager::SaveMap(std::string filename, json j)
 {
+    if(!visual_persistence::ValidName(filename)) return false;
     if(!CreateSettingsDirectory())
     {
         return false;
@@ -33,6 +36,7 @@ bool VisualMapSettingsManager::SaveMap(std::string filename, json j)
 json VisualMapSettingsManager::LoadMap(std::string filename)
 {
     json j;
+    if(!visual_persistence::ValidName(filename)) return j;
 
     if(!CreateSettingsDirectory())
     {
@@ -50,6 +54,16 @@ json VisualMapSettingsManager::LoadMap(std::string filename)
 std::vector<std::string> VisualMapSettingsManager::GetMapNames()
 {
     return list_files(MapsFolder());
+}
+
+bool VisualMapSettingsManager::SaveWorkspace(json j)
+{
+    return CreateSettingsDirectory() && write_file(SettingsFolder() / "visual-map-workspace.json", j);
+}
+
+json VisualMapSettingsManager::LoadWorkspace()
+{
+    return load_json_file(SettingsFolder() / "visual-map-workspace.json");
 }
 
 bool VisualMapSettingsManager::SaveGradient(std::string filename, json j)
@@ -121,22 +135,16 @@ filesystem::path VisualMapSettingsManager::GradientsFolder()
 
 bool VisualMapSettingsManager::write_file(filesystem::path file_name, json j)
 {
-    std::ofstream file(file_name, std::ios::out | std::ios::binary);
-
-    if(file)
+    try
     {
-        try
-        {
-            file << j.dump(4);
-            file.close();
-        }
-        catch(const std::exception& e)
-        {
-            LOG_ERROR("[OpenRGBVisualMapPlugin] Cannot write file: %s\n", e.what());
-            return false;
-        }
+        const std::string data = j.dump(4);
+        QSaveFile file(QString::fromStdString(file_name.string()));
+        if(!file.open(QIODevice::WriteOnly)
+           || file.write(data.data(), qint64(data.size())) != qint64(data.size()) || !file.commit())
+        { LOG_ERROR("[OpenRGBVisualMapPlugin] Cannot save file: %s", file.errorString().toUtf8().constData()); return false; }
     }
-
+    catch(const std::exception& e)
+    { LOG_ERROR("[OpenRGBVisualMapPlugin] Cannot serialize file: %s", e.what()); return false; }
     return true;
 }
 

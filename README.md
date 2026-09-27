@@ -37,3 +37,7 @@ This is a plugin for [OpenRGB](https://gitlab.com/CalcProgrammer1/OpenRGB) that 
 Here is a link to find the documentation you need.
 
 [VisualMap Help](https://gitlab.com/OpenRGBDevelopers/OpenRGB-Wiki/-/blob/stable/Plugins/VisualMap/VisualMap.md)
+
+This fork also provides [automatic map persistence and canonical profile
+references](ROOM-PERSISTENCE.md), including exclusive map activation and an
+[offscreen Qt regression harness](tests/room-persistence/README.md).

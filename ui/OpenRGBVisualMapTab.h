@@ -27,6 +27,11 @@ public:
     explicit OpenRGBVisualMapTab(QWidget *parent = nullptr);
     ~OpenRGBVisualMapTab();
     void HideAll();
+    void FlushMaps();
+    void BeginProfileLoad();
+    void LoadProfile(const json&);
+    json SaveProfile();
+    void FinishProfileLoad();
 
 public slots:
     void Clear();
@@ -42,5 +47,10 @@ private:
 
     bool                    SearchAndAutoLoad();
     VirtualControllerTab*   AddTab();
+    VirtualControllerTab*   FindOrLoad(const std::string&);
+    void                    Activate(VirtualControllerTab*, bool, bool persist = true);
+    bool                    switching = false, profile_loading = false, profile_applied = false;
+    std::string             previous_map;
+    json                    Selection() const;
 
 };

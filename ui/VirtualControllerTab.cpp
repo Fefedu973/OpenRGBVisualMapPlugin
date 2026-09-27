@@ -24,6 +24,9 @@
 #include "WidgetEditor.h"
 #include "ZoneManager.h"
 #include "LedRouting.h"
+#include "MapPersistence.h"
+#include <QSignalBlocker>
+#include <QScopedValueRollback>
 
 VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     QWidget(parent),
@@ -31,6 +34,10 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
     virtual_controller(new VirtualController())
 {
     ui->setupUi(this);
+    virtual_controller->SetRoutingEnabled(false);
+    save_timer.setSingleShot(true);
+    save_timer.setInterval(500);
+    connect(&save_timer, &QTimer::timeout, this, [this]{ FlushSave(); });
 
     /*-----------------------------------------------------*\
     | Default settings for main grid                        |
@@ -89,6 +96,7 @@ VirtualControllerTab::VirtualControllerTab(QWidget *parent):
 
 VirtualControllerTab::~VirtualControllerTab()
 {
+    if(!FlushSave()) LOG_ERROR("[OpenRGBVisualMapPlugin] Unsaved map changes at close");
     delete virtual_controller;
 
     ZoneManager::Get()->FreeControllerZones(controller_zones);
@@ -159,15 +167,24 @@ void VirtualControllerTab::InitZoneList()
 
 void VirtualControllerTab::LoadFile(std::string filename)
 {
+    if(!FlushSave()) throw std::runtime_error("Cannot switch away from an unsaved map");
     json j = VisualMapSettingsManager::LoadMap(filename);
-
+    if(!j.is_object() || !j.contains("ctrl_zones") || !j.contains("grid_settings"))
+        throw std::invalid_argument("Invalid or missing Visual Map file: " + filename);
+    canonical_file = filename;
     RenameController(filename);
-
     LoadJson(j);
+    // Keep source metadata and unresolved members; later edits merge the live
+    // values without deleting unrelated imported fields.
+    active_state = j;
+    CaptureState();
+    dirty = false;
+    save_timer.stop();
 }
 
 void VirtualControllerTab::LoadJson(json j)
 {    
+    const QScopedValueRollback<bool> load_guard(loading, true);
     virtual_controller->Clear();
 
     active_state["ctrl_zones"] = json::array();
@@ -308,6 +325,7 @@ void VirtualControllerTab::LoadJson(json j)
         virtual_controller->UpdateSize(settings->w, settings->h);
 
         UpdateVirtualControllerDetails();
+        active_state = visual_persistence::Merge(j, json(virtual_controller->GetZones()), json(settings));
     }
 }
 
@@ -332,11 +350,12 @@ void VirtualControllerTab::VirtualControllerPostUpdateSlot(const QImage& image)
 
 void VirtualControllerTab::Hide()
 {
-    virtual_controller->Register(false, false);
+    SetActive(false);
 }
 
 void VirtualControllerTab::Recreate()
 {
+    CaptureState();
     /*-----------------------------------------------------*\
     | Drop the zones before InitZoneList frees them         |
     \*-----------------------------------------------------*/
@@ -359,7 +378,52 @@ void VirtualControllerTab::ReassignZones()
 
 void VirtualControllerTab::PauseForDetection()
 {
+    CaptureState();
+    FlushSave();
     virtual_controller->Clear();
+}
+
+json VirtualControllerTab::CaptureState()
+{
+    if(!loading)
+        active_state = visual_persistence::Merge(active_state, json(virtual_controller->GetZones()), json(settings));
+    return active_state;
+}
+
+void VirtualControllerTab::StateChanged()
+{
+    if(loading) return;
+    CaptureState(); dirty = true;
+    ui->virtual_controller_details_label->setToolTip(canonical_file.empty()
+        ? "Unsaved map: use Save to choose its file." : "Changes will be saved automatically.");
+    if(!canonical_file.empty()) save_timer.start();
+}
+
+bool VirtualControllerTab::FlushSave()
+{
+    save_timer.stop();
+    if(!dirty || canonical_file.empty()) return true;
+    CaptureState();
+    const bool ok = VisualMapSettingsManager::SaveMap(canonical_file, active_state);
+    if(ok) dirty = false;
+    ui->virtual_controller_details_label->setToolTip(ok ? "Map saved automatically." : "Map could not be saved. Changes remain in memory; use Save to retry.");
+    if(!ok) ui->virtual_controller_details_label->setText("Map save failed — changes remain unsaved");
+    return ok;
+}
+
+void VirtualControllerTab::SuspendOutput()
+{
+    virtual_controller->SetRoutingEnabled(false);
+}
+
+void VirtualControllerTab::SetActive(bool value)
+{
+    SuspendOutput();
+    active = value;
+    const QSignalBlocker blocker(register_controller);
+    register_controller->setChecked(value);
+    virtual_controller->Register(value, value && settings->hide_members);
+    if(value) virtual_controller->SetRoutingEnabled(true);
 }
 
 void VirtualControllerTab::AddActiveZone(ControllerZone* added_zone)
@@ -464,6 +528,7 @@ void VirtualControllerTab::on_device_list_DeviceAdded(ControllerZone* controller
     virtual_controller->Add(controller_zone);
     UpdateVirtualControllerDetails();
     ui->grid->ResetItems(virtual_controller->GetZones());
+    StateChanged();
 }
 
 
@@ -473,6 +538,7 @@ void VirtualControllerTab::on_device_list_DeviceRemoved(ControllerZone* controll
     virtual_controller->Remove(controller_zone);
     UpdateVirtualControllerDetails();
     ui->grid->ResetItems(virtual_controller->GetZones());
+    StateChanged();
 }
 
 void VirtualControllerTab::on_device_list_SelectionChanged(std::vector<ControllerZone*> selected_controller_zones)
@@ -491,12 +557,14 @@ void VirtualControllerTab::on_itemOptions_ItemOptionsChanged()
 {
     virtual_controller->UpdateVirtualZone();
     ui->grid->UpdateItems();
+    StateChanged();
 }
 
 void VirtualControllerTab::on_grid_Changed()
 {
     virtual_controller->UpdateVirtualZone();
     ui->itemOptions->Update();
+    StateChanged();
 }
 
 void VirtualControllerTab::on_itemOptions_ShapeEditRequest(ControllerZone* controller_zone)
@@ -517,6 +585,7 @@ void VirtualControllerTab::on_gridOptions_SettingsChanged()
     ui->grid->ApplySettings(settings);
     ui->backgroundApplier->SetSize(settings->w, settings->h);
     virtual_controller->UpdateSize(settings->w, settings->h);
+    StateChanged();
 }
 
 void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
@@ -568,6 +637,7 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
     ui->grid->ApplySettings(settings);
     ui->grid->UpdateItems();
     ui->gridOptions->SetSettings(settings);
+    StateChanged();
 }
 
 /*---------------------------------------------------------*\
@@ -575,7 +645,7 @@ void VirtualControllerTab::on_gridOptions_AutoResizeRequest()
 \*---------------------------------------------------------*/
 void VirtualControllerTab::RegisterAction()
 {
-    virtual_controller->Register(register_controller->isChecked(), settings->hide_members);
+    emit ActivationRequested(this, register_controller->isChecked());
 }
 
 void VirtualControllerTab::AddBackgroundAction()
@@ -591,10 +661,12 @@ void VirtualControllerTab::ClearVmapAction()
     }
 
     virtual_controller->Clear();
+    active_state["ctrl_zones"] = json::array();
 
     ui->grid->ResetItems(virtual_controller->GetZones());
 
     ui->itemOptions->Update();
+    StateChanged();
 }
 
 void VirtualControllerTab::SaveVmapAction()
@@ -605,14 +677,15 @@ void VirtualControllerTab::SaveVmapAction()
 
     if(!filename.isEmpty())
     {
-        RenameController(filename.toStdString());
-
-        json j;
-
-        j["ctrl_zones"]     = virtual_controller->GetZones();
-        j["grid_settings"]  = settings;
-
-        VisualMapSettingsManager::SaveMap(filename.toStdString(), j);
+        if(!visual_persistence::ValidName(filename.toStdString()))
+        { QMessageBox::warning(this,"Cannot save map","Choose a filename without path separators."); return; }
+        const auto state = CaptureState();
+        if(!VisualMapSettingsManager::SaveMap(filename.toStdString(), state))
+        { QMessageBox::warning(this,"Cannot save map","The file could not be saved. Existing data was not replaced."); return; }
+        canonical_file = filename.toStdString();
+        RenameController(canonical_file);
+        dirty = false; save_timer.stop();
+        if(active) emit ActivationRequested(this, true);
     }
 }
 
@@ -640,6 +713,11 @@ void VirtualControllerTab::LoadVmapAction()
 
     QString filename = inp->textValue();
 
-    LoadFile(filename.toStdString());
-    ApplyAutoRegister();
+    try
+    {
+        LoadFile(filename.toStdString());
+        ApplyAutoRegister();
+    }
+    catch(const std::exception& e)
+    { QMessageBox::warning(this,"Cannot load map",QString::fromUtf8(e.what())); }
 }

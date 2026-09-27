@@ -212,6 +212,7 @@ void VirtualController::UpdateVirtualZone()
 
 void VirtualController::DeviceUpdateLEDs()
 {
+    if(!routing_enabled.load()) return;
     {
         std::lock_guard<std::mutex> lock(image_mutex);
         if(!image_running || (image_frame && std::chrono::steady_clock::now() < image_expiry)) return;
@@ -521,6 +522,7 @@ void VirtualController::ApplyToDevice(const QImage& image)
     \*-----------------------------------------------------*/
     {
         std::lock_guard<std::mutex> lock(added_zones_mutex);
+        if(!routing_enabled.load()) return;
 
         for(ControllerZone* ctrl_zone: added_zones)
         {
@@ -630,6 +632,8 @@ room_image::SubmitResult VirtualController::SubmitImage(unsigned zone,
     std::unique_lock<std::mutex> lock(image_mutex, std::try_to_lock);
     if(!lock.owns_lock()) return room_image::SubmitResult::Busy;
     if(!image_running) return room_image::SubmitResult::Unsupported;
+    // Busy keeps capability-aware producers from falling back to LED writes.
+    if(!routing_enabled.load()) return room_image::SubmitResult::Busy;
     image_frame = std::move(frame);
     image_mapping = mapping;
     image_expiry = std::chrono::steady_clock::now() + std::chrono::milliseconds(lease_ms);
@@ -659,6 +663,19 @@ void VirtualController::StopImages()
     if(image_worker.joinable()) image_worker.join();
 }
 
+void VirtualController::SetRoutingEnabled(bool enabled)
+{
+    routing_enabled.store(false);
+    {
+        std::lock_guard<std::mutex> lock(image_mutex);
+        ++routing_generation;
+        image_frame.reset(); image_dirty=false; image_expiry={};
+    }
+    // Drain a frame already routing before another map is allowed to emit.
+    { std::lock_guard<std::mutex> lock(added_zones_mutex); }
+    routing_enabled.store(enabled);
+}
+
 void VirtualController::ImageLoop()
 {
     auto next_frame = std::chrono::steady_clock::now();
@@ -673,12 +690,13 @@ void VirtualController::ImageLoop()
         const auto now = std::chrono::steady_clock::now();
         const auto frame = image_frame;
         const auto mapping = image_mapping;
+        const auto generation = routing_generation.load();
         const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(image_expiry-now).count();
         const auto notify = callback;
         image_dirty=false;
         if(!frame || remaining <= 0) continue;
         lock.unlock();
-        const bool deferred = RouteImage(frame, mapping, unsigned(std::clamp<int64_t>(remaining,100,5000)));
+        const bool deferred = RouteImage(frame, mapping, unsigned(std::clamp<int64_t>(remaining,100,5000)),generation);
         if(notify && now-last_preview >= std::chrono::milliseconds(67))
         {
             auto preview_mapping = mapping;
@@ -694,11 +712,12 @@ void VirtualController::ImageLoop()
 }
 
 bool VirtualController::RouteImage(const std::shared_ptr<const room_image::Frame>& frame,
-                                   room_image::Mapping mapping, unsigned lease_ms)
+                                   room_image::Mapping mapping, unsigned lease_ms, uint64_t generation)
 {
     mapping.brightness *= std::clamp(virtual_controller->GetModeBrightness(0)/100.0,0.0,1.0);
     std::lock_guard<std::mutex> lock(added_zones_mutex);
     std::set<RGBControllerInterface*> led_controllers;
+    if(!routing_enabled.load() || routing_generation.load()!=generation) return false;
     const auto now = std::chrono::steady_clock::now();
     bool deferred = false;
     for(auto& route : image_routes)

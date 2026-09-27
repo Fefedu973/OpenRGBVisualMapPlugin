@@ -15,6 +15,7 @@
 #include "TooltipProxy.h"
 #include "VisualMapSettingsManager.h"
 #include "ZoneManager.h"
+#include "ProfileManager.h"
 
 /*---------------------------------------------------------*\
 | Plugin Global Variables                                   |
@@ -97,6 +98,7 @@ void OpenRGBVisualMapPlugin::Unload()
     // Removing one wrapper signals a device-list change. Do not recreate maps
     // while all their wrappers and image workers are being torn down.
     unloading.store(true);
+    if(ui) ui->FlushMaps();
     /*-----------------------------------------------------*\
     | Unregister all virtual controllers synchronously via  |
     | the static instance list. This ensures the controllers|
@@ -133,17 +135,23 @@ OpenRGBVisualMapPlugin::~OpenRGBVisualMapPlugin()
 
 void OpenRGBVisualMapPlugin::OnProfileAboutToLoad()
 {
-
+    if(!ui) return;
+    QMetaObject::invokeMethod(ui, [this]{ ui->BeginProfileLoad(); }, QThread::currentThread() == ui->thread()
+                             ? Qt::DirectConnection : Qt::BlockingQueuedConnection);
 }
 
-void OpenRGBVisualMapPlugin::OnProfileLoad(nlohmann::json /*profile_data*/)
+void OpenRGBVisualMapPlugin::OnProfileLoad(nlohmann::json profile_data)
 {
-
+    if(!ui) return;
+    QMetaObject::invokeMethod(ui, [this,profile_data]{ ui->LoadProfile(profile_data); }, QThread::currentThread() == ui->thread()
+                             ? Qt::DirectConnection : Qt::BlockingQueuedConnection);
 }
 
 nlohmann::json OpenRGBVisualMapPlugin::OnProfileSave()
 {
     nlohmann::json profile_json;
+    if(ui) QMetaObject::invokeMethod(ui, [this,&profile_json]{ profile_json=ui->SaveProfile(); },
+        QThread::currentThread() == ui->thread() ? Qt::DirectConnection : Qt::BlockingQueuedConnection);
     return(profile_json);
 }
 
@@ -155,9 +163,11 @@ unsigned char* OpenRGBVisualMapPlugin::OnSDKCommand(unsigned int /*pkt_id*/, uns
 /*---------------------------------------------------------*\
 | Update Signals                                            |
 \*---------------------------------------------------------*/
-void OpenRGBVisualMapPlugin::ProfileManagerUpdated(unsigned int /*update_reason*/)
+void OpenRGBVisualMapPlugin::ProfileManagerUpdated(unsigned int update_reason)
 {
-
+    if(ui && update_reason == PROFILEMANAGER_UPDATE_REASON_ACTIVE_PROFILE_CHANGED)
+        QMetaObject::invokeMethod(ui, [this]{ ui->FinishProfileLoad(); }, QThread::currentThread() == ui->thread()
+                                 ? Qt::DirectConnection : Qt::BlockingQueuedConnection);
 }
 
 void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
@@ -178,7 +188,8 @@ void OpenRGBVisualMapPlugin::ResourceManagerUpdated(unsigned int update_reason)
             | virtual controller's device thread stops      |
             | touching controllers before they are deleted. |
             \*---------------------------------------------*/
-            ui->PauseForDetection();
+            QMetaObject::invokeMethod(ui, [this]{ ui->PauseForDetection(); },
+                QThread::currentThread() == ui->thread() ? Qt::DirectConnection : Qt::BlockingQueuedConnection);
             break;
 
         case RESOURCEMANAGER_UPDATE_REASON_DEVICE_LIST_UPDATED:

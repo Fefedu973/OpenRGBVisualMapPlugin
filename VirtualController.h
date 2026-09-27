@@ -54,6 +54,7 @@ public:
     bool                            HasZone(ControllerZone*);
     bool                            IsEmpty();
     void                            Register(bool, bool);
+    void                            SetRoutingEnabled(bool);
     void                            Remove(ControllerZone*);
     void                            SetName(std::string name);
     void                            SetPostUpdateCallBack(std::function<void(const QImage&)>);
@@ -101,13 +102,15 @@ private:
     bool                            image_capable = false;
     std::atomic<bool>               image_attached{false};
     std::atomic<uint64_t>           image_sequence{0};
+    std::atomic<bool>               routing_enabled{true};
+    std::atomic<uint64_t>           routing_generation{0};
     RGBController_Setup             setup;
 
     void                            ForceDirectMode();
     void                            ImageLoop();
     void                            StopImages();
     bool                            RouteImage(const std::shared_ptr<const room_image::Frame>&,
-                                               room_image::Mapping, unsigned);
+                                               room_image::Mapping, unsigned, uint64_t);
     bool                            WouldCreateCycle(RGBControllerInterface*) const;
     std::set<RGBControllerInterface*> graph_targets; // instances_mutex
 

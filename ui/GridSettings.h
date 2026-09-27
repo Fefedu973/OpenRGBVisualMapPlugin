@@ -9,9 +9,9 @@ struct GridSettings
     bool show_bounds;
     int grid_size;
     bool snap_to_grid;
-    bool auto_load;
-    bool auto_register;
-    bool hide_members;
+    bool auto_load = false;
+    bool auto_register = false;
+    bool hide_members = false;
 };
 
 #endif // GRIDSETTINGS_H
