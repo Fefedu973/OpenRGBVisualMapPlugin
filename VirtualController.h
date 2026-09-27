@@ -25,7 +25,9 @@
 #include "LedRouting.h"
 #include "RGBControllerInterface.h"
 #include "ImageRouting.h"
+#include "RoutingPerformance.h"
 #include <FrameRouting/OpenRGBImagePluginAPI.h>
+#include <FrameRouting/RGBControllerColorFrameInterface.h>
 
 class VirtualController : public room_image::RGBControllerImageInterface
 {
@@ -86,8 +88,11 @@ private:
         unsigned zone, start;
         visual_image::Plan plan;
         std::chrono::steady_clock::time_point last_submit{};
+        room_color::RGBControllerColorFrameInterface* color_sink = nullptr;
+        uint64_t color_topology = 0;
     };
     std::vector<ImageRoute>          image_routes;
+    visual_performance::Routing    routing_performance;
     std::mutex                      added_zones_mutex;
     // Cached settings are rebuilt on the GUI thread. Workers never read mutable
     // ControllerZoneSettings while the editor is dragging/resizing a member.

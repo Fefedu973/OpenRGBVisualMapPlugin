@@ -58,18 +58,117 @@ public:
 struct Member
 {
     ControllerZone zone{};
-    explicit Member(RGBControllerInterface* c)
+    explicit Member(RGBControllerInterface* c, unsigned zone_index=0)
     {
-        zone.set_controller(c); zone.zone_idx=0; zone.is_segment=false; zone.segment_idx=0;
+        zone.set_controller(c); zone.zone_idx=zone_index; zone.is_segment=false; zone.segment_idx=0;
         zone.settings=ControllerZoneSettings::defaults(); zone.settings.shape=CUSTOM;
         auto* s=zone.settings.custom_shape=new CustomShape();
-        s->w=c->GetZoneMatrixMapWidth(0);s->h=c->GetZoneMatrixMapHeight(0);
-        const auto* m=c->GetZoneMatrixMapData(0);
+        s->w=c->GetZoneMatrixMapWidth(zone_index);s->h=c->GetZoneMatrixMapHeight(zone_index);
+        const auto* m=c->GetZoneMatrixMapData(zone_index);
         for(unsigned y=0;y<s->h;++y) for(unsigned x=0;x<s->w;++x)
             if(m[size_t(y)*unsigned(s->w)+x] != NA) s->led_positions.push_back(new LedPosition{m[size_t(y)*unsigned(s->w)+x],QPointF(x,y)});
     }
     ~Member(){delete zone.settings.custom_shape;}
 };
+
+// Intercepts only the optional color-frame interface. A direct SetColor call
+// remains observable, so refusal tests cannot accidentally pass via fallback.
+class ColorBatchDevice : public FakeDevice
+{
+public:
+    explicit ColorBatchDevice(unsigned count,bool two_zones=false,bool six_segments=false):FakeDevice(count,1)
+    {
+        native=false;
+        if(two_zones)
+        {
+            name="Two-zone synthetic output";
+            zones.push_back(zones.front());leds.resize(2*count);SetupColors();
+        }
+        if(six_segments)
+        {
+            name="Six-segment synthetic output";
+            for(unsigned i=0;i<6;++i)
+            {
+                segment s;s.name="Segment "+std::to_string(i);s.type=ZONE_TYPE_LINEAR;s.start_idx=2*i;s.leds_count=2;
+                zones[0].segments.push_back(s);
+            }
+        }
+    }
+    std::atomic<uint64_t> topology{41};
+    std::atomic<unsigned> batches{0}, direct_colors{0};
+    std::atomic<room_color::SubmitResult> batch_result{room_color::SubmitResult::Accepted};
+    std::mutex batch_mutex;
+    std::shared_ptr<const room_color::ColorFrame> last_batch;
+    unsigned last_lease=0;
+    uint64_t GetColorTopology() const override {return topology.load();}
+    room_color::SubmitResult SubmitColorFrame(std::shared_ptr<const room_color::ColorFrame> f,unsigned lease) override
+    {
+        const auto result=f->topology==topology.load()?batch_result.load():room_color::SubmitResult::Stale;
+        {std::lock_guard<std::mutex> lock(batch_mutex);last_batch=std::move(f);last_lease=lease;}
+        ++batches;return result;
+    }
+    void SetColor(unsigned index,RGBColor color) override {++direct_colors;RGBController::SetColor(index,color);}
+};
+
+void ColorBatches()
+{
+    FakeAPI api;OpenRGBVisualMapPlugin::api=&api;
+    ColorBatchDevice multi_zone(1,true), multi_segment(12,false,true);
+    api.physical={&multi_zone,&multi_segment};
+    Member first(&multi_zone,0),second(&multi_zone,1),overlap(&multi_segment);
+    first.zone.settings.x=1;second.zone.settings.x=17;
+    std::vector<std::unique_ptr<Member>> segments;
+    for(unsigned i=0;i<6;++i)
+    {
+        auto m=std::make_unique<Member>(&multi_segment);
+        m->zone.is_segment=true;m->zone.segment_idx=i;m->zone.settings.x=2*i;
+        delete m->zone.settings.custom_shape;m->zone.settings.custom_shape=CustomShape::HorizontalLine(2);
+        segments.push_back(std::move(m));
+    }
+    // The overlapping whole-zone member is distinct from its segments. Its
+    // repeated LED indexes must retain map order instead of being deduplicated.
+    overlap.zone.settings.x=5;
+    QImage image(32,4,QImage::Format_RGB32);
+    for(int y=0;y<4;++y)for(int x=0;x<32;++x)image.setPixel(x,y,qRgb(x*7,y*20,30));
+    const auto frame=visual_image::FromImage(image,800);
+    {
+        VirtualController map;
+        map.Add(&first.zone);map.Add(&second.zone);
+        for(auto& m:segments)map.Add(&m->zone);
+        map.Add(&overlap.zone);map.UpdateSize(32,4);
+        auto* sink=dynamic_cast<room_image::RGBControllerImageInterface*>(api.created.back());CHECK(sink);
+        auto submit=[&]{Await([&]{return sink->SubmitImage(0,frame,{},777)==room_image::SubmitResult::Accepted;});};
+        submit();Await([&]{return multi_zone.batches==1&&multi_segment.batches==1;});
+        {
+            std::lock_guard<std::mutex> z(multi_zone.batch_mutex),s(multi_segment.batch_mutex);
+            const auto& zf=*multi_zone.last_batch;const auto& sf=*multi_segment.last_batch;
+            CHECK(zf.values.size()==2&&zf.values[0].index==0&&zf.values[1].index==1);
+            CHECK(zf.values[0].color!=zf.values[1].color);
+            CHECK(sf.values.size()==24&&sf.topology==41);
+            for(unsigned i=0;i<24;++i)CHECK(sf.values[i].index==i%12);
+            CHECK(sf.values[0].color!=sf.values[12].color);
+            CHECK(multi_segment.last_lease>=100&&multi_segment.last_lease<=777);
+        }
+        CHECK(multi_zone.direct_colors==0&&multi_segment.direct_colors==0);
+        // A resized destination must see the cached token, not a freshly read
+        // token that would falsely legitimize an old route's indexes.
+        multi_segment.topology=42;submit();Await([&]{return multi_segment.batches==2;});
+        {std::lock_guard<std::mutex> lock(multi_segment.batch_mutex);CHECK(multi_segment.last_batch->topology==41);}
+        CHECK(multi_segment.direct_colors==0&&multi_segment.led_updates==0);
+        map.UpdateSize(32,4);submit();Await([&]{return multi_segment.batches==3;});
+        {std::lock_guard<std::mutex> lock(multi_segment.batch_mutex);CHECK(multi_segment.last_batch->topology==42);}
+        for(auto refused:{room_color::SubmitResult::Busy,room_color::SubmitResult::Invalid,room_color::SubmitResult::Stale})
+        {
+            multi_segment.batch_result=refused;const auto before=multi_segment.batches.load();submit();
+            Await([&]{return multi_segment.batches>before;});
+            CHECK(multi_segment.direct_colors==0&&multi_segment.led_updates==0);
+        }
+        multi_segment.batch_result=room_color::SubmitResult::Unsupported;
+        submit();Await([&]{return multi_segment.led_updates>0;});
+        CHECK(multi_segment.direct_colors==24);CHECK(multi_zone.direct_colors==0);
+    }
+    OpenRGBVisualMapPlugin::api=nullptr;
+}
 
 void Geometry()
 {
@@ -309,11 +408,12 @@ void SegmentIdentity()
     CHECK(active.size()==1&&active[0]["segment_idx"]==1);
 }
 
+void TestRoutingPerformance();
 int main(int argc,char** argv)
 {
     QApplication app(argc,argv);
     try{
-        Geometry();LegacySampling();AffineGeometryAndJson();AffineNativePipeline();Pipeline();LegacyHost();SegmentIdentity();
+        Geometry();LegacySampling();AffineGeometryAndJson();AffineNativePipeline();Pipeline();LegacyHost();SegmentIdentity();ColorBatches();TestRoutingPerformance();
         if(argc==3&&std::string(argv[1])=="--validate-map")
         {
             std::ifstream file(argv[2]);CHECK(file.good());json map;file>>map;
@@ -328,7 +428,7 @@ int main(int argc,char** argv)
             }
             std::cout<<"Map parser: "<<identities.size()<<" distinct members, "<<points<<" preserved LED points; no device binding\n";
         }
-        std::cout<<"PASS geometry, affine JSON/fractional/duplicate/rotation/flips/polygon rendering, native affine pipeline, legacy sampling, actual wrapper/mailbox/lease/cycle/lifetime pipeline, legacy host, segment identity/JSON compatibility\n";return 0;
+        std::cout<<"PASS geometry, affine JSON/fractional/duplicate/rotation/flips/polygon rendering, native affine pipeline, legacy sampling, actual wrapper/mailbox/lease/cycle/lifetime pipeline, legacy host, segment identity/JSON compatibility, grouped color frames across two zones and six segments, cached topology/refusals/legacy fallback\n";return 0;
     }
     catch(const std::exception& e){std::cerr<<"FAIL "<<e.what()<<"\n";return 1;}
 }

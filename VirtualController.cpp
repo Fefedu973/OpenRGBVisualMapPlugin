@@ -9,6 +9,7 @@
 \*---------------------------------------------------------*/
 
 #include <algorithm>
+#include <map>
 #include <set>
 #include "OpenRGBVisualMapPlugin.h"
 #include "RGBControllerInterface.h"
@@ -149,6 +150,9 @@ void VirtualController::UpdateVirtualZone()
         const unsigned start = ctrl_zone->start_idx();
         image_routes.push_back({ctrl_zone, controller, ctrl_zone->zone_idx, start,
             visual_image::BuildPlan(ctrl_zone, width.load(), height.load())});
+        auto& image_route=image_routes.back();
+        image_route.color_sink=dynamic_cast<room_color::RGBControllerColorFrameInterface*>(controller);
+        if(image_route.color_sink) image_route.color_topology=image_route.color_sink->GetColorTopology();
 
         for(const LedRouting::LedRoute& route : routes)
         {
@@ -714,10 +718,18 @@ void VirtualController::ImageLoop()
 bool VirtualController::RouteImage(const std::shared_ptr<const room_image::Frame>& frame,
                                    room_image::Mapping mapping, unsigned lease_ms, uint64_t generation)
 {
+    const auto route_started=std::chrono::steady_clock::now();
     mapping.brightness *= std::clamp(virtual_controller->GetModeBrightness(0)/100.0,0.0,1.0);
     std::lock_guard<std::mutex> lock(added_zones_mutex);
     std::set<RGBControllerInterface*> led_controllers;
     if(!routing_enabled.load() || routing_generation.load()!=generation) return false;
+    struct ColorBatch
+    {
+        room_color::RGBControllerColorFrameInterface* sink = nullptr;
+        std::shared_ptr<room_color::ColorFrame> frame;
+        bool invalid = false;
+    };
+    std::map<RGBControllerInterface*,ColorBatch> batches;
     const auto now = std::chrono::steady_clock::now();
     bool deferred = false;
     for(auto& route : image_routes)
@@ -740,14 +752,69 @@ bool VirtualController::RouteImage(const std::shared_ptr<const room_image::Frame
                 }
             }
         }
+        ColorBatch* batch=nullptr;
+        if(route.color_sink)
+        {
+            auto& grouped=batches[route.controller];batch=&grouped;
+            if(!batch->frame)
+            {
+                batch->sink=route.color_sink;
+                batch->frame=std::make_shared<room_color::ColorFrame>();
+                batch->frame->topology=route.color_topology;
+            }
+            if(batch->frame->topology!=route.color_topology ||
+               route.plan.samples.size()>room_color::MaxUpdates-batch->frame->values.size())
+                batch->invalid=true;
+            if(batch->invalid) continue;
+        }
+        auto* performance=batch?nullptr:routing_performance.Find(route.controller);
+        if(!batch && !performance) performance=routing_performance.Add(route.controller,route.controller->GetName());
         auto led_mapping=mapping;led_mapping.brightness*=route.plan.brightness;
         for(const auto& sample : route.plan.samples)
         {
             const uint32_t c = room_image::SampleBGRA(*frame,led_mapping,sample.u,sample.v);
-            route.controller->SetColor(route.start+sample.led,ToRGBColor(qRed(c),qGreen(c),qBlue(c)));
+            const auto rgb=ToRGBColor(qRed(c),qGreen(c),qBlue(c));
+            if(batch)
+            {
+                // Preserve member/segment order, including repeated indexes.
+                batch->frame->values.push_back({route.start+sample.led,rgb});
+                continue;
+            }
+            const auto color_started=std::chrono::steady_clock::now();
+            route.controller->SetColor(route.start+sample.led,rgb);
+            if(performance) performance->Add(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now()-color_started).count());
         }
-        if(!route.plan.samples.empty()) led_controllers.insert(route.controller);
+        if(!batch && !route.plan.samples.empty()) led_controllers.insert(route.controller);
+    }
+    for(auto& item:batches)
+    {
+        auto& batch=item.second;
+        if(batch.invalid || batch.frame->values.empty()) continue;
+        // Relinquish the only mutable alias before submitting one combined
+        // frame for every segment owned by this map on the controller.
+        std::shared_ptr<const room_color::ColorFrame> colors=std::move(batch.frame);
+        const auto result=batch.sink->SubmitColorFrame(colors,lease_ms);
+        if(result!=room_color::SubmitResult::Unsupported) continue;
+        // An absent/unsupported secondary capability retains the old host's
+        // route. Busy, invalid or resized destinations never block here.
+        auto* controller=item.first;
+        auto* performance=routing_performance.Find(controller);
+        if(!performance) performance=routing_performance.Add(controller,controller->GetName());
+        for(const auto& color:colors->values)
+        {
+            const auto started=std::chrono::steady_clock::now();
+            controller->SetColor(color.index,color.color);
+            if(performance) performance->Add(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now()-started).count());
+        }
+        led_controllers.insert(controller);
     }
     for(auto* controller : led_controllers) controller->UpdateLEDs();
+    const auto route_finished=std::chrono::steady_clock::now();
+    const auto report=routing_performance.Finish(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(route_finished-route_started).count(),
+        std::chrono::duration_cast<std::chrono::milliseconds>(route_finished.time_since_epoch()).count());
+    if(!report.empty()) LOG_INFO("%s",report.c_str());
     return deferred;
 }

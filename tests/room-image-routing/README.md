@@ -8,7 +8,7 @@ set OPENRGB_CORE_DIR=C:\path\to\OpenRGB-Room
 Build-Tests.cmd
 ```
 
-Le kit Qt, MSVC et le cœur doivent être compatibles. `VCVARS` peut désigner un autre script d’environnement Visual Studio. La sortie est `.build/routing-tests.exe`. Le test crée un `QCoreApplication`, aucun navigateur, aucune fenêtre ni capture.
+Le kit Qt, MSVC et le cœur doivent être compatibles. `VCVARS` peut désigner un autre script d’environnement Visual Studio. La sortie est `.build/routing-tests.exe`. Le test crée une `QApplication` avec la plateforme Qt `offscreen`, aucun navigateur, aucune fenêtre visible ni capture.
 
 Cas couverts :
 
@@ -25,5 +25,9 @@ Cas couverts :
 - Vidage du plan avant suppression des membres ; suppression des wrappers et détachement avant destruction du plugin.
 - Graphe A→B valide ; A→A et B→A refusés, indépendamment des noms de contrôleurs.
 - Hôte sans extension image : grille historique 128×128 conservée et aucune sortie image annoncée.
+- Un seul lot de couleurs par contrôleur réunissant deux zones ou six segments, y compris des index recouvrants dont l'ordre est conservé.
+- Jeton de topologie capturé au rebind : redimensionnement refusé avec l'ancien jeton, nouvelle route utilisant le jeton actualisé.
+- Refus des lots `Busy`, `Invalid` et `Stale` sans appel direct à `SetColor` ; `Unsupported` seul autorisant le repli historique.
+- Diagnostic de durée limité à 28 contrôleurs et un rapport par dix secondes, noms sur une ligne et silence pour les routes rapides.
 
 Résultat initial sur Windows x64, MSVC 14.44, Qt 6.8.3 : PASS. Les tests ne valident ni les appareils physiques, ni la boucle d’événements complète de l’application. Le correctif de concurrence du registre des contrôleurs virtuels dans le cœur possède ses propres tests ; ce faux registre est synchrone.

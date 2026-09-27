@@ -4,3 +4,4 @@
 using json = nlohmann::json;
 constexpr unsigned LL_WARNING = 3;
 #define LOG_ERROR(...) ((void)0)
+#define LOG_INFO(...) ((void)0)
